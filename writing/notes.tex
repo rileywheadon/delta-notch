@@ -1,0 +1,68 @@
+\documentclass{article}
+
+\usepackage[margin=1.5in]{geometry}
+\usepackage{amsmath}
+
+\begin{document}
+
+\begin{flushleft}
+
+\section{Collier et al., 1996}
+
+Collier et al. make the following five modelling assumptions:
+\begin{enumerate}
+  \item Cells interact through Delta-Notch signalling if and only if they are adjacent.
+  \item Production of Notch is an increasing (hill) function of Delta in neighbouring cells.
+  \item Production of Delta is a decreasing (hill) function of Notch in the same cell.
+  \item Production of Notch and Delta is balanced by decay proportional to concentration.
+  \item Low levels of Notch cause the primary fate, high levels cause the secondary fate.
+\end{enumerate}
+
+Define the following variables:
+
+\begin{itemize}
+  \item $\tau$: time
+  \item $N_{P}$: notch activity (concentration) in cell $P$
+  \item $D_{P}$: delta activity (concentration) in cell $P$
+  \item $\overline{D}_{P}$: average delta activity in neighbours of $P$
+  \item $N_{0}$: typical notch activity (across all cells)
+  \item $D_{0}$: typical delta activity (across all cells)
+  \item $\mu$: The decay rate for notch (assumed constant)
+  \item $\rho$: The decay rate for delta (assumed constant)
+\end{itemize}
+
+Then, define the following system of differential equations, where $F:[0, \infty) \rightarrow [0, \infty)$ is a continuous increasing function and $G: [0, \infty)\rightarrow [0, \infty)$ is a continuous decreasing function.
+
+$$
+\begin{aligned}
+  \frac{d(N_{P} / N_{0})}{d\tau} = F(\overline{D}_{P} / D_{0}) - \mu N_{P} / N_{0} \\[5pt]
+  \frac{d(D_{P} / D_{0})}{d\tau} = G(N_{P} / N_{0}) - \rho D_{P} / D_{0}
+\end{aligned}
+$$
+
+This equation is inherently nondimensional, since $N_{P} / N_{0}$ and $D_{P} / D_{0}$ have no units.
+
+\subsection{Writing Down a Dimensional Model}
+
+Let us continue to use $N_{P}$, $D_{P}$, and $\overline{D}_{P}$ as defined above. Let $t$ denote the dimensional time and let $u$ and $r$ be the dimensional decay rates for notch and delta. Then, assuming the dimensional analogues of $F$ and $G$ are hill functions of order $1$, we have:
+
+$$
+\begin{aligned}
+  \frac{dN_{P}}{dt} &= \frac{\overline{D}_{P}}{d_{0} + \overline{D}_{P}} - u N_{P} \\[5pt]
+  \frac{dD_{P}}{dt} &= \frac{n_{0}}{n_{0} + N_{P}} - rD_{P}
+\end{aligned}
+$$
+
+In the equation above, $d_{0}$ is the half-max of notch production induced by delta in neighbouring cells while $n_{0}$ is the half-min of delta production induced by notch. 
+
+\medskip
+
+This model is a good start, but we will need to explicitly model the concentration of delta-notch complexes $C$ in order to write down a probabilistic model. Since $D_{P}$ and $N_{P}$ denote the level of delta and notch \emph{activation} (that is, the concentration of complexes), 
+
+\subsection{Deriving a Probabilistic Model}
+
+TBD
+
+\end{flushleft}
+
+\end{document}
