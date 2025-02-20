@@ -21,9 +21,9 @@ def g(N, h, mu):
 # --- ODE System ---
 def ode_system(t, y):
     N1, D1, N2, D2 = y
-    dN1_dt = beta * f(D2, k, theta) - N1
+    dN1_dt = beta * f(D2/2, k, theta) - N1
     dD1_dt = g(N1, h, mu) - D1
-    dN2_dt = beta * f(D1, k, theta) - N2
+    dN2_dt = beta * f(D1/2, k, theta) - N2
     dD2_dt = g(N2, h, mu) - D2
     return [dN1_dt, dD1_dt, dN2_dt, dD2_dt]
 
