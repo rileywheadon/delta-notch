@@ -39,7 +39,7 @@ t_span = (0, 50)
 t_eval = np.linspace(t_span[0], t_span[1], 1000)
 
 # Number of different initial conditions to simulate
-num_simulations = 50
+num_simulations = 30
 
 # Prepare an array to store each solution (shape: num_simulations x 4 x len(t_eval))
 all_solutions = []
@@ -49,10 +49,10 @@ for i in range(num_simulations):
     # Create a random perturbation about the baseline initial condition.
     # Baseline: [0.1, 0.9, 0.15, 0.85]
     y0 = [
-        0.1 + np.random.uniform(-0.05, 0.05),
-        0.9 + np.random.uniform(-0.05, 0.05),
-        0.15 + np.random.uniform(-0.05, 0.05),
-        0.85 + np.random.uniform(-0.05, 0.05)
+        0.92 + np.random.uniform(-0.05, 0.05),
+        0.92 + np.random.uniform(-0.05, 0.05),
+        0.92 + np.random.uniform(-0.05, 0.05),
+        0.92 + np.random.uniform(-0.05, 0.05)
     ]
     sol = solve_ivp(ode_system, t_span, y0, t_eval=t_eval, rtol=1e-6, atol=1e-9)
     all_solutions.append(sol.y)
