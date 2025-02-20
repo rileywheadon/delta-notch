@@ -5,7 +5,7 @@ from scipy.integrate import solve_ivp
 # --- Adjusted Parameter Choices ---
 k = 2.0         # Hill exponent for Notch activation
 h = 2.0         # Hill exponent for Delta inhibition
-beta = 1.0      # Production scaling for Notch
+v = 1.0      # Production scaling for Delta
 theta = 0.01    # Threshold for Delta activation of Notch
 mu = 100        # Threshold for Notch inhibition of Delta
 
@@ -21,10 +21,10 @@ def g(N, h, mu):
 # --- ODE System ---
 def ode_system(t, y):
     N1, D1, N2, D2 = y
-    dN1_dt = beta * f(D2/2, k, theta) - N1
-    dD1_dt = g(N1, h, mu) - D1
-    dN2_dt = beta * f(D1/2, k, theta) - N2
-    dD2_dt = g(N2, h, mu) - D2
+    dN1_dt = f(D2/2, k, theta) - N1
+    dD1_dt = v * (g(N1, h, mu) - D1)
+    dN2_dt = f(D1/2, k, theta) - N2
+    dD2_dt = v * (g(N2, h, mu) - D2)
     return [dN1_dt, dD1_dt, dN2_dt, dD2_dt]
 
 # --- Adjusted Simulation Settings ---
@@ -38,7 +38,7 @@ y0 = [1.0, 1.0, 0.99, 0.99]  # Slight asymmetry in D2 initial value
 sol = solve_ivp(ode_system, t_span, y0, t_eval=t_eval, method='RK45', rtol=1e-6, atol=1e-9)
 
 # --- Create the four-panel plot matching the image ---
-fig, axs = plt.subplots(2, 2, figsize=(12, 10))
+fig, axs = plt.subplots(2, 2, figsize=(10, 8))
 
 lw = 1.0  # Line width for the plots
 
