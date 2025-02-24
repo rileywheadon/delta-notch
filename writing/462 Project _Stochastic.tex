@@ -1,0 +1,248 @@
+\documentclass{article}
+
+%some useful packages
+\usepackage{amsmath,amsthm,amsfonts,amssymb}  %math stuff
+\usepackage{graphicx} %to embed images
+\usepackage{enumitem} %fancy lists
+\usepackage{fullpage} %smaller margins
+\usepackage{color} %smaller margins
+\usepackage{float}
+\usepackage{array} % For better table control
+\usepackage{stackrel}
+\usepackage{nicematrix}
+\NiceMatrixOptions{
+code-for-first-row = \color{blue} ,
+code-for-first-row = \color{blue} ,
+code-for-last-row = \color{blue} ,
+code-for-first-col = \color{blue} ,
+code-for-last-col = \color{blue}
+}
+
+
+\title{Math 462 Project}
+\author{Authors:}
+\date{February 2025}
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+The numbers of Notch (\(N_P\)) and Delta (\(D_P\)) molecules changing over time due to random reactions motivates us to employ a stochastic model. Each reaction happens with a certain probability per unit time. \\ 
+However, we want to show that, in the large-number limit, the expected values \(E[N_P]\) and \(E[D_P]\) follow the deterministic ODEs:
+
+\[
+\frac{dN_P}{dt} = F(D_{\text{neighbour},P}) - \mu N_P
+\]
+\[
+\frac{dD_P}{dt} = G(N_P) - \rho D_P
+\]
+
+\hfill
+
+We establish a detailed stochastic model for Notch-Delta signalling, ensuring that it converges to the deterministic ODE model under suitable regularity conditions. The system is described by a continuous-time Markov process (CTMC) and then derive the expected value equations to show how it approximates the deterministic model.
+
+\section{Stochastic Model for Notch-Delta Signalling}
+\subsection{Chemical Reactions and Propensities}
+To construct a probabilistic model, we define the stochastic dynamics of the Delta-Notch interaction as a set of discrete reaction events. We introduce the following reactions:
+
+\begin{align*}
+  N_{P} + D_{P} &\xrightarrow{k_1} C_{P} \quad \text{(Binding of Notch and Delta)} \\
+  C_{P} &\xrightarrow{k_2} N_{P}^{*} + D_{P} \quad \text{(Activation of Notch)} \\
+  C_{P} &\xrightarrow{k_{-1}} N_{P} + D_{P} \quad \text{(Dissociation of the complex)}
+\end{align*}
+
+where:
+
+\begin{itemize}
+  \item $C_{P}$ represents the Notch-Delta complex in cell $P$.
+  \item $k_1$ is the rate at which Notch and Delta bind to form a complex.
+  \item $k_2$ is the rate at which the complex activates Notch, producing an intracellular signal.
+  \item $k_{-1}$ is the dissociation rate of the complex back into Notch and Delta.
+\end{itemize}
+
+Reactions describing Notch and Delta production and degradation  are summarized in the table below:
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|} \hline 
+         Reaction&  Reaction Equation& Associated term\\ \hline 
+         Notch production&  \( N_P \to N_P + 1 \)& \( F(D_{\text{neighbour},P}) \)\\ \hline 
+         Notch degradation&  \( N_P \to N_P - 1 \)& \( \mu N_P \)\\ \hline 
+         Delta production&  \( D_P \to D_P + 1 \)& \( G(N_P) \)\\ \hline 
+         Delta degradation&  \( D_P \to D_P - 1 \)& \( \rho D_P \)\\\hline
+    \end{tabular}
+    \caption{A summary of Notch and Delta production and degradation reactions}
+    \label{1}
+    
+\end{table}
+
+where:
+\begin{itemize}
+    \item \( F(D_{\text{neighbour},P}) \) is an increasing function describing the effect of Delta on Notch production.
+    \item \( G(N_P) \) is a decreasing function representing Notch inhibiting Delta.
+\end{itemize}
+
+\subsection{Chemical Master Equation and State Probabilities}
+Let \( P(N_P, D_P, C_P, t) \) be the probability that the system is in state \( (N_P, D_P, C_P) \) at time \( t \). The probability evolves according to the chemical master equation (CME):
+
+\[
+\frac{dP}{dt} = \sum_{\text{all reactions}} \Big[ \text{gain term} - \text{loss term} \Big]
+\]
+
+\begin{align*}
+  \frac{dP(N_P, D_P, C_P, t)}{dt} &= k_1 (N_P - 1)(D_P - 1) P(N_P - 1, D_P - 1, C_P + 1, t) \\
+  &\quad + k_{-1} (C_P + 1) P(N_P + 1, D_P + 1, C_P - 1, t) \\
+  &\quad + k_2 (C_P + 1) P(N_P, D_P, C_P - 1, t) \\
+  &\quad + F(D_{\text{neighbour},P}) P(N_P - 1, D_P, C_P, t) \\
+  &\quad + G(N_P) P(N_P, D_P - 1, C_P, t) \\
+  &\quad + \mu (N_P + 1) P(N_P + 1, D_P, C_P, t) \\
+  &\quad + \rho (D_P + 1) P(N_P, D_P + 1, C_P, t) \\
+  &\quad - (k_1 N_P D_P + k_{-1} C_P + k_2 C_P + \mu N_P + \rho D_P) P(N_P, D_P, C_P, t).
+\end{align*}
+
+\subsection{Expected Value Approximation}
+To derive the deterministic equations, we compute the expected values:
+
+\[
+E[N_P] = \sum_{N_P} N_P P(N_P, D_P, C_P, t)
+\]
+
+\[
+E[D_P] = \sum_{D_P} D_P P(N_P, D_P, C_P, t)
+\]
+
+\[
+E[C_P] = \sum_{C_P} C_P P(N_P, D_P, C_P, t)
+\]
+
+Taking the time derivative:
+
+\[
+\frac{dE[N_P]}{dt} = \sum_{N_P} N_P \frac{dP(N_P, D_P, C_P, t)}{dt}.
+\]
+
+Substituting from the CME, we obtain:
+
+\[
+\frac{dE[N_P]}{dt} = -k_1 E[N_P]E[D_P] + k_{-1}E[C_P] + k_2 E[C_P] + F(E[D_{\text{neighbour},P}]) - \mu E[N_P].
+\]
+
+Similarly, for Delta:
+
+\[
+\frac{dE[D_P]}{dt} = -k_1 E[N_P]E[D_P] + k_{-1}E[C_P] + G(E[N_P]) - \rho E[D_P].
+\]
+
+For Complexes, we start with the transition terms in the CME.
+\begin{align*}
+\frac{dP(N_P, D_P, C_P, t)}{dt} = &+ 
+ k_1 (N_P - 1)(D_P - 1) P(N_P - 1, D_P - 1, C_P + 1, t)\\
+& + k_{-1} (C_P + 1) P(N_P + 1, D_P + 1, C_P - 1, t)\\
+& + k_2 (C_P + 1) P(N_P, D_P, C_P - 1, t)
+\end{align*}
+
+We compute the expected value for complexes, \( E[C_P] \), and substitute into the time derivative expression:
+
+\[
+\frac{dE[C_P]}{dt} = k_1 E[N_P] E[D_P] - (k_{-1} + k_2) E[C_P] - k_{-1}
+\]
+
+Rearranging, we get the final form:
+\[
+\frac{dE[C_P]}{dt} = k_1 E[N_P]E[D_P] - (k_{-1} + k_2) E[C_P].
+\]
+
+Using the main equation derived above, we substitute \( dP/dt \) for each reaction.
+
+For Notch production, we expand:
+
+\[
+\sum_{N_P} N_P \left[ F(D_{\text{neighbour},P}) P(N_P - 1, D_P, C_P, t) - F(D_{\text{neighbour},P}) P(N_P, D_P, C_P, t) \right]
+\]
+
+Shifting the sum over \( N_P \) gives:
+
+\[
+\sum_{N_P} (N_P + 1) F(D_{\text{neighbour},P}) P(N_P, D_P, C_P, t) - \sum_{N_P} N_P F(D_{\text{neighbour},P}) P(N_P, D_P, C_P, t)
+\]
+
+Rearranging:
+
+\[
+\sum_{N_P} F(D_{\text{neighbour},P}) P(N_P, D_P, C_P, t) = E[F(D_{\text{neighbour},P})]
+\]
+
+Thus, the equation simplifies to:
+
+\[
+\frac{dE[N_P]}{dt} = E[F(D_{\text{neighbour},P})] - \mu E[N_P]
+\]
+
+Similarly, for Delta:
+
+\[
+\frac{dE[D_P]}{dt} = E[G(N_P)] - \rho E[D_P]
+\]
+
+\subsection{The Mean-Field Approximation}
+In general, expected values of nonlinear functions like \( E[F(D_P)] \) are not necessarily equal to \( F(E[D_P]) \). However, under large-number assumptions, fluctuations around the mean become small (due to the law of large numbers), and we approximate:
+
+\[
+E[F(D_{\text{neighbour},P})] \approx F(E[D_{\text{neighbour},P}])
+\]
+
+\[
+E[G(N_P)] \approx G(E[N_P])
+\]
+
+This assumes that each individual cell’s fluctuations average out in large populations.
+
+\subsection{Deterministic Model Recovery}
+
+Substituting these approximations into our equations:
+
+\[
+\frac{dE[N_P]}{dt} = F(E[D_{\text{neighbour},P}]) - \mu E[N_P]
+\]
+
+\[
+\frac{dE[D_P]}{dt} = G(E[N_P]) - \rho E[D_P]
+\]
+
+Thus, we recover the deterministic system:
+
+\[
+\frac{dN_P}{dt} = F(D_{\text{neighbour},P}) - \mu N_P
+\]
+
+\[
+\frac{dD_P}{dt} = G(N_P) - \rho D_P
+\]
+
+The calculation confirms that in the large-number limit, the stochastic model converges to the deterministic ordinary differential equation (ODE) system. This implies that as the molecular count increases, transitioning the system to a more macroscopic scale, the stochastic model naturally aligns with the deterministic framework.
+
+\subsection{Convergence to the Deterministic Model}
+
+To show convergence, define fluctuations:
+
+\[
+X = N_P - E[N_P], \quad Y = D_P - E[D_P], \quad Z = C_P - E[C_P].
+\]
+
+Taking expectations:
+
+\[
+\frac{dE[X]}{dt} = -\mu E[X], \quad \frac{dE[Y]}{dt} = -\rho E[Y], \quad \frac{dE[Z]}{dt} = -(k_{-1} + k_2)E[Z].
+\]
+
+These decay exponentially, meaning that as time progresses:
+
+\[
+E[X], E[Y], E[Z] \to 0.
+\]
+
+Thus, the stochastic model converges to the deterministic ODE model as molecule numbers increase.
+
+
+\end{document}
