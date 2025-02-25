@@ -52,6 +52,22 @@ To construct a probabilistic model, we define the stochastic dynamics of the Del
   C_{P} &\xrightarrow{k_{-1}} N_{P} + D_{P} \quad \text{(Dissociation of the complex)}
 \end{align*}
 
+\medskip
+
+% COMMENTS BEGIN HERE
+\color{red}
+
+Shouldn't the binding equation use $\overline{D}_{P}$ (i.e. the delta concentration in neighbouring cells) instead of $D_{P}$? Also, I think this would be a good place to state the assumptions you used to derive these equations. The start of section "2. The Model" in Collier et al. contains some more information about interpreting $N$ and $D$ that might be useful to read through.
+
+\medskip
+
+I'm also unsure about the activation equation, because it implies that a complex is splitting to form an $N_{P}^{*}$ (what makes this different from $N_{P}$, by the way?) and a $D_{P}$. I think something like $C_{P} \xrightarrow{k_{2}} N_{P}^{*} + D_{P}$ might be more accurate.
+
+\color{black}
+% COMMENTS END HERE
+
+\medskip
+
 where:
 
 \begin{itemize}
@@ -101,6 +117,23 @@ Let \( P(N_P, D_P, C_P, t) \) be the probability that the system is in state \( 
   &\quad - (k_1 N_P D_P + k_{-1} C_P + k_2 C_P + \mu N_P + \rho D_P) P(N_P, D_P, C_P, t).
 \end{align*}
 
+% COMMENTS BEGIN HERE
+\color{red}
+
+I think there are a couple mistakes in this equation. For example, in the first term, we're looking at the probability of a binding event, which creates one $C_{P}$ and destroys a $N_{P}$ and a $D_{P}$. Therefore, I believe we need to be in state $(N_{P} + 1, D_{P} + 1, C_{P} - 1)$  in order for a binding event to take us to state $(N_{P}, D_{P}, C_{P})$. I think the first term should be the following, although I could be mistaken.
+
+$$
+k_{1} (N_{P} + 1)(D_{P} + 1) P(N_{P} + 1, D_{P} + 1, C_{P} - 1, t)
+$$
+
+\medskip
+
+I think some of the other terms have similar issues. I'm also still unsure about the difference between the unbinding ($k_{-1}$) and activation ($k_{2}$) reactions. What assumptions are you making?
+
+\color{black}
+% COMMENTS END HERE
+
+
 \subsection{Expected Value Approximation}
 To derive the deterministic equations, we compute the expected values:
 
@@ -122,6 +155,14 @@ Taking the time derivative:
 \frac{dE[N_P]}{dt} = \sum_{N_P} N_P \frac{dP(N_P, D_P, C_P, t)}{dt}.
 \]
 
+% COMMENTS BEGIN HERE
+\medskip
+\color{red}
+This looks good and makes sense to me.
+\color{black}
+\medskip
+% COMMENTS END HERE
+
 Substituting from the CME, we obtain:
 
 \[
@@ -133,6 +174,14 @@ Similarly, for Delta:
 \[
 \frac{dE[D_P]}{dt} = -k_1 E[N_P]E[D_P] + k_{-1}E[C_P] + G(E[N_P]) - \rho E[D_P].
 \]
+
+% COMMENTS BEGIN HERE
+\medskip
+\color{red}
+I'm not sure how you got to here, but the equation makes sense.
+\color{black}
+\medskip
+% COMMENTS END HERE
 
 For Complexes, we start with the transition terms in the CME.
 \begin{align*}
@@ -153,6 +202,21 @@ Rearranging, we get the final form:
 \frac{dE[C_P]}{dt} = k_1 E[N_P]E[D_P] - (k_{-1} + k_2) E[C_P].
 \]
 
+% COMMENTS BEGIN HERE
+\medskip
+\color{red}
+Isn't this just the previous equation without the $k_{-1}$? I also think you're missing an $E[C_{P}]$:
+
+$$
+\frac{dE[C_{P}]}{dt} = k_{1}E[N_{P}]E[D_{P}] - (k_{-1} + k_{2})E[C_{P}] - k_{-1}E[C_{P}]
+$$
+
+and then you can do some simple algebra to get rid of the last term.
+\color{black}
+\medskip
+% COMMENTS END HERE
+
+
 Using the main equation derived above, we substitute \( dP/dt \) for each reaction.
 
 For Notch production, we expand:
@@ -160,6 +224,14 @@ For Notch production, we expand:
 \[
 \sum_{N_P} N_P \left[ F(D_{\text{neighbour},P}) P(N_P - 1, D_P, C_P, t) - F(D_{\text{neighbour},P}) P(N_P, D_P, C_P, t) \right]
 \]
+
+% COMMENTS BEGIN HERE
+\medskip
+\color{red}
+Where does this equation come from?
+\color{black}
+\medskip
+% COMMENTS END HERE
 
 Shifting the sum over \( N_P \) gives:
 
