@@ -1,7 +1,8 @@
 \documentclass{article}
 
-\usepackage[margin=1.5in]{geometry}
+\usepackage[left=1.5in, right=1.5in, top=1in, bottom=1in]{geometry}
 \usepackage{amsmath}
+\usepackage{amssymb}
 
 \begin{document}
 
@@ -42,26 +43,83 @@ $$
 
 This equation is inherently nondimensional, since $N_{P} / N_{0}$ and $D_{P} / D_{0}$ have no units.
 
-\subsection{Writing Down a Dimensional Model}
-
-Let us continue to use $N_{P}$, $D_{P}$, and $\overline{D}_{P}$ as defined above. Let $t$ denote the dimensional time and let $u$ and $r$ be the dimensional decay rates for notch and delta. Then, assuming the dimensional analogues of $F$ and $G$ are hill functions of order $1$, we have:
-
-$$
-\begin{aligned}
-  \frac{dN_{P}}{dt} &= \frac{\overline{D}_{P}}{d_{0} + \overline{D}_{P}} - u N_{P} \\[5pt]
-  \frac{dD_{P}}{dt} &= \frac{n_{0}}{n_{0} + N_{P}} - rD_{P}
-\end{aligned}
-$$
-
-In the equation above, $d_{0}$ is the half-max of notch production induced by delta in neighbouring cells while $n_{0}$ is the half-min of delta production induced by notch. 
-
 \medskip
 
-This model is a good start, but we will need to explicitly model the concentration of delta-notch complexes $C$ in order to write down a probabilistic model. Since $D_{P}$ and $N_{P}$ denote the level of delta and notch \emph{activation} (that is, the concentration of complexes), 
+\textbf{Remark:} The notch activity can also be taken to be the number of complexes formed by the binding of notch to its activated ligand delta (Collier et al. 1996).
+
+\newpage
 
 \subsection{Deriving a Probabilistic Model}
 
-TBD
+We will make the assumption that each cell has $N$ notch molecules (which can be in a complex, or not). As we did above, define $\overline{D}$ to be the average number of active delta molecules in neighbouring cells. Let $k_{b}$ be the binding rate and $k_{u}$ the unbinding rate. Let $p_{n}(t)$ be the probability there are $n$ complexes at time $t$. Then, define the Kolmogorov forward equation:
+
+$$
+\begin{aligned}
+  p_{n}(t + \Delta t)= &\,\,p_{n-1}(t) \cdot \underbrace{(N - (n - 1))(\overline{D} - (n - 1)) k_{b} \Delta t}_{\text{P(binding)}}  \\[5pt]
+                      &+ p_{n}(t) \cdot \underbrace{(1 - (N - n)(\overline{D} - n)k_{b}\Delta t)}_{\text{P(no binding)}} \cdot \underbrace{(1 - n k_{u} \Delta t)}_{\text{P(no unbinding)}} \\[5pt]
+                      &+ p_{n+1}(t) \cdot \underbrace{(n + 1)k_{u}\Delta t}_{\text{P(unbinding)}}
+\end{aligned}
+$$
+
+Rearranging this equation (and cancelling out the term with $\Delta t^2$) we get: 
+
+$$
+\begin{aligned}
+p_{n}'(t) = &\,\,p_{n-1}(t) \cdot (N - (n - 1))(\overline{D} - (n - 1)) k_{b} \\[5pt]
+            &-p_{n}(t)\cdot (N-n)(\overline{D} - n)k_{b} - p_{n}(t) \cdot n k_{u} \\[5pt]
+            &+ p_{n+1}(t) \cdot (n + 1)k_{u}
+\end{aligned}
+$$
+
+Let $C(t)$ be the number of complexes at time $t$. From the equation above, we have:
+
+$$
+y(t) = \mathbb{E}[C(t)] = \sum_{n = 0}^{N} np_{n}(t) \Rightarrow y'(t) = \sum_{n = 0}^{N} np_{n}'(t)
+$$
+
+Now, we substitute $p_{n}'(t)$ for the expression derived above:
+
+$$
+\begin{aligned}
+  y'(t) = &\,\,\sum_{n = 2}^{N}  np_{n-1}(t)(N - (n - 1))(\overline{D} - (n - 1)) k_{b} \\[5pt]
+          &-  \sum_{n = 1}^{N - 1} np_{n}(t) (N - n)(\overline{D} - n )k_{b} -  \sum_{n = 1}^{N}  n^2 p_{n}(t) k_{u} \\[5pt]
+          &- \sum_{n = 1}^{N - 1}  np_{n+1}(t) (n+1)k_{u}
+\end{aligned}
+$$
+
+We will need to reindex the $p_{n-1}$ and $p_{n+1}$ terms. To do this, begin by rewriting:
+
+$$
+\begin{aligned}
+  y'(t) = &\,\,\sum_{n = 2}^{N}  (n-1 + 1)p_{n-1}(t)(N - (n - 1))(\overline{D} - (n - 1)) k_{b} \\[5pt] 
+          &-  \sum_{n = 1}^{N - 1} np_{n}(t) (N - n)( \overline{D} - n)k_{b} -  \sum_{n = 1}^{N}  n^2 p_{n}(t) k_{u} \\[5pt]
+          &- \sum_{n = 1}^{N - 1}  (n + 1 - 1)p_{n+1}(t) (n+1)k_{u}
+\end{aligned}
+$$
+
+Now, perform reindexing on the $p_{n- 1}$ and $p_{n+1}$ terms:
+
+$$
+\begin{aligned}
+y'(t) = &\,\,\sum_{n = 1}^{N - 1} (n + 1)p_{n}(t)(N - n) (\overline{D} - n)k_{b} \\[5pt]
+        &-  \sum_{n = 1}^{N - 1} np_{n}(t) (N - n)(\overline{D} - n)k_{b} -  \sum_{n = 1}^{N}  n^2 p_{n}(t) k_{u} \\[5pt]
+        &+  \sum_{n = 2}^{N}  (n - 1 )p_{n}(t) nk_{u} 
+\end{aligned}
+$$
+
+Now, we cancel out like terms to get the following:
+
+$$
+y'(t) = \sum_{n = 1}^{N} p_{n}(t)(N - n)(\overline{D} - n)k_{b} - \sum_{n = 1}^{N} np_{n}(t)  k_{u}
+$$
+
+Therefore, 
+
+$$
+y'(t) = (N - y)(\overline{D} - y)k_{b} -  yk_{u}
+$$
+
+Note that the $(N - y)(\overline{D} - y)$ term is an increasing function of $\overline{D}$, which means that it satisfies the conditions imposed by the Collier et al. (1996). However, it is not a hill function, which means the authors made different assumptions about the system.
 
 \end{flushleft}
 
