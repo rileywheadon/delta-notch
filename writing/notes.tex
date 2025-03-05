@@ -22,7 +22,9 @@ Binding of the Delta ligand from cell $B$ to the Notch receptor on cell $A$ resu
   \item Interaction between Delta ligands and Notch receptors from the same cell (cis-interaction) removes both molecules and does not trigger the release of NICD.
 \end{itemize}
 
-\section{Collier et al., 1996}
+\section{Ideas and Issues with Collier et al., 1996}
+
+\subsection{Model}
 
 Collier et al. make the following five modelling assumptions:
 \begin{enumerate}
@@ -33,7 +35,7 @@ Collier et al. make the following five modelling assumptions:
   \item Low levels of Notch cause the primary fate, high levels cause the secondary fate.
 \end{enumerate}
 
-Define the following variables:
+Then they define the following variables:
 
 \begin{itemize}
   \item $\tau$: time
@@ -57,84 +59,101 @@ $$
 
 This equation is inherently nondimensional, since $N_{P} / N_{0}$ and $D_{P} / D_{0}$ have no units.
 
-\medskip
+\newpage
 
-\textbf{Remark:} The notch activity can also be taken to be the number of complexes formed by the binding of notch to its activated ligand delta (Collier et al. 1996).
+\subsection{Issues}
+
+The Collier et al. model makes numerous simplifications that violate our current understanding of the delta-notch signalling network. These simplifications make it difficult to derive a probabilistic model from the Collier et al. model, since the biological implications of such a model would be contradictory. Some of the issues include:
+
+\begin{itemize}
+  \item Production of activated Notch (NICD) is exclusively a function of the Delta concentration in neighbouring cells, with no regard for the concentration of extracellular Notch receptors.
+  \item Furthermore, the concentration of extracellular Notch isn't accounted for at all, which means there is no way to create a meaningful reaction term that captures the dynamics of the system.
+  \item There are smaller issues, like the absence of cis-inhibition and the Serrate (Jagged) protein, but these aren't necessary to capture the fundamental behaviour of the system.
+\end{itemize}
+
+\subsection{Qualitative Results}
+
+In the two-cell periodic boundary condition case, Collier et al. show that there always exists a homogeneous steady state, although this state is unstable if the feedback in the Delta-Notch signalling network is sufficiently strong. If the line of cells is given Dirichlet boundary conditions, the inhomogeneity arises on the outside edges before gradually spreading inwards to the center of the domain. On the two-dimensional hexagonal lattice, the system exhibits different ratios of primary to secondary fated cells depending on the parameters. In particular, Collier et al. observed ratios of $1/2$, $1/3$, $1/4$, $1/5$, and $1/6$.
+
+\section{Probabilistic Models of Increasing Complexity}
+
+\textbf{Idea}: Our first goal is to develop a probabilistic model based on a modern understanding of the biochemistry of the delta-notch signalling network. Then, we will use this model to attempt to replicate qualitative results from Collier et al. (1996).
+
+\subsection{A First Model}
+
+Assume \emph{a priori} (i.e. from previous research) the following, where $I$ is NICD:
+
+\begin{itemize}
+  \item Basal extracellular Notch ($N$) production has the form $H^{+}(I) = N_{0}I^2/(1 + I^2)$. 
+  \item Basal extracellular Delta ($D$) production has the form $H^{-}(I) = D_{0}/(1 + I^2)$.
+  \item Extracellular Notch and Delta have the same decay rate, $\gamma$.
+\end{itemize}
+
+Then, define the following parameters:
+
+\begin{itemize}
+  \item $N_{0}$ and $D_{0}$ are the maximum rates of Notch/Delta production.
+  \item $k_{T}$ is the binding rate between extracellular Notch and Delta.
+  \item $N_{ext}$ and $D_{ext}$ refer to the average Notch/Delta levels in neighbouring cells.
+  \item $\gamma_{I}$ is the decay rate of NICD.
+\end{itemize}
 
 \newpage
 
-\subsection{Deriving a Probabilistic Model}
+Furthermore, we will assume that there is no cis-interaction and no Serrate ligand. This gives us the following set of chemical reactions that can occur in a single time step:
 
-We will make the assumption that each cell has $N$ notch molecules (which can be in a complex, or not). As we did above, define $\overline{D}$ to be the average number of active delta molecules in neighbouring cells. Let $k_{b}$ be the binding rate and $k_{u}$ the unbinding rate. Let $p_{n}(t)$ be the probability there are $n$ complexes at time $t$. Then, define the Kolmogorov forward equation:
+\begin{enumerate}
+  \item A Notch receptor (from cell $A$) binds to a Delta ligand (from cell $B$), triggering the release of NICD in cell $A$. This can be written as $N_{A} + D_{B} \rightarrow I_{A}$. The probability of this event is $k_{T}N_{A}D_{B}$.
+  \item A Notch receptor in cell $A$ decays ($N_{A} \rightarrow \emptyset$) with probability $\gamma N_{A}$.
+  \item A Delta ligand in cell $A$ decays ($D_{A} \rightarrow \emptyset$) with probability $\gamma D_{A}$.
+  \item A NICD molecule in cell $A$ decays ($I_{A} \rightarrow \emptyset$) with probability $\gamma_{I}I_{A}$.
+  \item A Notch receptor in cell $A$ is produced ($\emptyset \rightarrow N_{A}$) with probability $H^{+}(I)$.
+  \item A Delta ligand in cell $A$ is produced ($\emptyset \rightarrow D_{A}$) with probability $H^{-}(I)$.
+\end{enumerate}
+
+\subsection{Computational Implementation}
+
+We will make the assumption that reaction times follow a Poisson point process. Let $E$ be the set of all possible reaction events (i.e. reactions 1-6 above for all cells). Furthermore, let $|E| = N$ be the number of possible reactions. For each event, let $X_{i} \sim \text{Exp}(\lambda_{i})$ denote the time until the next event of type $i$, where $1 \leq i \leq N$. Then, the waiting time $T$ in between \emph{any} two events is:
+
+$$
+T = \text{min} \{ X_{1}, \dots, X_{N} \} \sim \text{Exp}\left( \sum_{i = 1}^{N} \lambda_{i} \right) 
+$$
+
+This results follows from the definition of an exponential distribution and the memoryless property. Then, we can use Gillespie's algorithm to simulate the system as follows:
+
+\medskip
+
+\textbf{Step 1}: Sample a value $t_{i}$ from $T$ using inverse transform sampling. 
+
+\medskip
+
+\textbf{Step 2}: Increment the current time $t$ by $t_{i}$.
+
+\medskip
+
+\textbf{Step 3}: Determine which event took place. To do this, recall that:
+
+$$P(X_{k} = \text{min} \{  X_{1}, \dots, X_{N} \}) = \frac{\lambda_{k}}{\lambda_{1} + \dots + \lambda_{N}}$$
+
+Use this fact to partition the interval $[0, 1]$. Then sample $y_{i}$ from a $\text{Unif}(0, 1)$ distribution, identify its partition, and find the corresponding event.
+
+\medskip
+
+\textbf{Step 4}: Update the state based on the event determined in the previous step.
+
+\subsection{Theoretical Justification}
+
+In this section, we need to show that in expectation, the model above converges to the following system of ODEs (adapted from Boareto et al., 2015):
 
 $$
 \begin{aligned}
-  p_{n}(t + \Delta t)= &\,\,p_{n-1}(t) \cdot \underbrace{(N - (n - 1))(\overline{D} - (n - 1)) k_{b} \Delta t}_{\text{P(binding)}}  \\[5pt]
-                      &+ p_{n}(t) \cdot \underbrace{(1 - (N - n)(\overline{D} - n)k_{b}\Delta t)}_{\text{P(no binding)}} \cdot \underbrace{(1 - n k_{u} \Delta t)}_{\text{P(no unbinding)}} \\[5pt]
-                      &+ p_{n+1}(t) \cdot \underbrace{(n + 1)k_{u}\Delta t}_{\text{P(unbinding)}}
+  \frac{dN}{dt} &= H^{+}(I) - k_{T}ND_{ext} - \gamma N \\[5pt]
+  \frac{dD}{dt} &= H^{-}(I) - k_{T}DN_{ext} - \gamma D \\[5pt]
+  \frac{dI}{dt} &= k_{T}ND_{ext} - \gamma_{I}I
 \end{aligned}
 $$
-
-Rearranging this equation (and cancelling out the term with $\Delta t^2$) we get: 
-
-$$
-\begin{aligned}
-p_{n}'(t) = &\,\,p_{n-1}(t) \cdot (N - (n - 1))(\overline{D} - (n - 1)) k_{b} \\[5pt]
-            &-p_{n}(t)\cdot (N-n)(\overline{D} - n)k_{b} - p_{n}(t) \cdot n k_{u} \\[5pt]
-            &+ p_{n+1}(t) \cdot (n + 1)k_{u}
-\end{aligned}
-$$
-
-Let $C(t)$ be the number of complexes at time $t$. From the equation above, we have:
-
-$$
-y(t) = \mathbb{E}[C(t)] = \sum_{n = 0}^{N} np_{n}(t) \Rightarrow y'(t) = \sum_{n = 0}^{N} np_{n}'(t)
-$$
-
-Now, we substitute $p_{n}'(t)$ for the expression derived above:
-
-$$
-\begin{aligned}
-  y'(t) = &\,\,\sum_{n = 2}^{N}  np_{n-1}(t)(N - (n - 1))(\overline{D} - (n - 1)) k_{b} \\[5pt]
-          &-  \sum_{n = 1}^{N - 1} np_{n}(t) (N - n)(\overline{D} - n )k_{b} -  \sum_{n = 1}^{N}  n^2 p_{n}(t) k_{u} \\[5pt]
-          &- \sum_{n = 1}^{N - 1}  np_{n+1}(t) (n+1)k_{u}
-\end{aligned}
-$$
-
-We will need to reindex the $p_{n-1}$ and $p_{n+1}$ terms. To do this, begin by rewriting:
-
-$$
-\begin{aligned}
-  y'(t) = &\,\,\sum_{n = 2}^{N}  (n-1 + 1)p_{n-1}(t)(N - (n - 1))(\overline{D} - (n - 1)) k_{b} \\[5pt] 
-          &-  \sum_{n = 1}^{N - 1} np_{n}(t) (N - n)( \overline{D} - n)k_{b} -  \sum_{n = 1}^{N}  n^2 p_{n}(t) k_{u} \\[5pt]
-          &- \sum_{n = 1}^{N - 1}  (n + 1 - 1)p_{n+1}(t) (n+1)k_{u}
-\end{aligned}
-$$
-
-Now, perform reindexing on the $p_{n- 1}$ and $p_{n+1}$ terms:
-
-$$
-\begin{aligned}
-y'(t) = &\,\,\sum_{n = 1}^{N - 1} (n + 1)p_{n}(t)(N - n) (\overline{D} - n)k_{b} \\[5pt]
-        &-  \sum_{n = 1}^{N - 1} np_{n}(t) (N - n)(\overline{D} - n)k_{b} -  \sum_{n = 1}^{N}  n^2 p_{n}(t) k_{u} \\[5pt]
-        &+  \sum_{n = 2}^{N}  (n - 1 )p_{n}(t) nk_{u} 
-\end{aligned}
-$$
-
-Now, we cancel out like terms to get the following:
-
-$$
-y'(t) = \sum_{n = 1}^{N} p_{n}(t)(N - n)(\overline{D} - n)k_{b} - \sum_{n = 1}^{N} np_{n}(t)  k_{u}
-$$
-
-Therefore, 
-
-$$
-y'(t) = (N - y)(\overline{D} - y)k_{b} -  yk_{u}
-$$
-
-Note that the $(N - y)(\overline{D} - y)$ term is an increasing function of $\overline{D}$, which means that it satisfies the conditions imposed by the Collier et al. (1996). However, it is not a hill function, which means the authors made different assumptions about the system.
 
 \end{flushleft}
 
 \end{document}
+
