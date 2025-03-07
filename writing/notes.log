@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024/Arch Linux) (preloaded format=pdflatex 2025.1.14)  4 MAR 2025 22:00
+This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024/Arch Linux) (preloaded format=pdflatex 2025.3.6)  6 MAR 2025 16:48
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -308,7 +308,7 @@ Package rerunfilecheck Info: File `notes.out' has not changed.
  ) 
 Here is how much of TeX's memory you used:
  9219 strings out of 476076
- 138371 string characters out of 5793775
+ 138371 string characters out of 5793776
  1941187 words of memory out of 5000000
  31227 multiletter control sequences out of 15000+600000
  561967 words of font info for 51 fonts, out of 8000000 for 9000
