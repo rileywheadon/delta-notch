@@ -4,6 +4,7 @@
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{hyperref}
+\usepackage{graphicx}
 
 \begin{document}
 
@@ -84,8 +85,8 @@ In the two-cell periodic boundary condition case, Collier et al. show that there
 Assume \emph{a priori} (i.e. from previous research) the following, where $I$ is NICD:
 
 \begin{itemize}
-  \item Basal extracellular Notch ($N$) production has the form $H^{+}(I) = N_{0}I^2/(1 + I^2)$. 
-  \item Basal extracellular Delta ($D$) production has the form $H^{-}(I) = D_{0}/(1 + I^2)$.
+  \item Basal extracellular Notch ($N$) production has the form $H^{+}(I) = n_{m}I^2/(n_{0}^2 + I^2)$. 
+  \item Basal extracellular Delta ($D$) production has the form $H^{-}(I) = d_{m}/(d_{0}^2 + I^2)$.
   \item Extracellular Notch and Delta have the same decay rate, $\gamma$.
 \end{itemize}
 
@@ -147,13 +148,67 @@ In this section, we need to show that in expectation, the model above converges 
 
 $$
 \begin{aligned}
-  \frac{dN}{dt} &= H^{+}(I) - k_{T}ND_{ext} - \gamma N \\[5pt]
-  \frac{dD}{dt} &= H^{-}(I) - k_{T}DN_{ext} - \gamma D \\[5pt]
+  \frac{dN}{dt} &= \frac{n_{m}I^2}{n_{0}^2 + I^2} - k_{T}ND_{ext} - \gamma N \\[5pt]
+  \frac{dD}{dt} &= \frac{d_{m}}{d_{0}^2 + I^2} - k_{T}DN_{ext} - \gamma D \\[5pt]
   \frac{dI}{dt} &= k_{T}ND_{ext} - \gamma_{I}I
 \end{aligned}
 $$
 
+TBD
+
+\subsection{Bifurcation Analysis}
+
+We perform a bifurcation analysis for the two-cell system, where $D_{ext}$ and $N_{ext}$ are treated as parameters. In other words, we will examine the steady states for one cell as a function of the Notch and Delta levels of the other cell. For simplicity, assume all parameters other than $D_{ext}, N_{ext}$ are fixed.
+
+$$
+\begin{aligned}
+  \frac{dN}{dt} &= \frac{n_{m}I^2}{n_{0}^2 + I^2} - (k_{T}D_{ext} + \gamma)N \\[5pt]
+  \frac{dD}{dt} &= \frac{d_{m}}{d_{0} + I^2} - (k_{T}N_{ext} + \gamma)D \\[5pt]
+  \frac{dI}{dt} &= k_{T}ND_{ext} - \gamma_{I}I \\[5pt]
+\end{aligned}
+$$
+
+Solving for the nullclines gives us the following:
+
+$$
+\begin{aligned}
+  N &= \frac{1}{\gamma + k_{T}D_{ext}}\left(\frac{n_{m}I^2}{n_{0}^2 + I^2}\right) \\[5pt]
+  D &= \frac{1}{\gamma + k_{T}N_{ext}}\left( \frac{d_{m}}{d_{0}^2 + I^2} \right) \\[5pt]
+  I &= \frac{k_{T}ND_{ext}}{\gamma_{I}}
+\end{aligned}
+$$
+
+Note that each nullcline defines a surface in $\mathbb{R}^3$. To express different cell fates, we need at least two stable steady states. We know that $I^{*} = k_{T}ND_{ext} / \gamma_{I}$ is the unique steady state value of $I$. Furthermore, by substituting $I^{*}$ into the $D$-nullcline, we get the unique steady-state value of $D$. There also exists a trivial stable steady state at $N = I = 0$. 
+
+\medskip
+
+It remains to find the other steady-state values of $N$ as a function of $D_{ext}$. To do this, we use the computer algebra system sympy. Substituting the equation for $I^{*}$ into the $N$-nullcline gives us the following nonzero steady-state values of $N$:
+
+\medskip
+
+% $$
+% N^{*} = \frac{n_{m}}{2(D_{ext}k_{T} + \gamma)} \pm \sqrt{-\frac{(2D_{ext}\gamma_{I}k_{T}n_{0} - D_{ext}k_{T}n_{m} + 2\gamma \gamma_{I}n_{0})(2 D_{ext} \gamma_{I}k_{T}n_{0} + D_{ext}k_{T}n_{m} + 2\gamma\gamma_{I}n_{0})}{2D_{ext}k_{T}(D_{ext}k_{T} + \gamma)}}
+% $$
+
+$$
+N^{*} = \frac{n_{m}}{2(D_{ext}k_{T} + \gamma)} \pm \sqrt{\frac{(D_{ext}k_{T}n_{m})^2 - 4(D_{ext}\gamma_{I}k_{T}n_{0} + \gamma \gamma_{I}n_{0})^2}{2D_{ext}k_{T}(D_{ext}k_{T} + \gamma)}}
+$$
+
+\textbf{Remark}: As mentioned above, we need two non-zero stable steady states for $N$ in order to represent the two different cell fates. This requires that the discriminant is positive:
+
+$$D_{ext}k_{T}n_{m} > 2D_{ext}\gamma_{I}k_{T}n_{0} + 2\gamma \gamma_{I} n_{0} \Rightarrow D_{ext}k_{T}(n_{m} - 2\gamma_{I}n_{0}) - 2\gamma \gamma_{I} n_{0} > 0$$
+
+As a general rule of thumb, increasing $n_{m}$ is a reliable way to recover these steady states. If we replace the $>$ sign with $=$ in the equation above, we find the location of a fold bifurcation. The lower branch corresponds to the $N = N_{ext}$, $D = D_{ext}$ unstable steady state. If the system is in this state, any perturbation will cause one cell to collapse to the high notch steady state and the other to collapse to the $N = 0$ steady state. Shown below is a rough sketch of the bifurcation diagram, including the corresponding cell fates.
+
+\includegraphics[width=\textwidth]{bifurcation-diagram}
+
 \end{flushleft}
 
 \end{document}
+
+
+
+
+
+
 
