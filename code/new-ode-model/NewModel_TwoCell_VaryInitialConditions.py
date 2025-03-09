@@ -1,103 +1,170 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.integrate import solve_ivp
+import matplotlib.cm as cm
 
-# --- Revised Parameter Choices ---
-k = 2.0       # Hill exponent for Notch activation
-h = 2.0       # Hill exponent for Delta inhibition
-beta = 1.5    # Production scaling for Notch; >1 to promote instability
-a = 0.01   # Threshold for Delta activation of Notch
-b = 100      # Threshold for Notch inhibition of Delta
+# --- Initialize Parameter Values ---
+k = 2           # Hill exponent for Notch activation
+NM = 10         # Maximum rates of Notch production
+DM = 10         # Maximum rates of Delta production
+N0 = 100        # Delta Hill function
+D0 = 100        # Delta Hill function
+KT = 0.0001     # Binding rate between extracellular Delta and Notch
+G = 0.01        # Decay rate for Delta and Notch
+GI = 0.025      # Decay rate for NICD
 
-# --- Revised Hill Functions ---
-def f(D, k, a):
-    """
-    Notch activation by Delta from the neighboring cell.
-    A threshold parameter theta sharpens the response.
-    """
-    return D**k / (a + D**k)
+# --- Hill Functions ---
+def H_plus(I):
+    """Notch activation by intracellular NICD."""
+    return (NM * I**k) / ((N0**k) + (I**k))
 
-def g(N, h, b):
-    """
-    Delta production inhibited by own Notch.
-    The parameter mu sets the inhibition threshold.
-    """
-    return 1 / (1 + b * N**h)
+def H_minus(I):
+    """Delta inhibited by intracellular NICD."""
+    return (DM * D0**k) / ((D0**k) + (I**k))
 
-# --- Define the Revised ODE System ---
+# --- ODE System ---
 def ode_system(t, y):
-    # y = [N1, D1, N2, D2] for the two-cell system.
-    N1, D1, N2, D2 = y
-    dN1_dt = beta * f(D2, k, a) - N1
-    dD1_dt = g(N1, h, b) - D1
-    dN2_dt = beta * f(D1, k, a) - N2
-    dD2_dt = g(N2, h, b) - D2
-    return [dN1_dt, dD1_dt, dN2_dt, dD2_dt]
+    N1, D1, I1, N2, D2, I2 = y
+    
+    # Cell 1
+    dN1_dt = H_plus(I1) - KT * N1 * D2 - G * N1
+    dD1_dt = H_minus(I1) - KT * D1 * N2 - G * D1
+    dI1_dt = KT * N1 * D2 - GI * I1
+
+    # Cell 2
+    dN2_dt = H_plus(I2) - KT * N2 * D1 - G * N2
+    dD2_dt = H_minus(I2) - KT * D2 * N1 - G * D2
+    dI2_dt = KT * N2 * D1 - GI * I2
+
+    return [dN1_dt, dD1_dt, dI1_dt, dN2_dt, dD2_dt, dI2_dt]
 
 # --- Simulation Settings ---
-t_span = (0, 50)
+t_span = (0, 1000)  
 t_eval = np.linspace(t_span[0], t_span[1], 1000)
 
-# Number of different initial conditions to simulate
-num_simulations = 10
+# Generate multiple initial conditions
+num_simulations = 20
+np.random.seed(42)  # For reproducibility
 
-# Prepare an array to store each solution (shape: num_simulations x 4 x len(t_eval))
+# Ranges for initial values
+N_range = (100, 400)
+D_range = (100, 400)
+I_range = (50, 200)
+
+# Store all solutions
 all_solutions = []
 
-# Loop over simulations with different starting positions.
+# Run simulations with different initial conditions
 for i in range(num_simulations):
-    # Create a random perturbation about the baseline initial condition.
-    # Baseline: [0.1, 0.9, 0.15, 0.85]
-    y0 = [
-        0.91 + np.random.uniform(-0.05, 0.05),
-        0.9 + np.random.uniform(-0.05, 0.05),
-        0.89 + np.random.uniform(-0.05, 0.05),
-        0.85 + np.random.uniform(-0.05, 0.05)
+    # Generate random initial conditions
+    N = np.random.uniform(*N_range, 2)
+    D = np.random.uniform(*D_range, 2)
+    I = np.random.uniform(*I_range, 2)
+    C1 = [
+        max(N),  # N1
+        min(D),  # D1
+        max(I)   # I1
     ]
-    sol = solve_ivp(ode_system, t_span, y0, t_eval=t_eval, rtol=1e-6, atol=1e-9)
-    all_solutions.append(sol.y)
+    
+    C2 = [
+        min(N),  # N2
+        max(D),  # D2
+        min(I)   # I2
+    ]
+    
+    y0 = C1 + C2  # Concatenate the two cell initial conditions
+    
+    # Solve the ODEs
+    sol = solve_ivp(ode_system, t_span, y0, t_eval=t_eval, method='RK45', rtol=1e-6, atol=1e-9)
+    all_solutions.append(sol)
 
-# Convert list to array: shape (num_simulations, 4, len(t_eval))
-all_solutions = np.array(all_solutions)
-# Compute the mean solution (averaging over simulations)
-mean_solution = all_solutions.mean(axis=0)  # shape: (4, len(t_eval))
+# --- Plotting all trajectories with mean ---
+fig, axs = plt.subplots(3, 1, figsize=(10, 6))
+titles = ['Notch Level', 'Delta Level', 'NICD Level']
+var_names = ['N', 'D', 'I']  # Variable names without the cell number
 
-# --- Plotting ---
-plt.figure(figsize=(10, 8))
+# Storage for calculating means
+all_data = {
+    'N1': np.zeros((num_simulations, len(t_eval))),
+    'D1': np.zeros((num_simulations, len(t_eval))),
+    'I1': np.zeros((num_simulations, len(t_eval))),
+    'N2': np.zeros((num_simulations, len(t_eval))),
+    'D2': np.zeros((num_simulations, len(t_eval))),
+    'I2': np.zeros((num_simulations, len(t_eval)))
+}
 
-# Colors for clarity:
-color_N1 = 'tab:blue'
-color_N2 = 'tab:orange'
-color_D1 = 'tab:blue'
-color_D2 = 'tab:orange'
+# Populate the arrays
+for i, sol in enumerate(all_solutions):
+    all_data['N1'][i] = sol.y[0]
+    all_data['D1'][i] = sol.y[1]
+    all_data['I1'][i] = sol.y[2]
+    all_data['N2'][i] = sol.y[3]
+    all_data['D2'][i] = sol.y[4]
+    all_data['I2'][i] = sol.y[5]
 
-# --- Plot Notch Dynamics (Top subplot) ---
-plt.subplot(2, 1, 1)
-# Plot individual simulations with low alpha (faint lines)
-for sol in all_solutions:
-    plt.plot(t_eval, sol[0], color=color_N1, alpha=0.3)
-    plt.plot(t_eval, sol[2], color=color_N2, alpha=0.3)
-# Plot the mean solutions prominently (thicker lines)
-plt.plot(t_eval, mean_solution[0], color=color_N1, lw=3, label='Mean N1')
-plt.plot(t_eval, mean_solution[2], color=color_N2, lw=3, label='Mean N2')
-plt.xlabel('Time')
-plt.ylabel('Notch Level')
-plt.title('Notch Dynamics')
-plt.legend()
+# Calculate means
+mean_data = {
+    'N1': np.mean(all_data['N1'], axis=0),
+    'D1': np.mean(all_data['D1'], axis=0),
+    'I1': np.mean(all_data['I1'], axis=0),
+    'N2': np.mean(all_data['N2'], axis=0),
+    'D2': np.mean(all_data['D2'], axis=0),
+    'I2': np.mean(all_data['I2'], axis=0)
+}
 
-# --- Plot Delta Dynamics (Bottom subplot) ---
-plt.subplot(2, 1, 2)
-# Plot individual simulations with low alpha
-for sol in all_solutions:
-    plt.plot(t_eval, sol[1], color=color_D1, alpha=0.3)
-    plt.plot(t_eval, sol[3], color=color_D2, alpha=0.3)
-# Plot the mean solutions prominently
-plt.plot(t_eval, mean_solution[1], color=color_D1, lw=3, label='Mean D1')
-plt.plot(t_eval, mean_solution[3], color=color_D2, lw=3, label='Mean D2')
-plt.xlabel('Time')
-plt.ylabel('Delta Level')
-plt.title('Delta Dynamics')
-plt.legend()
+# Plot each panel - using indices directly to avoid the KeyError
+for idx, (title, var_name) in enumerate(zip(titles, var_names)):
+    # Indices for cell 1 and cell 2 variables
+    idx1 = idx
+    idx2 = idx + 3
+    
+    # Plot individual trajectories with low opacity
+    for sol in all_solutions:
+        axs[idx].plot(sol.t, sol.y[idx1], 'b-', alpha=0.2)
+        axs[idx].plot(sol.t, sol.y[idx2], 'r-', alpha=0.2)
+    
+    # Plot mean trajectories with high opacity
+    cell1_key = f"{var_name}1"
+    cell2_key = f"{var_name}2"
+    
+    axs[idx].plot(t_eval, mean_data[cell1_key], 'b-', linewidth=2, label=f'Mean {cell1_key}')
+    axs[idx].plot(t_eval, mean_data[cell2_key], 'r-', linewidth=2, label=f'Mean {cell2_key}')
+    
+    axs[idx].set_xlabel('Time')
+    axs[idx].set_ylabel(title)
+    axs[idx].legend(loc='best')
+    
+    # Add a grid for better readability
+    axs[idx].grid(True, alpha=0.3)
 
 plt.tight_layout()
 plt.show()
+
+'''
+# --- Phase portrait (optional) ---
+plt.figure(figsize=(12, 6))
+
+# Delta vs NICD for both cells
+plt.subplot(1, 2, 1)
+for sol in all_solutions:
+    plt.plot(sol.y[2], sol.y[1], 'b-', alpha=0.2)  # I1 vs D1
+plt.plot(mean_data['I1'], mean_data['D1'], 'b-', linewidth=2, label='Mean Cell 1')
+plt.xlabel('NICD Level')
+plt.ylabel('Delta Level')
+plt.title('Phase Portrait: Delta vs NICD')
+plt.grid(True, alpha=0.3)
+plt.legend()
+
+plt.subplot(1, 2, 2)
+for sol in all_solutions:
+    plt.plot(sol.y[5], sol.y[4], 'r-', alpha=0.5)  # I2 vs D2
+plt.plot(mean_data['I2'], mean_data['D2'], 'r-', linewidth=2, label='Mean Cell 2')
+plt.xlabel('NICD Level')
+plt.ylabel('Delta Level')
+plt.title('Phase Portrait: Delta vs NICD')
+plt.grid(True, alpha=0.3)
+plt.legend()
+
+plt.tight_layout()
+plt.show()'
+'''
