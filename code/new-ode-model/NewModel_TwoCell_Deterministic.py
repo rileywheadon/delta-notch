@@ -4,12 +4,12 @@ from scipy.integrate import solve_ivp
 
 # --- Initialize Parameter Values ---
 k = 2           # Hill exponent for Notch activation
-NM = 10         # Maximum rates of Notch production
+NM = 15         # Maximum rates of Notch production
 DM = 10         # Maximum rates of Delta production
 N0 = 100        # Delta Hill function
 D0 = 100        # Delta Hill function
 KT = 0.0001     # Binding rate between estracellular Delta and Notch
-G = 0.01        # Decay rate for Delta and Notch
+G = 0.02        # Decay rate for Delta and Notch
 GI = 0.025       # Decay rate for NICD
 
 # --- Hill Functions ---
@@ -43,8 +43,8 @@ t_eval = np.linspace(t_span[0], t_span[1], 1000)
 
 # Initial conditions 
 # C = [N, D, I]
-C1 = [200, 200, 100]  # Initial conditions for cell 1
-C2 = [300, 150, 120]  # Initial conditions for cell 2
+C1 = [280, 200, 100]  # Initial conditions for cell 1
+C2 = [300, 180, 120]  # Initial conditions for cell 2
 
 # y = [N1, D1, I1, N2, D2, I2]
 y0 = C1 + C2  # Concatenate the two cell initial conditions
