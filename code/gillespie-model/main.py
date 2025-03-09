@@ -4,17 +4,18 @@ import numpy as np
 import logging
 
 # INITIALIZE PARAMETER VALUES
-KT = 0.0002  # Delta-Notch binding rate
-GE = 0.01    # Extracellular molecule decay rate (used in dN/dt and dD/dt equations)
-GI = 0.05    # NICD decay rate
-NM = 10      # Maximum rate of Notch production
-DM = 10      # Maximum rate of Delta production
+KT = 0.0001  # Delta-Notch binding rate
+GE = 0.002   # Extracellular molecule decay rate (used in dN/dt and dD/dt equations)
+GI = 0.01    # NICD decay rate
+NM = 5       # Maximum rate of Notch production
+DM = 5       # Maximum rate of Delta production
 N0 = 100     # Notch hill function (H+) half-max
 D0 = 100     # Delta hill function (H-) half-max
+N = 2        # Hill function parameter
 
 # INITIALIZE HILL FUNCTIONS
-HP = lambda i : (NM * i**2) / ((N0**2) + (i**2))
-HM = lambda i : (DM * D0**2) / ((D0**2) + (i**2))
+HP = lambda i : (NM * i**N) / ((N0**N) + (i**N))
+HM = lambda i : (DM * D0**N) / ((D0**N) + (i**N))
 
 # INITIALIZE NEIGHBOURS (by index in state, include both directions)
 NEIGHBOURS = np.array([
@@ -24,8 +25,8 @@ NEIGHBOURS = np.array([
 
 # INITIALIZE SYSTEM STATE (each element contains integers [N, D, I] for one cell)
 state = np.array([
-    [300, 50, 100],
-    [300, 50, 100],
+    [500, 50, 200],
+    [500, 50, 200],
 ])
 
 # INITIALIZE SYSTEM RATES (ri contains rates for reaction i)
@@ -57,8 +58,8 @@ def update_reaction_rates(state):
         r4[i] = cell[2] * GI  # Rate parameter of NICD decay
 
         # Set all of the production rates (reactions 5-6)
-        r5[i] = HP(cell[0])   # Rate parameter of Notch production
-        r6[i] = HM(cell[1])   # Rate parameter of Delta production
+        r5[i] = HP(cell[2])   # Rate parameter of Notch production
+        r6[i] = HM(cell[2])   # Rate parameter of Delta production
 
     # Sum over the neighbour pairs to get the binding rates (reaction 1) 
     for i, (cellA, cellB) in enumerate(NEIGHBOURS):
@@ -132,7 +133,7 @@ def main():
     global t
 
     # Initialize an empty results array
-    steps = 10000
+    steps = 50000
     vT = np.arange(steps)
     results = np.empty((steps, 2, 3))
     for i in vT:
@@ -152,28 +153,18 @@ def main():
         # Add the state to the results array
         results[i] = state
 
-
-    # Get the trajectories for the notch, delta, and NICD concentrations for each cell
-    N1 = results[:, 0, 0]
-    D1 = results[:, 0, 1]
-    I1 = results[:, 0, 2]
-    N2 = results[:, 1, 0]
-    D2 = results[:, 1, 1]
-    I2 = results[:, 1, 2]
-
     # Plot the results
     fig, axs = plt.subplots(3, 1, sharex = True)
-    axs[0].plot(vT, N1)
-    axs[0].plot(vT, N2)
     axs[0].set_ylabel("NOTCH")
-    axs[1].plot(vT, D1)
-    axs[1].plot(vT, D2)
+    axs[0].plot(vT, results[:, 0, 0])
+    axs[0].plot(vT, results[:, 1, 0])
     axs[1].set_ylabel("DELTA")
-    axs[2].plot(vT, I1)
-    axs[2].plot(vT, I2)
+    axs[1].plot(vT, results[:, 0, 1])
+    axs[1].plot(vT, results[:, 1, 1])
     axs[2].set_ylabel("NICD")
+    axs[2].plot(vT, results[:, 0, 2])
+    axs[2].plot(vT, results[:, 1, 2])
     # plt.show()
     fig.savefig('fig.pdf')
-
 
 main()
