@@ -1,49 +1,25 @@
+# Import libraries
 import numpy as np
 import sys
 import logging
 import time
 import numba
-import domains
-import visualization
+from scipy.interpolate import interp1d
+
+# Import configuration from config.py
+from config import H_PLUS, H_MINUS, INITIAL_CELL, KT, G, GI, TIME, STEPS
 
 # Initialize logger
 logger = logging.getLogger(__name__)
 logging.basicConfig(filename = "main.log", filemode="w", level=logging.INFO)
 
-# Parameter values
-K = 2        # Hill function exponent
-NM = 10      # Maximum rate of Notch production
-DM = 10      # Maximum rate of Delta production
-N0 = 100     # Notch hill function (H+) half-max
-D0 = 100     # Delta hill function (H-) half-max
-KT = 0.0001  # Delta-Notch binding rate
-G = 0.02     # Extracellular molecule decay rate (used in dN/dt and dD/dt equations)
-GI = 0.025   # NICD decay rate
-
-# Set the initial conditions and domain
-STEPS = 100000
-DOMAIN, SIZE = domains.linear(9, "dirichlet")
-INITIAL_CELL = np.array([200, 200, 100])
-
-
-# Increasing hill function
-@numba.njit
-def H_PLUS(i):
-    return (NM * i**K) / ((N0**K) + (i**K))
-
-
-# Decreasing hill function
-@numba.njit
-def H_MINUS(i):
-    return (DM * D0**K) / ((D0**K) + (i**K))
-
 
 # Generates the reaction rates based on the state
 @numba.njit
-def update_reaction_rates(state):
+def update_reaction_rates(state, domain):
 
     # Initialize empty rate arrays for each reaction
-    r1 = np.empty(len(DOMAIN))
+    r1 = np.empty(len(domain))
     r2 = np.empty(len(state))
     r3 = np.empty(len(state))
     r4 = np.empty(len(state))
@@ -63,7 +39,7 @@ def update_reaction_rates(state):
         r6[i] = H_MINUS(cell[2])   # Rate parameter of Delta production
 
     # Sum over the neighbour pairs to get the binding rates (reaction 1) 
-    for i, (cellA, cellB) in enumerate(DOMAIN):
+    for i, (cellA, cellB) in enumerate(domain):
         r1[i] = KT * state[cellA][0] * state[cellB][1]
 
     # Return the combined array of rates
@@ -73,35 +49,35 @@ def update_reaction_rates(state):
 # Takes the reaction rates and generates the next reaction time
 @numba.njit
 def generate_reaction_time(rates):
-    return np.random.exponential(scale = np.sum(rates))
+    return np.random.exponential(scale = 1 / np.sum(rates))
 
 
 # Generate an event, returning a (reaction, index) tuple
 @numba.njit
-def generate_event(rates, state):
+def generate_event(rates, state, domain):
 
     # Sample a random value in [0, 1] and find its index in the partition
     partition = np.cumsum(rates) / np.sum(rates)
     reaction = np.searchsorted(partition, np.random.rand())
 
     # Check if the event is a binding event
-    if reaction < len(DOMAIN):
-        return (1, reaction)
+    if reaction < len(domain):
+        return [1, reaction]
 
     # Otherwise do some modulo fuckery to get the reaction
-    reaction_type = 2 + ((reaction - len(DOMAIN)) // len(state))
-    index = (reaction - len(DOMAIN)) % len(state)
-    return (reaction_type, index)
+    reaction_type = 2 + ((reaction - len(domain)) // len(state))
+    index = (reaction - len(domain)) % len(state)
+    return [reaction_type, index]
 
 
 # Updates the state AND the reaciton rates given an event
 @numba.njit
-def update_state(state, event):
+def update_state(state, event, domain):
     reaction, index = event
 
     # Binding reaction event
     if reaction == 1:
-        cellA, cellB = DOMAIN[index]
+        cellA, cellB = domain[index]
         state[cellA][0] -= 1 # Remove Notch from cell A
         state[cellB][1] -= 1 # Remove Delta from cell B
         state[cellA][2] += 1 # Add a NICD to cell A
@@ -127,48 +103,84 @@ def update_state(state, event):
         state[index][1] += 1
 
     return state
-    
+ 
 
-# Main simulation loop
-def main():
+# Runs a single simulation 
+@numba.njit
+def simulate(domain, size):
 
     # Initialize the simulation
     t = 0
-    state = np.tile(INITIAL_CELL, (SIZE, 1))
-    rates = np.empty(len(DOMAIN) + (SIZE * 5))
-    v_time = np.empty(STEPS)
-    v_state = np.empty((STEPS, SIZE, 3))
+    state = np.empty((size, 3))
+    rates = np.empty(len(domain) + (size * 5))
 
-    # Step through the simulation
-    start = time.time()
-    for i in np.arange(STEPS):
+    # Unfortunate numba hack to set the state vector
+    for i in range(size): 
+        state[i] = INITIAL_CELL
+
+    # Initialize the state and time vectors
+    v_time = []
+    v_state = []
+    while t <= TIME:
 
         # Update reaction rates
-        rates = update_reaction_rates(state)
+        rates = update_reaction_rates(state, domain)
 
         # Add the current time to the time vector
-        v_time[i] = t
+        v_time.append(t)
 
         # Generate a new reaction time and increment time
         t += generate_reaction_time(rates)
 
         # Generate an event for this time step
-        event = generate_event(rates, state)
+        event = generate_event(rates, state, domain)
 
         # Update the state based on the event
-        state = update_state(state, event)
+        state = update_state(state, event, domain)
 
         # Add the state to the state vector
-        v_state[i] = state
+        v_state.append(np.copy(state))
+
+    # Append this sample to the data vectors
+    return v_time, v_state
+
+
+# Run a gillespie model with given domain and size
+def run(domain, size, samples = 1):
+    
+    # Initialize the data arrays
+    data_time = []
+    data_state = []
+    data_mean = []
+
+    # Run 'samples' simulations
+    start = time.time()
+    logger.info(f"Model: Gillespie, Samples: {samples}, Domain Size: {size}")
+
+    for i in range(samples):
+
+        v_time, v_state = simulate(domain, size)
+        v_time = np.array(v_time)
+        v_state = np.array(v_state)
+
+        # In two cell simulations, order the cells 
+        if size == 2 and v_state[-1][1, 0] > v_state[-1][0, 0]:
+            v_state = np.roll(v_state, 1, axis = 1)
+
+        # Linearly interpolate the state vector
+        f_interp = interp1d(v_time, v_state, axis = 0, fill_value = "extrapolate")
+        v_interp = f_interp(STEPS)
+
+        # Add the time, state, and interpolated vectors to the data
+        data_time.append(v_time)
+        data_state.append(v_state)
+        data_mean.append(v_interp)
+        logger.info(f" - {time.time() - start:.4f}s: Finished simulation {i}")
+
+    # Average over the interpolated data to get the mean
+    data_mean = np.average(data_mean, axis = 0) 
+    logger.info(f"Finished in {time.time() - start:.4f}s")
+    return data_time, data_state, data_mean
 
 
 
-    logging.info(f"{time.time() - start:.4f}s: Computation complete.")
-    logging.info(f"Iteration speed: {(10**6) * (time.time() - start) / STEPS:.2f}μs")
-
-    # Plot the results
-    visualization.linear(v_time, v_state)
-    logging.info(f"{time.time() - start:.4f}s: Graphing complete.")
-
-
-main()

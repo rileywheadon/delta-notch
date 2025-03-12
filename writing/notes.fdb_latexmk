@@ -1,5 +1,5 @@
 # Fdb version 4
-["pdflatex"] 1741482637.94436 "notes.tex" "notes.pdf" "notes" 1741482638.53553 0
+["pdflatex"] 1741747673.20854 "notes.tex" "notes.pdf" "notes" 1741747673.7635 0
   "/usr/share/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc" 1736268207 2900 1537cc8184ad1792082cd229ecc269f4 ""
   "/usr/share/texmf-dist/fonts/map/fontname/texfonts.map" 1736268207 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "/usr/share/texmf-dist/fonts/tfm/jknappen/ec/tcrm1000.tfm" 1736268207 1536 e07581a4bb3136ece9eeb4c3ffab8233 ""
@@ -81,9 +81,9 @@
   "/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map" 1741308502.60054 5318467 8236939515598d005dfbcc2e1a40f206 ""
   "/var/lib/texmf/web2c/pdftex/pdflatex.fmt" 1741308360 7113016 f210616e03b4a4ff8d26e91f67d9b528 ""
   "bifurcation-diagram.png" 1741482440.34403 54906 86831681033cc32912fc5a8a35d8800f ""
-  "notes.aux" 1741482638.4732 1427 20a06a949aa5cec0a761f90e473fa801 "pdflatex"
-  "notes.out" 1741482638.47368 1708 a6d9587a2948063fc0e97052d7c76f98 "pdflatex"
-  "notes.tex" 1741482636.16188 11375 37e071f0dae0bb08c84c2c989e602212 ""
+  "notes.aux" 1741747673.69887 1563 9bb7a2ace900098709bb4f48d8e39fce "pdflatex"
+  "notes.out" 1741747673.69931 1874 1c49c9d7b51ce54330c3a1b305c8bfcc "pdflatex"
+  "notes.tex" 1741747671.58009 11609 aed27ab1ccb59a3d581d89d121fc3af8 ""
   (generated)
   "notes.aux"
   "notes.log"

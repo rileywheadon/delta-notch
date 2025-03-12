@@ -86,7 +86,7 @@ Assume \emph{a priori} (i.e. from previous research) the following, where $I$ is
 
 \begin{itemize}
   \item Basal extracellular Notch ($N$) production has the form $H^{+}(I) = n_{m}I^2/(n_{0}^2 + I^2)$. 
-  \item Basal extracellular Delta ($D$) production has the form $H^{-}(I) = d_{m}/(d_{0}^2 + I^2)$.
+  \item Basal extracellular Delta ($D$) production has the form $H^{-}(I) = d_{m}d_{0}^2/(d_{0}^2 + I^2)$.
   \item Extracellular Notch and Delta have the same decay rate, $\gamma$.
 \end{itemize}
 
@@ -142,6 +142,10 @@ Use this fact to partition the interval $[0, 1]$. Then sample $y_{i}$ from a $\t
 
 \textbf{Step 4}: Update the state based on the event determined in the previous step.
 
+\subsubsection{Time-Scale Analysis}
+ 
+The expected time for event $i$ to occur is given by $\mathbb{E}[X_{i}] = 1/\lambda_{i}$. Therefore, the rate at which event $i$ occurs is $\lambda_{i}$, which is equal to the rate at which the event occurs in the original ODE. This means that the trajectories generated from the Gillespie's algorithm implementation of the model can be compared directly to the trajectories generated from the ODE itself, without any need for scaling.
+
 \subsection{Theoretical Justification}
 
 In this section, we need to show that in expectation, the model above converges to the following system of ODEs (adapted from Boareto et al., 2015):
@@ -149,7 +153,7 @@ In this section, we need to show that in expectation, the model above converges 
 $$
 \begin{aligned}
   \frac{dN}{dt} &= \frac{n_{m}I^2}{n_{0}^2 + I^2} - k_{T}ND_{ext} - \gamma N \\[5pt]
-  \frac{dD}{dt} &= \frac{d_{m}}{d_{0}^2 + I^2} - k_{T}DN_{ext} - \gamma D \\[5pt]
+  \frac{dD}{dt} &= \frac{d_{m}d_{0}^2}{d_{0}^2 + I^2} - k_{T}DN_{ext} - \gamma D \\[5pt]
   \frac{dI}{dt} &= k_{T}ND_{ext} - \gamma_{I}I
 \end{aligned}
 $$
@@ -163,7 +167,7 @@ We perform a bifurcation analysis for the two-cell system, where $D_{ext}$ and $
 $$
 \begin{aligned}
   \frac{dN}{dt} &= \frac{n_{m}I^2}{n_{0}^2 + I^2} - (k_{T}D_{ext} + \gamma)N \\[5pt]
-  \frac{dD}{dt} &= \frac{d_{m}}{d_{0} + I^2} - (k_{T}N_{ext} + \gamma)D \\[5pt]
+  \frac{dD}{dt} &= \frac{d_{m}d_{0}^2}{d_{0}^2 + I^2} - (k_{T}N_{ext} + \gamma)D \\[5pt]
   \frac{dI}{dt} &= k_{T}ND_{ext} - \gamma_{I}I \\[5pt]
 \end{aligned}
 $$
@@ -173,7 +177,7 @@ Solving for the nullclines gives us the following:
 $$
 \begin{aligned}
   N &= \frac{1}{\gamma + k_{T}D_{ext}}\left(\frac{n_{m}I^2}{n_{0}^2 + I^2}\right) \\[5pt]
-  D &= \frac{1}{\gamma + k_{T}N_{ext}}\left( \frac{d_{m}}{d_{0}^2 + I^2} \right) \\[5pt]
+  D &= \frac{1}{\gamma + k_{T}N_{ext}}\left( \frac{d_{m}d_{0}^2}{d_{0}^2 + I^2} \right) \\[5pt]
   I &= \frac{k_{T}ND_{ext}}{\gamma_{I}}
 \end{aligned}
 $$
@@ -185,10 +189,6 @@ Note that each nullcline defines a surface in $\mathbb{R}^3$. To express differe
 It remains to find the other steady-state values of $N$ as a function of $D_{ext}$. To do this, we use the computer algebra system sympy. Substituting the equation for $I^{*}$ into the $N$-nullcline gives us the following nonzero steady-state values of $N$:
 
 \medskip
-
-% $$
-% N^{*} = \frac{n_{m}}{2(D_{ext}k_{T} + \gamma)} \pm \sqrt{-\frac{(2D_{ext}\gamma_{I}k_{T}n_{0} - D_{ext}k_{T}n_{m} + 2\gamma \gamma_{I}n_{0})(2 D_{ext} \gamma_{I}k_{T}n_{0} + D_{ext}k_{T}n_{m} + 2\gamma\gamma_{I}n_{0})}{2D_{ext}k_{T}(D_{ext}k_{T} + \gamma)}}
-% $$
 
 $$
 N^{*} = \frac{n_{m}}{2(D_{ext}k_{T} + \gamma)} \pm \sqrt{\frac{(D_{ext}k_{T}n_{m})^2 - 4(D_{ext}\gamma_{I}k_{T}n_{0} + \gamma \gamma_{I}n_{0})^2}{2D_{ext}k_{T}(D_{ext}k_{T} + \gamma)}}

@@ -1,0 +1,22 @@
+INFO:gillespie:Model: Gillespie, Samples: 20, Domain Size: 2
+INFO:gillespie: - 4.5094s: Finished simulation 0
+INFO:gillespie: - 4.5852s: Finished simulation 1
+INFO:gillespie: - 4.6610s: Finished simulation 2
+INFO:gillespie: - 4.7341s: Finished simulation 3
+INFO:gillespie: - 4.8058s: Finished simulation 4
+INFO:gillespie: - 4.8783s: Finished simulation 5
+INFO:gillespie: - 4.9512s: Finished simulation 6
+INFO:gillespie: - 5.0235s: Finished simulation 7
+INFO:gillespie: - 5.0960s: Finished simulation 8
+INFO:gillespie: - 5.1669s: Finished simulation 9
+INFO:gillespie: - 5.2384s: Finished simulation 10
+INFO:gillespie: - 5.3092s: Finished simulation 11
+INFO:gillespie: - 5.3806s: Finished simulation 12
+INFO:gillespie: - 5.4524s: Finished simulation 13
+INFO:gillespie: - 5.5234s: Finished simulation 14
+INFO:gillespie: - 5.5954s: Finished simulation 15
+INFO:gillespie: - 5.6667s: Finished simulation 16
+INFO:gillespie: - 5.7378s: Finished simulation 17
+INFO:gillespie: - 5.8095s: Finished simulation 18
+INFO:gillespie: - 5.8810s: Finished simulation 19
+INFO:gillespie:Finished in 5.8838s
