@@ -12,8 +12,8 @@ G = 0.02     # Extracellular molecule decay rate (used in dN/dt and dD/dt equati
 GI = 0.025   # NICD decay rate
 
 # Initial and parameter perturbations
-PI = 0.1
-PP = 0.05
+PI = 0.05
+NOISE = 0.02
 
 # Set the simulation length and initial cell state
 TIME = 1000

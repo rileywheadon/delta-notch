@@ -7,26 +7,19 @@ import numba
 from scipy.integrate import solve_ivp
 
 # Import configuration from config.py
-from config import H_PLUS, H_MINUS, INITIAL_CELL, KT, G, GI, PI, PP, TIME, STEPS
+from config import H_PLUS, H_MINUS, INITIAL_CELL, KT, G, GI, PI, NOISE, TIME, STEPS
 
 # Initialize logger
 logger = logging.getLogger(__name__)
 logging.basicConfig(filename = "main.log", filemode="w", level=logging.INFO)
 
 
-# Perturb a variable with a sd of n * p
-@numba.njit
-def perturb(n, p):
-    return n + np.random.normal(0, n * p)
-
-
 # Define the ODE system
-def ode_system(t, y, name, neighbours, size, mode):
+@numba.njit
+def deterministic_step(domain, state):
 
-    # Reshape into a matrix where each row represents a cell [N, D, I]
-    state = y.reshape(size, 3)
-    
-    # Generate the derivative functions
+    # Generate the increments 
+    name, neighbours, size = domain
     derivatives = np.empty((size, 3))
     for cell in range(size):
 
@@ -35,11 +28,9 @@ def ode_system(t, y, name, neighbours, size, mode):
         indices = neighbours[mask, 1]
 
         # Compute the average delta signal over the neighbours
-        divisor = 1
-        if name == "Linear": divisor = 2
-        if name == "Hexagonal": divisor = 6
-        n_ext = np.sum(state[indices, 0]) / divisor
-        d_ext = np.sum(state[indices, 1]) / divisor
+        divisors = {"Two Cell": 1, "Linear": 2, "Hexagonal": 6}
+        n_ext = np.sum(state[indices, 0]) / divisors[name]
+        d_ext = np.sum(state[indices, 1]) / divisors[name]
 
         # Current cell values
         n, d, i = state[cell]
@@ -48,66 +39,64 @@ def ode_system(t, y, name, neighbours, size, mode):
         dN = H_PLUS(i) - KT * n * d_ext - G * n
         dD = H_MINUS(i) - KT * d * n_ext - G * d
         dI = KT * n * d_ext - GI * i
-
-        # Perturb parameter values in stochastic simulations
-        if mode == "Stochastic":
-            dN = H_PLUS(i) - perturb(KT, PP) * n * d_ext - perturb(G, PP) * n
-            dD = H_MINUS(i) - perturb(KT, PP) * d * n_ext - perturb(G, PP) * d
-            dI = perturb(KT, PP) * n * d_ext - perturb(GI, PP) * i
-
         derivatives[cell] = [dN, dD, dI]
     
     # Return flattened array
-    return derivatives.flatten()
+    return derivatives
 
 
 # Run a single simulation of the deterministic ODE model
-def simulate(domain, mode):
+@numba.njit
+def simulate(domain, dt, perturbations, wiener):
 
-    # Set the initial conditions
+    # Initialize the states variable
     name, neighbours, size = domain
-    state = np.empty((size, 3))
+    states = np.empty((STEPS, size, 3))
 
-    for i in range(size):
-        for j in range(3):
+    # Set the initial condition 
+    # Add perturbation (deterministic simulations only) 
+    for i in range(size): 
+        states[0, i] = INITIAL_CELL
+        states[0, i] += perturbations[i]
 
-            # Use a fixed initial state in stochastic simulations
-            state[i][j] = INITIAL_CELL[j]
+    # Use a forward Euler method to simulate positive solutions to the ODE
+    # Add wiener noise (stochastic simulations only)
+    for i in range(1, STEPS):
+        derivatives = deterministic_step(domain, states[i-1])
+        states[i] = states[i - 1] + (derivatives * dt) 
+        states[i] += states[i - 1] * NOISE * wiener[i]
+        states[i] = np.maximum(0, states[i])
 
-            # Perturb the initial state in deterministic simulations
-            if mode == "Deterministic":
-                state[i][j] = perturb(state[i][j], PI)
-
-    # Return a solution to the system of differential equations
-    res = solve_ivp(
-        fun = ode_system, 
-        t_span = (0, TIME), 
-        y0 = state.flatten(), 
-        t_eval = np.linspace(0, TIME, STEPS),
-        args = (*domain, mode),
-        rtol = 1e-6, 
-        atol = 1e-9
-    )
-
-    return res.t, res.y.T.reshape(STEPS, size, 3)
+    return np.linspace(0, TIME, STEPS), states
 
 
 # Run a gillespie model with given domain and size
 def ode(domain, mode, samples = 1):
     
-    # Initialize the data arrays
-    data_time = []
-    data_state = []
-
-    # Run 'samples' simulations
-    start = time.time()
+    # Initialize the simulations
+    dt = TIME / STEPS
     name, neighbours, size = domain
-    logger.info(f"Model: {mode} ODE, Samples: {samples}, Domain: {name}")
+    data_time, data_state = [], []
 
+    # Run simulations simulations
+    start = time.time()
+    logger.info(f"Model: {mode} ODE, Samples: {samples}, Domain: {name}")
     for i in range(samples):
 
+        # Generate initial perturbations 
+        if mode == "Deterministic":
+            perturbations = np.random.normal(0, INITIAL_CELL * PI, (size, 3))
+            wiener = np.zeros((STEPS, size, 3))
+
+        # Generate wiener values 
+        if mode == "Stochastic":
+            perturbations = np.zeros((size, 3))
+            wiener = np.random.normal(0, np.sqrt(dt), (STEPS, size, 3))
+        
+        # Run the simulation
+        v_time, v_state = simulate(domain, dt, perturbations, wiener)
+
         # In two cell simulations, order the cells 
-        v_time, v_state = simulate(domain, mode)
         if size == 2 and v_state[-1, 1, 0] > v_state[-1, 0, 0]:
             v_state = np.roll(v_state, 1, axis = 1)
 

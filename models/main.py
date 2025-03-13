@@ -28,7 +28,7 @@ def main():
     visualization.two_cell_individual(domain, deterministic_data, "Deterministic")
 
     # Stochastic Model
-    stochastic_data = ode.ode(domain, "Deterministic", samples = 25)
+    stochastic_data = ode.ode(domain, "Stochastic", samples = 25)
     visualization.two_cell_individual(domain, stochastic_data, "Stochastic")
 
     # Gillespie Model

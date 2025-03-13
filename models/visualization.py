@@ -37,6 +37,7 @@ def two_cell_individual(domain, data, model):
     fig.suptitle(f"{name} {model}")
 
     # Save to the img/ foler
+    plt.tight_layout()
     fname = "_".join(f"{name} {model}".lower().split(" "))
     plt.savefig(f"img/{fname}.pdf", format = "pdf")
 
