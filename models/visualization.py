@@ -4,11 +4,13 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 # Import modules
-from config import STEPS
+from config import TIME, STEPS
 
 
 # Static, individual visualization for two-cell models
-def two_cell_individual(data, title):
+def two_cell_individual(domain, data, model):
+
+    name, neighbours, size = domain
     times, states, means = data
     fig, axs = plt.subplots(nrows = 3, sharex = True)
 
@@ -21,18 +23,58 @@ def two_cell_individual(data, title):
             axs[i].plot(times[j], states[j][:, 1, i], color = "orange", alpha = 0.1)
 
         # Plot the means at full opacity
-        axs[i].plot(STEPS, means[:, 0, i], color = "green")
-        axs[i].plot(STEPS, means[:, 1, i], color = "orange")
+        default_times = np.linspace(0, TIME, STEPS)
+        axs[i].plot(default_times, means[:, 0, i], color = "green")
+        axs[i].plot(default_times, means[:, 1, i], color = "orange")
 
     # Set axis labels
     axs[0].set_ylabel("Notch Molecules")
     axs[1].set_ylabel("Delta Molecules")
     axs[2].set_ylabel("NICD Molecules")
-    axs[2].set_xlabel("Time")
 
-    # Add title and legend
-    fig.suptitle(title)
-    plt.show()
+    # Add title and labels to the graph
+    fig.supxlabel("Time")
+    fig.suptitle(f"{name} {model}")
+
+    # Save to the img/ foler
+    fname = "_".join(f"{name} {model}".lower().split(" "))
+    plt.savefig(f"img/{fname}.pdf", format = "pdf")
+
+
+# Static, comparison visualization for two-cell models
+def two_cell_comparison(all_data):
+
+    # Iterate through axes (0: Deterministic, 1: Stochastic, 2: Gillespie)
+    fig, axs = plt.subplots(nrows = 3, sharex = True)
+    for i in range(3):
+
+        # Unpack the data arrays
+        data = all_data[i]
+        times, states, means = data 
+
+        # Plot the trajectories for each sample
+        for j in range(len(states)):
+            axs[i].plot(times[j], states[j][:, 0, 0], color = "green", alpha = 0.1)
+            axs[i].plot(times[j], states[j][:, 1, 0], color = "orange", alpha = 0.1)
+
+        # Plot the means at full opacity
+        default_times = np.linspace(0, TIME, STEPS)
+        axs[i].plot(default_times, means[:, 0, 0], color = "green")
+        axs[i].plot(default_times, means[:, 1, 0], color = "orange")
+
+    # Set axis labels
+    axs[0].set_ylabel("Deterministic")
+    axs[1].set_ylabel("Stochastic")
+    axs[2].set_ylabel("Gillespie")
+
+    # Add title and labels to the graph
+    fig.supxlabel("Time")
+    fig.supylabel("Notch Molecules")
+    fig.suptitle(f"Two Cell Model Comparison")
+
+    # Save to the img/ foler
+    plt.tight_layout()
+    plt.savefig(f"img/two_cell_comparison.pdf", format = "pdf")
 
 
 # Static, individual visualization for linear models

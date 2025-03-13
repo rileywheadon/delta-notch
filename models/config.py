@@ -11,10 +11,14 @@ KT = 0.0001  # Delta-Notch binding rate
 G = 0.02     # Extracellular molecule decay rate (used in dN/dt and dD/dt equations)
 GI = 0.025   # NICD decay rate
 
+# Initial and parameter perturbations
+PI = 0.1
+PP = 0.05
+
 # Set the simulation length and initial cell state
 TIME = 1000
+STEPS = 10000
 INITIAL_CELL = np.array([200, 200, 100])
-STEPS = np.linspace(0, TIME, 10000)
 
 # Define increasing hill function based on parameters above
 @numba.njit

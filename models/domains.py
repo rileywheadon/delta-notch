@@ -15,7 +15,8 @@ def linear(size, boundary):
         output.append([i, (i+1) % size])
         output.append([(i+1) % size, i])
 
-    return np.array(output), size
+    name = "Two Cell" if size == 2 else "Linear"
+    return name, np.array(output), size
 
 
 # TEST CASES
@@ -67,7 +68,7 @@ def hexagonal_dirichlet(height, width):
             # Bottom right neighbour
             if h < height - 1: output.append([i, i + width])
 
-    return np.array(output), (height * width)
+    return "Hexagonal", np.array(output), (height * width)
 
 
 # Hexagonal domain with periodic boundary
@@ -103,7 +104,7 @@ def hexagonal_periodic(height, width):
             # Bottom right neighbour
             output.append([rm + w, rb + w])
 
-    return np.array(output), (height * width)
+    return "Hexagonal", np.array(output), (height * width)
 
 
 # Master function to call the correct helper
