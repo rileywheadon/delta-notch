@@ -39,7 +39,7 @@ def two_cell_individual(domain, data, model):
     # Save to the img/ foler
     plt.tight_layout()
     fname = "_".join(f"{name} {model}".lower().split(" "))
-    plt.savefig(f"img/{fname}.pdf", format = "pdf")
+    plt.savefig(f"../paper/img/{fname}.pdf", dpi = 200, format = "pdf")
 
 
 # Static, comparison visualization for two-cell models
@@ -75,7 +75,7 @@ def two_cell_comparison(all_data):
 
     # Save to the img/ foler
     plt.tight_layout()
-    plt.savefig(f"img/two_cell_comparison.pdf", format = "pdf")
+    plt.savefig(f"../paper/img/two_cell_comparison.pdf", dpi = 200, format = "pdf")
 
 
 # Static, individual visualization for linear models
