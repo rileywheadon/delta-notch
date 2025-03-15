@@ -302,6 +302,20 @@ The matrix element $A_{j,i}$ represents the transition rate from state $i$ to st
 
 \subsection{Stochastic ODE Model}
 
+To capture the inherent randomness in cellular processes while maintaining computational efficiency, we implement a stochastic differential equation (SDE) model based on the chemical Langevin equation formalism. This approach represents an intermediate level of detail between the deterministic ODE model and the fully discrete Gillespie algorithm.
+
+Starting from the deterministic ODEs described in Section 3.3, we incorporate stochastic fluctuations by adding noise terms proportional to the square root of the reaction propensities:
+$$
+\begin{aligned}
+  dN &= \left( \frac{n_{m}I^2}{n_{0}^2 + I^2} - k_{T}ND_{ext} - \gamma N \right) dt + \sigma \cdot N \cdot dW_{N} \\ \\[5pt]
+  dD &= \left( \frac{d_{m}d_{0}^2}{d_{0}^2 + I^2} - k_{T}DN_{ext} - \gamma D \right)  dt + \sigma \cdot D \cdot dW_{D}  \\[5pt]
+  dI &= \left( k_{T}ND_{ext} - \gamma_{I}I \right) dt + \sigma \cdot I \cdot dW_{I}
+\end{aligned}
+$$
+where $dW_N$, $dW_D$, and $dW_I$ are independent Wiener processes representing white noise. The structure of the noise terms follows from the assumption that noise in each reaction channel is proportional to the current concentration of those molecules. \par
+
+For numerical implementation, we employ the Euler-Maruyama scheme with time step $dt$. The deterministic step is first calculated, and then the Wiener increments are sampled from a normal distribution with mean 0 and standard deviation $\sqrt{dt}$. Each increment is scaled by the its respective variable and added to the results of the deterministic step.
+
 \subsection{Gillespie Algorithm}
 
 We will make the assumption that reaction times follow a Poisson point process. Let $E$ be the set of all possible reaction events (i.e. reactions 1-6 above for all cells). Furthermore, let $|E| = N$ be the number of possible reactions. For each event, let $X_{i} \sim \text{Exp}(\lambda_{i})$ denote the time until the next event of type $i$, where $1 \leq i \leq N$. Then, the waiting time $T$ in between \emph{any} two events is:
