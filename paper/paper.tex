@@ -300,6 +300,18 @@ The matrix element $A_{j,i}$ represents the transition rate from state $i$ to st
 
 \subsection{Deterministic ODE Model}
 
+We implemented the following deterministic ODE model adapted from Boareto et al. (2015): 
+
+$$
+\begin{aligned}
+  \frac{dN}{dt} &= \frac{n_{m}I^2}{n_{0}^2 + I^2} - k_{T}ND_{ext} - \gamma N \\[5pt]
+  \frac{dD}{dt} &= \frac{d_{m}d_{0}^2}{d_{0}^2 + I^2} - k_{T}DN_{ext} - \gamma D \\[5pt]
+  \frac{dI}{dt} &= k_{T}ND_{ext} - \gamma_{I}I
+\end{aligned}
+$$
+
+where $N$ is the number of intracellular Notch molecules, $D$ is the number of intracellular Delta molecules, and $I$ is the number of NICD molecules (see $3.1$ reference). This model is a simplification of the model found in Boareto et al. That model included an additonal equation for the Jagged molecule and kept track of cis-inhibition: where a Notch and Delta bind together inside the same cell, resulting in the degradation of both cells without contributing to the amount of NICD. So as to more directly compare our results with those of Collier et al., we ignore Jagged interactions and cis-inhibition. Including an NICD variable was necessary, however, as this additional interaction allowed for the assignment of probabilities to each reaction event and thus for the derivation of the Kolmogorov Equations and Gillespie algorithm.
+
 \subsection{Stochastic ODE Model}
 
 To capture the inherent randomness in cellular processes while maintaining computational efficiency, we implement a stochastic differential equation (SDE) model based on the chemical Langevin equation formalism. This approach represents an intermediate level of detail between the deterministic ODE model and the fully discrete Gillespie algorithm.
