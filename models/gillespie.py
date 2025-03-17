@@ -153,6 +153,7 @@ def gillespie(domain, samples = 1):
     data_time = []
     data_state = []
     data_mean = []
+    data_diff = []
 
     # Run 'samples' simulations
     start = time.time()
@@ -169,6 +170,11 @@ def gillespie(domain, samples = 1):
         if size == 2 and v_state[-1, 1, 0] > v_state[-1, 0, 0]:
             v_state = np.roll(v_state, 1, axis = 1)
 
+        # Compute the differentiation time for two cell simulations
+        if size == 2:
+            max_index = np.argmax(v_state[:, 1, 0] < 1)
+            data_diff.append(v_time[max_index])
+
         # Linearly interpolate the state vector
         f_interp = interp1d(v_time, v_state, axis = 0, fill_value = "extrapolate")
         v_interp = f_interp(np.linspace(0, TIME, STEPS))
@@ -179,10 +185,11 @@ def gillespie(domain, samples = 1):
         data_mean.append(v_interp)
         logger.info(f" - {time.time() - start:.4f}s: Finished simulation {i}")
 
-    # Average over the interpolated data to get the mean
+    # Average over the interpolated data to get STD and the mean
+    data_std = np.std(data_mean, axis = 0)
     data_mean = np.average(data_mean, axis = 0) 
     logger.info(f"Finished in {time.time() - start:.4f}s")
-    return data_time, data_state, data_mean
+    return data_time, data_state, data_mean, data_std, data_diff
 
 
 

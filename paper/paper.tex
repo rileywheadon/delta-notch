@@ -106,8 +106,6 @@ Then, define the following parameters:
   \item $\gamma_{I}$ is the decay rate of NICD.
 \end{itemize}
 
-\newpage
-
 Furthermore, we will assume that there is no cis-interaction and no Serrate ligand. This gives us the following set of chemical reactions that can occur in a single time step:
 
 \begin{enumerate}
@@ -122,10 +120,7 @@ Furthermore, we will assume that there is no cis-interaction and no Serrate liga
 \subsection{Kolmogorov Forward Equations}
 \subsubsection{Derivation of Kolmogorov Forward Equation}
 
-Let us define:\\
-$P(n,d,i,t)$ = probability of having $n$ Notch receptors, $d$ Delta ligands, and $i$ NICD molecules at time $t$.\\
-
-The Kolmogorov forward equation describes how $P(n,d,i,t)$ changes over a small time step $\Delta t$:
+Let us define $P(n,d,i,t)$ to be the probability of having $n$ Notch receptors, $d$ Delta ligands, and $i$ NICD molecules at time $t$. The Kolmogorov forward equation describes how $P(n,d,i,t)$ changes over a small time step $\Delta t$:
 
 \begin{align*}
 P(n,d,i,t+\Delta t) &= P(n,d,i,t) \\

@@ -47,9 +47,10 @@ def deterministic_step(domain, state):
 
 # Run a single simulation of the deterministic ODE model
 @numba.njit
-def simulate(domain, dt, perturbations, wiener):
+def simulate(domain, perturbations, wiener):
 
     # Initialize the states variable
+    dt = TIME / STEPS
     name, neighbours, size = domain
     states = np.empty((STEPS, size, 3))
 
@@ -70,45 +71,68 @@ def simulate(domain, dt, perturbations, wiener):
     return np.linspace(0, TIME, STEPS), states
 
 
+# Return the initial perturbations and wiener values
+def initialize_simulation(index, domain, mode, samples):
+
+    # Default to perturbation and wiener coefficients of 0
+    name, neighbours, size = domain
+    perturbations = np.zeros((size, 3))
+    wiener = np.zeros((STEPS, size, 3))
+
+    # Generate consistent initial perturbations 
+    if mode == "Deterministic-Linear" and size == 2:
+        value = INITIAL_CELL * PI * ((index + 1) / samples)
+        perturbations = np.array([value, -value])
+
+    # Generate random initial perturbations 
+    if mode == "Deterministic-Random":
+        perturbations = np.random.normal(0, INITIAL_CELL * PI, (size, 3))
+
+    # Generate wiener values 
+    if mode == "Stochastic":
+        dt = TIME / STEPS
+        wiener = np.random.normal(0, np.sqrt(dt), (STEPS, size, 3))
+
+    return perturbations, wiener
+
+
 # Run a gillespie model with given domain and size
 def ode(domain, mode, samples = 1):
     
     # Initialize the simulations
-    dt = TIME / STEPS
     name, neighbours, size = domain
-    data_time, data_state = [], []
+    data_time, data_state, data_diff = [], [], []
 
     # Run simulations simulations
     start = time.time()
     logger.info(f"Model: {mode} ODE, Samples: {samples}, Domain: {name}")
     for i in range(samples):
 
-        # Generate initial perturbations 
-        if mode == "Deterministic":
-            perturbations = np.random.normal(0, INITIAL_CELL * PI, (size, 3))
-            wiener = np.zeros((STEPS, size, 3))
-
-        # Generate wiener values 
-        if mode == "Stochastic":
-            perturbations = np.zeros((size, 3))
-            wiener = np.random.normal(0, np.sqrt(dt), (STEPS, size, 3))
-        
-        # Run the simulation
-        v_time, v_state = simulate(domain, dt, perturbations, wiener)
+        # Get the initial conditions and run the simulation
+        perturbations, wiener = initialize_simulation(i, domain, mode, samples)
+        v_time, v_state = simulate(domain, perturbations, wiener)
 
         # In two cell simulations, order the cells 
         if size == 2 and v_state[-1, 1, 0] > v_state[-1, 0, 0]:
             v_state = np.roll(v_state, 1, axis = 1)
+
+        # Compute the differentiation time for two cell simulations
+        if size == 2:
+            max_index = np.argmax(v_state[:, 1, 0] < 1)
+            data_diff.append(v_time[max_index])
 
         # Add the time, state, and interpolated vectors to the data
         data_time.append(v_time)
         data_state.append(v_state)
         logger.info(f" - {time.time() - start:.4f}s: Finished simulation {i}")
 
-    # Average over the interpolated data to get the mean
-    data_mean = np.average(data_state, axis = 0) 
+    # Get the mean and standard deviation of each sample
+    data_mean = np.average(data_state, axis = 0)
+    data_std = np.std(data_state, axis = 0)
+
+    # Return the results of the simulation(s)
     logger.info(f"Finished in {time.time() - start:.4f}s")
-    return data_time, data_state, data_mean
+    return data_time, data_state, data_mean, data_std, data_diff
 
 
 

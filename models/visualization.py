@@ -1,6 +1,7 @@
 # Import libraries
 from matplotlib.colors import LinearSegmentedColormap
 import matplotlib.pyplot as plt
+import matplotlib as mpl
 import numpy as np
 
 # Import modules
@@ -11,21 +12,30 @@ from config import TIME, STEPS
 def two_cell_individual(domain, data, model):
 
     name, neighbours, size = domain
-    times, states, means = data
+    times, states, means, stds, diffs = data
     fig, axs = plt.subplots(nrows = 3, sharex = True)
 
     # Iterate through axes (0: Notch, 1: Delta, 2: NICD)
     for i in range(3):
+        
+        # Reduce the linewidth
+        mpl.rcParams['lines.linewidth'] = 1
 
         # Plot the trajectories for each sample
         for j in range(len(states)):
-            axs[i].plot(times[j], states[j][:, 0, i], color = "green", alpha = 0.1)
-            axs[i].plot(times[j], states[j][:, 1, i], color = "orange", alpha = 0.1)
+            axs[i].plot(times[j], states[j][:, 0, i], color = "green", alpha = 0.2)
+            axs[i].plot(times[j], states[j][:, 1, i], color = "orange", alpha = 0.2)
 
         # Plot the means at full opacity
-        default_times = np.linspace(0, TIME, STEPS)
-        axs[i].plot(default_times, means[:, 0, i], color = "green")
-        axs[i].plot(default_times, means[:, 1, i], color = "orange")
+        vT = np.linspace(0, TIME, STEPS)
+        axs[i].plot(vT, means[:, 0, i], color = "darkgreen")
+        axs[i].plot(vT, means[:, 1, i], color = "darkorange")
+
+        # Plot the standard deviations
+        axs[i].plot(vT, means[:, 0, i] + stds[:, 0, i], "--", color = "green")
+        axs[i].plot(vT, means[:, 0, i] - stds[:, 0, i], "--", color = "green")
+        axs[i].plot(vT, means[:, 1, i] + stds[:, 1, i], "--", color = "orange")
+        axs[i].plot(vT, means[:, 1, i] - stds[:, 1, i], "--", color = "orange")
 
     # Set axis labels
     axs[0].set_ylabel("Notch Molecules")
@@ -39,7 +49,8 @@ def two_cell_individual(domain, data, model):
     # Save to the img/ foler
     plt.tight_layout()
     fname = "_".join(f"{name} {model}".lower().split(" "))
-    plt.savefig(f"../paper/img/{fname}.pdf", dpi = 200, format = "pdf")
+    plt.savefig(f"img/{fname}.pdf", dpi = 200)
+    plt.close(fig)
 
 
 # Static, comparison visualization for two-cell models
@@ -51,7 +62,7 @@ def two_cell_comparison(all_data):
 
         # Unpack the data arrays
         data = all_data[i]
-        times, states, means = data 
+        times, states, means, stds, diffs = data
 
         # Plot the trajectories for each sample
         for j in range(len(states)):
@@ -75,7 +86,54 @@ def two_cell_comparison(all_data):
 
     # Save to the img/ foler
     plt.tight_layout()
-    plt.savefig(f"../paper/img/two_cell_comparison.pdf", dpi = 200, format = "pdf")
+    plt.savefig(f"img/two_cell_comparison.pdf", dpi = 200)
+    plt.close(fig)
+
+
+# Static, differentiation time plot for deterministic two-cell models
+def two_cell_deterministic_differentiation(domain, data):
+
+    # Unpack domain and data objects
+    name, neighbours, size = domain
+    states, diffs = np.array(data[1]), data[4]
+
+    # Compute the initial perturbations
+    perturbations = states[:, 0, 0, 0] - states[:, 0, 1, 0]
+
+    # Plot the initial perturbation against differentiation time
+    mpl.rcParams['lines.linewidth'] = 2
+    plt.plot(perturbations, diffs, "ko-")
+    plt.xlabel("Initial Perturbation") 
+    plt.ylabel("Differentiation Time")
+    plt.title("Initial Perturbation vs. Differentiation Time")
+
+    # Save to the img/ folder
+    plt.tight_layout()
+    plt.savefig(f"img/two_cell_deterministic_differentiation.pdf", dpi = 200)
+    plt.close()
+
+
+# Static differentiation time plot for stochastic ODE and gillespie models
+def two_cell_stochastic_differentiation(domain, stochastic_data, gillespie_data):
+
+    # Unpack domain and data objects (abbreviate s - stochastic, g - gillespie)
+    name, neighbours, size = domain
+    s_diffs = stochastic_data[4]
+    g_diffs = gillespie_data[4]
+
+    # Plot the initial perturbation against differentiation time
+    bins = np.linspace(0, 1500, 30)
+    plt.hist(s_diffs, bins, color="blue", label = "Stochastic", alpha = 0.4)
+    plt.hist(g_diffs, bins, color="red", label = "Gillespie", alpha = 0.4)
+    plt.xlabel("Differentiation Time") 
+    plt.ylabel("Count")
+    plt.title("Histogram of Differentiation Times")
+    plt.legend()
+
+    # Save to the img/ folder
+    plt.tight_layout()
+    plt.savefig(f"img/two_cell_stochastic_differentiation.pdf", dpi = 200)
+    plt.close()
 
 
 # Static, individual visualization for linear models

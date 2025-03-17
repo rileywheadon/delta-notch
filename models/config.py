@@ -16,7 +16,7 @@ PI = 0.05
 NOISE = 0.02
 
 # Set the simulation length and initial cell state
-TIME = 1000
+TIME = 1500
 STEPS = 10000
 INITIAL_CELL = np.array([200, 200, 100])
 
