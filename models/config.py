@@ -1,34 +1,35 @@
 import numpy as np
 import numba
 
-# Parameter values
-K = 2        # Hill function exponent
-NM = 10      # Maximum rate of Notch production
-DM = 10      # Maximum rate of Delta production
-N0 = 100     # Notch hill function (H+) half-max
-D0 = 100     # Delta hill function (H-) half-max
-KT = 0.0001  # Delta-Notch binding rate
-G = 0.02     # Extracellular molecule decay rate (used in dN/dt and dD/dt equations)
-GI = 0.025   # NICD decay rate
+# Default simulation parameters
+DEFAULT = np.array([
+    2,       # K: Hill function exponent
+    10,      # NM: Maximum rate of Notch production
+    10,      # DM: Maximum rate of Delta production
+    100,     # N0: Notch hill function (H+) half-max
+    100,     # D0: Delta hill function (H-) half-max
+    0.0001,  # KT: Delta-Notch binding rate
+    0.02,    # G: Extracellular molecule decay rate 
+    0.025,   # GI: NICD decay rate
+])
 
-# Initial and parameter perturbations
-PI = 0.05
-NOISE = 0.02
+# Default initial cell state
+DEFAULT_CELL = np.array([200, 200, 100])
 
-# Set the simulation length and initial cell state
+# Default simulation length and time steps
 TIME = 1500
-STEPS = 10000
-INITIAL_CELL = np.array([200, 200, 100])
+STEPS = 7500
 
 # Define increasing hill function based on parameters above
 @numba.njit
-def H_PLUS(i):
+def H_PLUS(params, i):
+    K, NM, DM, N0, D0 = params[:5]
     return (NM * i**K) / ((N0**K) + (i**K))
-
 
 # Define decreasing hill function based on parameters below
 @numba.njit
-def H_MINUS(i):
+def H_MINUS(params, i):
+    K, NM, DM, N0, D0 = params[:5]
     return (DM * D0**K) / ((D0**K) + (i**K))
 
 

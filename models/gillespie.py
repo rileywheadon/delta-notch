@@ -6,17 +6,14 @@ import time
 import numba
 from scipy.interpolate import interp1d
 
-# Import configuration from config.py
-from config import H_PLUS, H_MINUS, INITIAL_CELL, KT, G, GI, TIME, STEPS
-
-# Initialize logger
-logger = logging.getLogger(__name__)
-logging.basicConfig(filename = "main.log", filemode="w", level=logging.INFO)
+# Import modules
+from config import H_PLUS, H_MINUS, DEFAULT, TIME, STEPS
 
 
 # Generates the reaction rates based on the state
 @numba.njit
-def update_reaction_rates(state, neighbours):
+def update_reaction_rates(state, neighbours, params):
+    K, NM, DM, N0, D0, KT, G, GI = params
 
     # Initialize empty rate arrays for each reaction
     r1 = np.empty(len(neighbours))
@@ -35,8 +32,8 @@ def update_reaction_rates(state, neighbours):
         r4[i] = cell[2] * GI  # Rate parameter of NICD decay
 
         # Set all of the production rates (reactions 5-6)
-        r5[i] = H_PLUS(cell[2])   # Rate parameter of Notch production
-        r6[i] = H_MINUS(cell[2])   # Rate parameter of Delta production
+        r5[i] = H_PLUS(params, cell[2])
+        r6[i] = H_MINUS(params, cell[2])
 
     # Sum over the neighbour pairs to get the binding rates (reaction 1) 
     for i, (cellA, cellB) in enumerate(neighbours):
@@ -107,28 +104,26 @@ def update_state(state, event, neighbours):
 
 # Runs a single simulation 
 @numba.njit
-def simulate(domain):
+def gillespie(domain, initial, params = DEFAULT):
 
     # Initialize the simulation
     t = 0
+    state = initial
     name, neighbours, size = domain
-    state = np.empty((size, 3))
     rates = np.empty(len(neighbours) + (size * 5))
 
-    # Unfortunate numba hack to set the state vector
-    for i in range(size): 
-        state[i] = INITIAL_CELL
-
     # Initialize the state and time vectors
-    v_time = []
-    v_state = []
+    vT, vS = [], []
     while t <= TIME:
 
         # Update reaction rates
-        rates = update_reaction_rates(state, neighbours)
+        rates = update_reaction_rates(state, neighbours, params)
 
         # Add the current time to the time vector
-        v_time.append(t)
+        vT.append(t)
+
+        # Add the state to the state vector
+        vS.append(np.copy(state))
 
         # Generate a new reaction time and increment time
         t += generate_reaction_time(rates)
@@ -139,57 +134,5 @@ def simulate(domain):
         # Update the state based on the event
         state = update_state(state, event, neighbours)
 
-        # Add the state to the state vector
-        v_state.append(np.copy(state))
-
-    # Append this sample to the data vectors
-    return v_time, v_state
-
-
-# Run a gillespie model with given domain and size
-def gillespie(domain, samples = 1):
-    
-    # Initialize the data arrays
-    data_time = []
-    data_state = []
-    data_mean = []
-    data_diff = []
-
-    # Run 'samples' simulations
-    start = time.time()
-    name, neighbours, size = domain
-    logger.info(f"Model: Gillespie, Samples: {samples}, Domain: {name}")
-
-    for i in range(samples):
-
-        v_time, v_state = simulate(domain)
-        v_time = np.array(v_time)
-        v_state = np.array(v_state)
-
-        # In two cell simulations, order the cells 
-        if size == 2 and v_state[-1, 1, 0] > v_state[-1, 0, 0]:
-            v_state = np.roll(v_state, 1, axis = 1)
-
-        # Compute the differentiation time for two cell simulations
-        if size == 2:
-            max_index = np.argmax(v_state[:, 1, 0] < 1)
-            data_diff.append(v_time[max_index])
-
-        # Linearly interpolate the state vector
-        f_interp = interp1d(v_time, v_state, axis = 0, fill_value = "extrapolate")
-        v_interp = f_interp(np.linspace(0, TIME, STEPS))
-
-        # Add the time, state, and interpolated vectors to the data
-        data_time.append(v_time)
-        data_state.append(v_state)
-        data_mean.append(v_interp)
-        logger.info(f" - {time.time() - start:.4f}s: Finished simulation {i}")
-
-    # Average over the interpolated data to get STD and the mean
-    data_std = np.std(data_mean, axis = 0)
-    data_mean = np.average(data_mean, axis = 0) 
-    logger.info(f"Finished in {time.time() - start:.4f}s")
-    return data_time, data_state, data_mean, data_std, data_diff
-
-
+    return vT, vS
 

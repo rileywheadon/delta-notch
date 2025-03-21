@@ -1,63 +1,28 @@
-# Import libraries
-import numpy as np
-import sys
-import logging
-import time
-import numba
-
 # Import modules 
+import experiments as ex
 import visualization as vis
-import domains
-import gillespie 
-import ode
-
-# Initialize logger
-logger = logging.getLogger(__name__)
-logging.basicConfig(filename = "main.log", filemode="w", level=logging.INFO)
-
 
 # Run all simulations
-np.random.seed(69420)
 def main():
 
-    # Two Cell Domain 
-    domain = domains.linear(2, "dirichlet")
+    # Two-Cell Tests
+    ex.ex01()
+    ex.ex02()
+    ex.ex03()
 
-    # Deterministic Model (Linear ICs)
-    linear_data = ode.ode(domain, "Deterministic-Linear", samples = 10)
-    vis.two_cell_individual(domain, linear_data, "Linear Deterministic")
-    
-    # Deterministic Model (Random ICs)
-    random_data = ode.ode(domain, "Deterministic-Random", samples = 10)
-    vis.two_cell_individual(domain, random_data, "Random Deterministic")
+    # Linear Domain Tests
+    ex.ex04()
+    ex.ex05()
+    ex.ex06()
 
-    # Stochastic Model
-    stochastic_data = ode.ode(domain, "Stochastic", samples = 10)
-    vis.two_cell_individual(domain, stochastic_data, "Stochastic")
+    # Hexagonal Domain Tests
+    # TBD
 
-    # Gillespie Model
-    gillespie_data = gillespie.gillespie(domain, samples = 10)
-    vis.two_cell_individual(domain, gillespie_data, "Gillespie")
-
-    # Comparison Plot
-    all_data = (random_data, stochastic_data, gillespie_data)
-    vis.two_cell_comparison(all_data)
-
-    # Differentiation time plots (with additional samples)
-    linear_data = ode.ode(domain, "Deterministic-Linear", samples = 50)
-    stochastic_data = ode.ode(domain, "Stochastic", samples = 500)
-    gillespie_data = gillespie.gillespie(domain, samples = 500)
-    vis.two_cell_deterministic_differentiation(domain, linear_data)
-    vis.two_cell_stochastic_differentiation(domain, stochastic_data, gillespie_data)
-    
-    # Linear Domain (Dirichlet)
-    # domain, size = domains.linear(11, "dirichlet")
-    # v_time, v_state = gillespie.run(domain, size)
-
-    # Linear Domain (Periodic)
-    # domain, size = domains.linear(11, "periodic")
-    # v_time, v_state = gillespie.run(domain, size)
+    # Two-Cell Experiments
+    ex.ex10()
+    ex.ex11()
+    ex.ex12()
+    # ex.ex13()
 
 
 main()
-
