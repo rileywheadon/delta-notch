@@ -55,18 +55,19 @@ Each experiment has a unique numerical ID, which makes them easier to identify.
 
 ### Two-Cell
 
-- `10`: How does varying the initial perturbation affect differentiation time in the deterministic two-cell model? To do this, we run simulations and plot perturbation size against differentiation time.
+- `10`: How does varying the initial perturbation (to Notch) affect differentiation time in the deterministic two-cell model? To do this, we run simulations and plot perturbation size against differentiation time.
 - `11`: How does noise affect differentiation time in the stochastic two-cell model? Which noise coefficient most accurately replicates the behaviour of the Gillespie model? Use a KDE to estimate the distribution.
-- `12`:
-- `13`: How does changing the parameters (particularly `NM`, `DM`, `KT`, `G`, `GI`) affect whether the cells differentiate or not? Search the parameter space for all three types of models.
+- `12`: How large does an initial perturbation (to Notch) need to be to guarantee that the agent-based model converges to a steady-state where a _specific_ cell has the primary fate?
+- `13`: How does changing the parameters (particularly `NM`, `DM`, `KT`, `G`, `GI`) affect whether the cells differentiate or not? Search the parameter space for all three types of models. In lieu of knowing more complex methods, we will use OAT (one at a time) sensitivity analysis for this experiment.
 
 ### Linear
 
-- `14`: How do odd/even domains and dirichlet/periodic boundary conditions affect cell patterns? Test all combinations and make a plot showing the different patterns and their frequency. Use the Gillespie model.
-- `15`: How do dirichlet/periodic boundary conditions affect differentiation times? Use the Gillespie model.
-- `16`: Redo experiment `12` on a linear domain. Search the parameter space for all three types of models.
+- `14`: How do odd/even domains and dirichlet/periodic boundary conditions affect cell patterns? Test all combinations and make a plot showing the different patterns and their frequency. Use the stochastic ODE.
+- `15`: How do dirichlet/periodic boundary conditions affect differentiation times? Use the stochastic ODE model.
+- `16`: How does domain size affect differentiation time? Use the stochastic ODE model.
+- `17`: Redo experiment `13` on a linear domain. Search the parameter space for all three types of models.
 
 ### Hexagonal
 
-- `17`: How does domain shape affect differentiation time and the number of cells with each fate? Use the Gillespie model. Test wide and flat as well as more regular domains.
-- `18`: How do dirichlet/periodic boundary conditions affect cell patterns? Use a 5x5 domain and the Gillespie model. Show each pattern (or just the top 5 if there's a lot of them) and their frequency.
+- `18`: How does domain shape affect differentiation time and the number of cells with each fate? Use the Gillespie model. Test wide and flat as well as more regular domains.
+- `19`: How do dirichlet/periodic boundary conditions affect cell patterns? Use a 5x5 domain and the Gillespie model. Show each pattern (or just the top 5 if there's a lot of them) and their frequency.
