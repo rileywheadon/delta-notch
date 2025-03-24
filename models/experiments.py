@@ -210,7 +210,7 @@ def ex12(runs = 100, shift = np.linspace(0, 100, 6)):
 
 
 # Helper function for stability analysis on two parameters i1, i2 in DEFAULT
-def two_parameter_stability(i1, i2, model, samples = 9):
+def two_parameter_stability(i1, i2, model, samples = 25):
 
     # Helper function to generate parameter space for parameter i
     def parameter_space(i):
@@ -267,6 +267,19 @@ def ex13():
         grids.append([d_grid, s_grid, g_grid])
 
     vis.vis13(grids, pairs)
+    print("\nExperiment Completed!\n")
+
+
+# Experiment 14: Linear model pattern analysis
+def ex14():
+
+    print("\nRunning Experiment 14\n")
+
+    domain = domains.linear(9, "Dirichlet")
+    vT, vS = ode.ode(domain, DEFAULT_CELL, noise = 0.02)
+    print(pattern(vS))
+
+
     print("\nExperiment Completed!\n")
 
 

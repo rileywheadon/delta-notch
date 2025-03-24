@@ -29,4 +29,13 @@ def differentiation(vT, vS):
     return vT[np.max(vI)]
 
 
+# Get the pattern for a single simulation
+def pattern(vS):
+    return np.where(vS[-1, :, 0] < 1, 0, 1)
 
+# NOTE: In the function above, vS is stores states with shape (# steps, # cells, 3)
+# I only use one index to denote cells in both linear and hexagonal domains
+# If your vS has shape (# steps, width, height, 3) you could use the code below
+
+def pattern_hexagonal(vS):
+    return np.where(vS[-1, :, :, 0] < 1, 0, 1)

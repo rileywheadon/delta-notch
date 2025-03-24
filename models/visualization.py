@@ -213,8 +213,6 @@ def stability_visualization(ax, grids, pair):
     ax.yaxis.set_major_formatter(mpl.ticker.StrMethodFormatter("{x:.1e}"))
 
     # Set the x and y limits, titles, labels, etc.
-    print(f"i1: {i1}, i2: {i2}")
-    print(f"X Limit: {DEFAULT[i1] * 10}, Y Limit: {DEFAULT[i2] * 10}")
     ax.xaxis.set_ticks(np.linspace(0, DEFAULT[i1] * 10, 3))
     ax.yaxis.set_ticks(np.linspace(0, DEFAULT[i2] * 10, 3))
     ax.set_xlim(0, DEFAULT[i1] * 10)
