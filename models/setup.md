@@ -58,7 +58,7 @@ Each experiment has a unique numerical ID, which makes them easier to identify.
 - `10`: How does varying the initial perturbation (to Notch) affect differentiation time in the deterministic two-cell model? To do this, we run simulations and plot perturbation size against differentiation time.
 - `11`: How does noise affect differentiation time in the stochastic two-cell model? Which noise coefficient most accurately replicates the behaviour of the Gillespie model? Use a KDE to estimate the distribution.
 - `12`: How large does an initial perturbation (to Notch) need to be to guarantee that the agent-based model converges to a steady-state where a _specific_ cell has the primary fate?
-- `13`: How does changing the parameters (particularly `NM`, `DM`, `KT`, `G`, `GI`) affect whether the cells differentiate or not? Search the parameter space for all three types of models. In lieu of knowing more complex methods, we will use OAT (one at a time) sensitivity analysis for this experiment.
+- `13`: How does changing the parameters (particularly `NM`, `DM`, `KT`, `G`, `GI`) affect whether the cells differentiate or not? Search the parameter space for all three types of models. We will use two at a time sensitivity analysis to plot 2D subspaces of parameter space in which the model differentiates.
 
 ### Linear
 

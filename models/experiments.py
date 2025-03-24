@@ -5,7 +5,7 @@ import numba
 from tqdm import trange
 
 # Import modules 
-from config import DEFAULT_CELL
+from config import DEFAULT_CELL, DEFAULT
 from helpers import *
 import visualization as vis
 import domains
@@ -209,33 +209,64 @@ def ex12(runs = 100, shift = np.linspace(0, 100, 6)):
     print("\nExperiment Completed!\n")
 
 
-# Experiment 13: Effect of hyperparameters on cell differentiation in all three models 
-def ex13():
+# Helper function for stability analysis on two parameters i1, i2 in DEFAULT
+def two_parameter_stability(i1, i2, model, samples = 9):
 
-    # Generate the grid of parameter ranges 
-    print("\nRunning Experiment 13\n")
-    grid = np.meshgrid(
-        [2],                                          # K
-        [4, 7, 10, 13, 16],                           # NM
-        [4, 7, 10, 13, 16],                           # DM
-        [100],                                        # N0
-        [100],                                        # D0
-        [0.00004, 0.00007, 0.0001, 0.00013, 0.00016], # KT
-        [0.01, 0.015, 0.02, 0.025, 0.03],             # G
-        [0.01, 0.015, 0.02, 0.025, 0.03],             # GI
-    )
-
+    # Helper function to generate parameter space for parameter i
+    def parameter_space(i):
+        if i in [i1, i2]:
+            return DEFAULT[i] * np.logspace(-1, 1, samples)
+        else:
+            return [DEFAULT[i]]
+  
+    # Generate list of parameter arrays for each simulation (plist)
+    grid = np.meshgrid(*[parameter_space(i) for i in range(8)])
     params = np.array(grid).T.reshape(-1,8)
     success = np.empty(len(params))
 
     # Iterate through the list of parameters
     domain = domains.linear(2, "Dirichlet")
     for i in trange(len(params)):
-        vT, vS = ode.ode(domain, DEFAULT_CELL, params = params[i])
-        success[i] = 0 if differentiation(vT, vS) == vT[-1] else 1
 
-    # Plot the results
-    vis.vis13(params, success)
+        # Set the initial condition (adding 2% initial perturbation for deterministic)
+        initial = np.array([DEFAULT_CELL, DEFAULT_CELL], dtype = np.float64)
+        if model == "Deterministic":
+            initial += np.random.normal(0, DEFAULT_CELL * 0.02, (2, 3))
+
+        # Run a simulation with the given model (with 2% noise for stochastic ODE)
+        vT, vS = None, None
+        if model == "Deterministic":
+            vT, vS = ode.ode(domain, initial, params = params[i])
+        if model == "Stochastic":
+            vT, vS = ode.ode(domain, initial, noise = 0.02, params = params[i])
+        if model == "Gillespie":
+            vT, vS = gillespie.gillespie(domain, initial, params = params[i])
+
+        # Check if one cell has low Notch and the other has high Notch
+        vS = np.array(vS)
+        vS = np.sort(vS[:, :, 0], axis = 1)
+        success[i] = (vS[-1, 0] < 1 and vS[-1, 1] > 1)
+
+    # Subset the parameter list on the successful simulations
+    return params[np.argwhere(success), [i1, i2]]
+
+
+# Experiment 13: Effect of parameters on cell differentiation in all three models 
+def ex13():
+
+    print("\nRunning Experiment 13\n")
+
+    # Define the paris of indices for stability analysis 
+    # Use the parameters NM (1), DM (2), KT (5), G (6), GI (7)
+    pairs = [(1,2),(1,5),(2,5),(1,6),(2,6),(5,6),(1,7),(2,7),(5,7),(6,7)]
+    grids = []
+    for pair in pairs:
+        d_grid = two_parameter_stability(pair[0], pair[1], "Deterministic")
+        s_grid = two_parameter_stability(pair[0], pair[1], "Stochastic")
+        g_grid = two_parameter_stability(pair[0], pair[1], "Gillespie")
+        grids.append([d_grid, s_grid, g_grid])
+
+    vis.vis13(grids, pairs)
     print("\nExperiment Completed!\n")
 
 

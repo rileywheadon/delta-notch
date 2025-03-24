@@ -3,14 +3,14 @@ import numba
 
 # Default simulation parameters
 DEFAULT = np.array([
-    2,       # K: Hill function exponent
-    10,      # NM: Maximum rate of Notch production
-    10,      # DM: Maximum rate of Delta production
-    100,     # N0: Notch hill function (H+) half-max
-    100,     # D0: Delta hill function (H-) half-max
-    0.0001,  # KT: Delta-Notch binding rate
-    0.02,    # G: Extracellular molecule decay rate 
-    0.025,   # GI: NICD decay rate
+    2,       # 0, K: Hill function exponent
+    10,      # 1, NM: Maximum rate of Notch production
+    10,      # 2, DM: Maximum rate of Delta production
+    100,     # 3, N0: Notch hill function (H+) half-max
+    100,     # 4, D0: Delta hill function (H-) half-max
+    0.0001,  # 5, KT: Delta-Notch binding rate
+    0.02,    # 6, G: Extracellular molecule decay rate 
+    0.025,   # 7, GI: NICD decay rate
 ])
 
 # Default initial cell state

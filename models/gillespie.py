@@ -114,7 +114,7 @@ def gillespie(domain, initial, params = DEFAULT):
 
     # Initialize the state and time vectors
     vT, vS = [], []
-    while t <= TIME:
+    while t <= TIME and len(vT) < 100000:
 
         # Update reaction rates
         rates = update_reaction_rates(state, neighbours, params)

@@ -6,23 +6,23 @@ import visualization as vis
 def main():
 
     # Two-Cell Tests
-    ex.ex01()
-    ex.ex02()
-    ex.ex03()
+    # ex.ex01()
+    # ex.ex02()
+    # ex.ex03()
 
     # Linear Domain Tests
-    ex.ex04()
-    ex.ex05()
-    ex.ex06()
+    # ex.ex04()
+    # ex.ex05()
+    # ex.ex06()
 
     # Hexagonal Domain Tests
     # TBD
 
     # Two-Cell Experiments
-    ex.ex10()
-    ex.ex11()
-    ex.ex12()
-    # ex.ex13()
+    # ex.ex10()
+    # ex.ex11()
+    # ex.ex12()
+    ex.ex13()
 
 
 main()

@@ -1,12 +1,14 @@
 # Import libraries
 from scipy.stats import gaussian_kde
+from scipy.spatial import ConvexHull
 from matplotlib.colors import LinearSegmentedColormap
+from matplotlib.patches import Polygon
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 import numpy as np
 
 # Import modules
-from config import TIME, STEPS
+from config import TIME, STEPS, DEFAULT
 
 
 # Visualization 01-03 helper function:
@@ -172,5 +174,96 @@ def vis12(shift, fates):
     plt.close()
 
 
-def vis13(params, success):
-    return
+# Helper function for vis13
+def stability_visualization(ax, grids, pair):
+    
+    # List of parameter names in LaTeX
+    NAMES = [
+        r"$K$",
+        r"$N_M$",
+        r"$D_M$",
+        r"$N_0$",
+        r"$D_0$",
+        r"$K_T$",
+        r"$\gamma$",
+        r"$\gamma_I$"
+    ]
+
+    # Unpack parameters, set constants
+    i1, i2 = pair
+    d_grid, s_grid, g_grid = grids
+
+    # Compute the convex hull for each grid
+    d_hull = d_grid[ConvexHull(d_grid).vertices, :]
+    s_hull = s_grid[ConvexHull(s_grid).vertices, :]
+    g_hull = g_grid[ConvexHull(g_grid).vertices, :]
+
+    # Plot the convex hull for each grid
+    d_poly = Polygon(d_hull, fc='none', ec="b", label="Deterministic ODE")
+    s_poly = Polygon(s_hull, fc='none', ec="g", label="Stochastic ODE")
+    g_poly = Polygon(g_hull, fc='none', ec="r", label="Agent-Based")
+
+    # Add the patches to the axes object
+    ax.add_patch(d_poly)
+    ax.add_patch(s_poly)
+    ax.add_patch(g_poly)
+   
+    # Set tick formatters
+    ax.xaxis.set_major_formatter(mpl.ticker.StrMethodFormatter("{x:.1e}"))
+    ax.yaxis.set_major_formatter(mpl.ticker.StrMethodFormatter("{x:.1e}"))
+
+    # Set the x and y limits, titles, labels, etc.
+    print(f"i1: {i1}, i2: {i2}")
+    print(f"X Limit: {DEFAULT[i1] * 10}, Y Limit: {DEFAULT[i2] * 10}")
+    ax.xaxis.set_ticks(np.linspace(0, DEFAULT[i1] * 10, 3))
+    ax.yaxis.set_ticks(np.linspace(0, DEFAULT[i2] * 10, 3))
+    ax.set_xlim(0, DEFAULT[i1] * 10)
+    ax.set_ylim(0, DEFAULT[i2] * 10)
+    ax.set_xlabel(NAMES[i1])
+    ax.set_ylabel(NAMES[i2])
+    ax.set_title(f"{NAMES[i1]} vs. {NAMES[i2]}")
+
+    # Remove the spines
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    ax.spines['bottom'].set_visible(False)
+    ax.spines['left'].set_visible(False)
+    return [d_poly, s_poly, g_poly]
+
+
+# Produce a triangle plot for stability analysis
+def vis13(grids, pairs): 
+
+    # The final plot will have the following arrangement:
+    # x/y  0      1      2      3
+    # 0 (1, 2)
+    # 1 (1, 5) (2, 5)
+    # 2 (1, 6) (2, 6) (5, 6)
+    # 3 (1, 7) (2, 7) (5, 7) (6, 7)
+
+    plt.rcParams['font.size'] = 10
+    fig, axs = plt.subplots(4, 4, figsize = (15, 12))
+    plots = [(0,0),(1,0),(1,1),(2,0),(2,1),(2,2),(3,0),(3,1),(3,2),(3,3)]
+    pairs = [(1,2),(1,5),(2,5),(1,6),(2,6),(5,6),(1,7),(2,7),(5,7),(6,7)]
+
+    # Iterate through the subplots, drawing when necessary
+    handles = 0
+    for (x, y), grid, pair in zip(plots, grids, pairs):
+        handles = stability_visualization(axs[x][y], grid, pair)
+
+    # Delete the empty plots
+    for (x, y) in [(0,1),(0,2),(0,3),(1,2),(1,3),(2,3)]:
+        axs[x][y].clear()
+        axs[x][y].axis("off")
+
+    # Add a legend 
+    plt.figlegend(handles = handles)
+    fig.suptitle("Stability Analysis")
+
+    # Save to the img/ folder
+    plt.tight_layout()
+    plt.savefig(f"img/vis13.pdf", dpi = 200)
+    plt.close()
+
+
+
