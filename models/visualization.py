@@ -367,13 +367,13 @@ def visualize_pattern(pattern, domain='hexagonal', ny=7, nx=7, radius=1.0):
     plt.show()
 
     # Example usages
-    # Hexagonal mode
+    # Hexagonal domain
     # hex_pattern = np.array([1, 0, 1, 1, 0, 1, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 1, 0, 0, 1, 
     #            1, 1, 0, 0, 1, 0, 0, 0, 1, 1, 0, 1, 1, 1, 0, 0, 1, 0, 1, 0, 
     #            1, 1, 0, 1, 1, 0, 0, 1, 0])
     # visualize_pattern(hex_pattern, domain='hexagonal', ny=7, nx=7)
 
-    # Linear mode
+    # Linear domain
     # linear_pattern = np.array([0, 0, 1, 1, 0, 1, 0, 1, 1, 1])
-    # visualize_pattern(linear_pattern, mode='linear')
+    # visualize_pattern(linear_pattern, domain='linear')
 
