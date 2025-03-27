@@ -16,14 +16,16 @@ def main():
     # ex.ex06()
 
     # Hexagonal Domain Tests
-    # TBD
+    ex.ex15()
 
     # Two-Cell Experiments
     # ex.ex10()
     # ex.ex11()
     # ex.ex12()
     # ex.ex13()
-    ex.ex14()
+    # ex.ex14()
+    
+    
 
 
 main()

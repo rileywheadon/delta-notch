@@ -2,7 +2,7 @@
 from scipy.stats import gaussian_kde
 from scipy.spatial import ConvexHull
 from matplotlib.colors import LinearSegmentedColormap
-from matplotlib.patches import Polygon
+from matplotlib.patches import Polygon, RegularPolygon, Rectangle
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 import numpy as np
@@ -263,5 +263,117 @@ def vis13(grids, pairs):
     plt.savefig(f"img/vis13.pdf", dpi = 200)
     plt.close()
 
+#  Produces a visualization of the cell pattern for either hexagonal or linear domains
+def visualize_pattern(pattern, domain='hexagonal', ny=7, nx=7, radius=1.0):
+    """
+    Visualize a pattern in either hexagonal or linear mode:
+    
+    Hexagonal Mode:
+    - pattern is a 1D numpy array of 0s and 1s
+    - ny is the number of rows
+    - nx is the number of columns
+    - radius controls the size of hexagons
+    
+    Linear Mode:
+    - pattern is a 1D numpy array of 0s and 1s
+    - Visualizes a single row of rectangular cells
+    """
+    # Create the figure and axis
+    fig, ax = plt.subplots(figsize=(10, 8))
+    
+    if domain == 'hexagonal':
+        # Ensure the pattern matches the grid size
+        assert len(pattern) == ny * nx, "Pattern length must match grid size"
+        
+        # Hexagon dimensions
+        hex_height = np.sqrt(3) * radius
+        
+        # Initialize hexagons in a parallelogram grid
+        pattern_index = 0
+        for j in range(ny):
+            for l in range(nx):
+                # Calculate hexagon center position for parallelogram grid
+                # Shift each row to right while starting from top
+                x = l * np.sqrt(3) * radius + j * 0.866 * radius  # Shifted right
+                y = (ny - 1 - j) * hex_height * 0.866  # Invert y to start from top
+                
+                # Determine color based on the grid value
+                facecolor = 'black' if pattern[pattern_index] == 0 else 'white'
+                pattern_index += 1
+                
+                # Create hexagon patch
+                hexagon = RegularPolygon(
+                    (x, y), 
+                    numVertices=6, 
+                    radius=radius,
+                    orientation=0,  # Flat-topped hexagon
+                    facecolor=facecolor,
+                    edgecolor='gray',
+                    linewidth=2.0
+                )
+                ax.add_patch(hexagon)
+        
+        # Set axis limits based on the parallelogram grid dimensions
+        max_x = (nx - 1) * 1.5 * radius + (ny - 1) * 0.75 * radius + 2 * radius 
+        max_y = (ny - 1) * hex_height * 0.866 + 2 * radius
+        ax.set_xlim(-radius, max_x + radius)
+        ax.set_ylim(-radius, max_y + radius)
+        
+        # Title
+        plt.title(f'Hexagonal Grid Pattern ({ny}x{nx})')
+    
+    elif domain == 'linear':
+        # Ensure the pattern is a 1D array
+        assert len(pattern.shape) == 1, "Pattern must be a 1D array for linear mode"
+        
+        # Rectangle width and height
+        rect_width = 1.0
+        rect_height = 2.0
+        
+        # Create rectangles for each cell in the pattern
+        for i, cell_value in enumerate(pattern):
+            # Determine color based on the cell value
+            facecolor = 'black' if cell_value == 0 else 'white'
+            
+            # Create rectangle patch
+            rect = Rectangle(
+                (i * rect_width, 0),  # x, y position
+                rect_width,  # width
+                rect_height,  # height
+                facecolor=facecolor,
+                edgecolor='gray',
+                linewidth=2.0
+            )
+            ax.add_patch(rect)
+        
+        # Set axis limits
+        ax.set_xlim(-0.1, len(pattern) * rect_width + 0.1)
+        ax.set_ylim(-0.1, rect_height + 0.1)
+        
+        # Title
+        plt.title(f'Linear Pattern ({len(pattern)} cells)')
+    
+    else:
+        raise ValueError("Mode must be either 'hexagonal' or 'linear'")
+    
+    # Ensure equal aspect ratio
+    ax.set_aspect('equal')
+    
+    # Remove axis
+    ax.axis('off')
+    
+    # Show the plot
+    plt.tight_layout()
+    plt.show()
 
+    # Example usages
+    # Hexagonal domain
+    # hex_pattern = np.array([1, 0, 1, 1, 0, 1, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 1, 0, 0, 1, 
+    #            1, 1, 0, 0, 1, 0, 0, 0, 1, 1, 0, 1, 1, 1, 0, 0, 1, 0, 1, 0, 
+    #            1, 1, 0, 1, 1, 0, 0, 1, 0])
+    # visualize_pattern(hex_pattern, domain='hexagonal', ny=7, nx=7)
+
+    # Linear domain
+    # linear_pattern = np.array([0, 0, 1, 1, 0, 1, 0, 1, 1, 1])
+    # visualize_pattern(linear_pattern, domain='linear')
 
