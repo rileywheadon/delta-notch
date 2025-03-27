@@ -1,0 +1,219 @@
+% $ biblatex auxiliary file $
+% $ biblatex bbl format version 3.3 $
+% Do not modify the above lines!
+%
+% This is an auxiliary file used by the 'biblatex' package.
+% This file may safely be deleted. It will be recreated by
+% biber as required.
+%
+\begingroup
+\makeatletter
+\@ifundefined{ver@biblatex.sty}
+  {\@latex@error
+     {Missing 'biblatex' package}
+     {The bibliography requires the 'biblatex' package.}
+      \aftergroup\endinput}
+  {}
+\endgroup
+
+
+\refsection{0}
+  \datalist[entry]{nty/global//global/global/global}
+    \entry{boareto_jaggeddelta_2015}{article}{}{}
+      \name{author}{6}{}{%
+        {{hash=4abe785ce73d6ea06db1e5026c57622b}{%
+           family={Boareto},
+           familyi={B\bibinitperiod},
+           given={Marcelo},
+           giveni={M\bibinitperiod}}}%
+        {{hash=6e6701ef62a8564999f38094b7994d72}{%
+           family={Jolly},
+           familyi={J\bibinitperiod},
+           given={Mohit\bibnamedelima Kumar},
+           giveni={M\bibinitperiod\bibinitdelim K\bibinitperiod}}}%
+        {{hash=5e483448d0cf28193ac760624950a7ee}{%
+           family={Lu},
+           familyi={L\bibinitperiod},
+           given={Mingyang},
+           giveni={M\bibinitperiod}}}%
+        {{hash=0978be651a5ef4ae2a5f3f37a57127e8}{%
+           family={Onuchic},
+           familyi={O\bibinitperiod},
+           given={José\bibnamedelima N.},
+           giveni={J\bibinitperiod\bibinitdelim N\bibinitperiod}}}%
+        {{hash=c563854719492878129e818e34d953cc}{%
+           family={Clementi},
+           familyi={C\bibinitperiod},
+           given={Cecilia},
+           giveni={C\bibinitperiod}}}%
+        {{hash=e1aafa4a6f7b6d973b7b308d275c740d}{%
+           family={Ben-Jacob},
+           familyi={B\bibinithyphendelim J\bibinitperiod},
+           given={Eshel},
+           giveni={E\bibinitperiod}}}%
+      }
+      \strng{namehash}{28cd3dfae283751af6e18067410363e8}
+      \strng{fullhash}{6d8334d40b32a11dbced58ce7fc115f1}
+      \strng{fullhashraw}{6d8334d40b32a11dbced58ce7fc115f1}
+      \strng{bibnamehash}{28cd3dfae283751af6e18067410363e8}
+      \strng{authorbibnamehash}{28cd3dfae283751af6e18067410363e8}
+      \strng{authornamehash}{28cd3dfae283751af6e18067410363e8}
+      \strng{authorfullhash}{6d8334d40b32a11dbced58ce7fc115f1}
+      \strng{authorfullhashraw}{6d8334d40b32a11dbced58ce7fc115f1}
+      \field{sortinit}{B}
+      \field{sortinithash}{d7095fff47cda75ca2589920aae98399}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{abstract}{Notch signaling pathway mediates cell-fate determination during embryonic development, wound healing, and tumorigenesis. This pathway is activated when the ligand Delta or the ligand Jagged of one cell interacts with the Notch receptor of its neighboring cell, releasing the Notch Intracellular Domain ({NICD}) that activates many downstream target genes. {NICD} affects ligand production asymmetrically––it represses Delta, but activates Jagged. Although the dynamical role of Notch–Jagged signaling remains elusive, it is widely recognized that Notch–Delta signaling behaves as an intercellular toggle switch, giving rise to two distinct fates that neighboring cells adopt––Sender (high ligand, low receptor) and Receiver (low ligand, high receptor). Here, we devise a specific theoretical framework that incorporates both Delta and Jagged in Notch signaling circuit to explore the functional role of Jagged in cell-fate determination. We find that the asymmetric effect of {NICD} renders the circuit to behave as a three-way switch, giving rise to an additional state––a hybrid Sender/Receiver (medium ligand, medium receptor). This phenotype allows neighboring cells to both send and receive signals, thereby attaining similar fates. We also show that due to the asymmetric effect of the glycosyltransferase Fringe, different outcomes are generated depending on which ligand is dominant: Delta-mediated signaling drives neighboring cells to have an opposite fate; Jagged-mediated signaling drives the cell to maintain a similar fate to that of its neighbor. We elucidate the role of Jagged in cell-fate determination and discuss its possible implications in understanding tumor–stroma cross-talk, which frequently entails Notch–Jagged communication.}
+      \field{day}{3}
+      \field{journaltitle}{Proceedings of the National Academy of Sciences}
+      \field{month}{2}
+      \field{note}{Publisher: Proceedings of the National Academy of Sciences}
+      \field{number}{5}
+      \field{title}{Jagged–Delta asymmetry in Notch signaling can give rise to a Sender/Receiver hybrid phenotype}
+      \field{urlday}{14}
+      \field{urlmonth}{3}
+      \field{urlyear}{2025}
+      \field{volume}{112}
+      \field{year}{2015}
+      \field{dateera}{ce}
+      \field{urldateera}{ce}
+      \true{nocite}
+      \field{pages}{E402\bibrangedash E409}
+      \range{pages}{-1}
+      \verb{doi}
+      \verb 10.1073/pnas.1416287112
+      \endverb
+      \verb{file}
+      \verb Full Text PDF:/home/rileywheadon/Zotero/storage/3G7TGTPZ/Boareto et al. - 2015 - Jagged–Delta asymmetry in Notch signaling can give rise to a SenderReceiver hybrid phenotype.pdf:application/pdf
+      \endverb
+      \verb{urlraw}
+      \verb https://www.pnas.org/doi/full/10.1073/pnas.1416287112
+      \endverb
+      \verb{url}
+      \verb https://www.pnas.org/doi/full/10.1073/pnas.1416287112
+      \endverb
+    \endentry
+    \entry{bray_notch_2006}{article}{}{}
+      \name{author}{1}{}{%
+        {{hash=9bf2361f658d828240875bd71854593e}{%
+           family={Bray},
+           familyi={B\bibinitperiod},
+           given={Sarah\bibnamedelima J.},
+           giveni={S\bibinitperiod\bibinitdelim J\bibinitperiod}}}%
+      }
+      \strng{namehash}{9bf2361f658d828240875bd71854593e}
+      \strng{fullhash}{9bf2361f658d828240875bd71854593e}
+      \strng{fullhashraw}{9bf2361f658d828240875bd71854593e}
+      \strng{bibnamehash}{9bf2361f658d828240875bd71854593e}
+      \strng{authorbibnamehash}{9bf2361f658d828240875bd71854593e}
+      \strng{authornamehash}{9bf2361f658d828240875bd71854593e}
+      \strng{authorfullhash}{9bf2361f658d828240875bd71854593e}
+      \strng{authorfullhashraw}{9bf2361f658d828240875bd71854593e}
+      \field{sortinit}{B}
+      \field{sortinithash}{d7095fff47cda75ca2589920aae98399}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{shorttitle}
+      \field{abstract}{Notch is the receptor in a highly conserved signalling pathway that is crucial in development and implicated in malignant transformation. The basic paradigm of Notch signalling is simple, and involves proteolytic cleavage to release an intracellular fragment (Nicd) that functions to regulate transcription.In the nucleus, Nicd displaces a repression complex and, with the {DNA}-binding {CSL} ({CBF}1, Su(H) and {LAG}-1) protein, recruits the co-activator Mastermind. Additional epigenetic cofactors are implicated and recruitment of kinases and ubiquitin ligases probably contribute to rapid turnover of the activator complex.Activity of the receptor is also regulated post-translationally. A number of different auxiliary components are implicated, including several ubiquitin ligases and proteins, such as Numb, that have direct links to the endocytic machinery.Notch ligands are transmembrane proteins and they require E3 ubiquitin ligases for their activity. The mechanisms whereby the ligands become competent to signal are not yet known, but probably entail endocytosis. Localization and cleavage of ligands might also contribute to their regulation.In many developmental processes, feedback mechanisms operate to amplify or restrict the activity of the Notch pathway. These include transcriptional regulation of auxiliary factors that in turn influence ligand or receptor activity and {microRNAs}.}
+      \field{issn}{1471-0080}
+      \field{journaltitle}{Nature Reviews Molecular Cell Biology}
+      \field{langid}{english}
+      \field{month}{9}
+      \field{note}{Publisher: Nature Publishing Group}
+      \field{number}{9}
+      \field{shortjournal}{Nat Rev Mol Cell Biol}
+      \field{shorttitle}{Notch signalling}
+      \field{title}{Notch signalling: a simple pathway becomes complex}
+      \field{urlday}{14}
+      \field{urlmonth}{3}
+      \field{urlyear}{2025}
+      \field{volume}{7}
+      \field{year}{2006}
+      \field{dateera}{ce}
+      \field{urldateera}{ce}
+      \field{pages}{678\bibrangedash 689}
+      \range{pages}{12}
+      \verb{doi}
+      \verb 10.1038/nrm2009
+      \endverb
+      \verb{file}
+      \verb Full Text PDF:/home/rileywheadon/Zotero/storage/RUT94GSB/Bray - 2006 - Notch signalling a simple pathway becomes complex.pdf:application/pdf
+      \endverb
+      \verb{urlraw}
+      \verb https://www.nature.com/articles/nrm2009
+      \endverb
+      \verb{url}
+      \verb https://www.nature.com/articles/nrm2009
+      \endverb
+      \keyw{Biochemistry,Cancer Research,Cell Biology,Developmental Biology,general,Life Sciences,Stem Cells}
+    \endentry
+    \entry{collier_pattern_1996}{article}{}{}
+      \name{author}{4}{}{%
+        {{hash=3a13de0877ce74b04f1cf62c71d5d109}{%
+           family={Collier},
+           familyi={C\bibinitperiod},
+           given={Joanne\bibnamedelima R.},
+           giveni={J\bibinitperiod\bibinitdelim R\bibinitperiod}}}%
+        {{hash=669944d6e107ec0e2b5b367699a0f1d6}{%
+           family={Monk},
+           familyi={M\bibinitperiod},
+           given={Nicholas\bibnamedelimb A.\bibnamedelimi M.},
+           giveni={N\bibinitperiod\bibinitdelim A\bibinitperiod\bibinitdelim M\bibinitperiod}}}%
+        {{hash=2ee9644b9267423553b2c9ee226c46b0}{%
+           family={Maini},
+           familyi={M\bibinitperiod},
+           given={Philip\bibnamedelima K.},
+           giveni={P\bibinitperiod\bibinitdelim K\bibinitperiod}}}%
+        {{hash=d2a8eb708252ec94e792ef6e57cb69c1}{%
+           family={Lewis},
+           familyi={L\bibinitperiod},
+           given={Julian\bibnamedelima H.},
+           giveni={J\bibinitperiod\bibinitdelim H\bibinitperiod}}}%
+      }
+      \strng{namehash}{0606238d8b835d48664072ea2ee5b7b0}
+      \strng{fullhash}{4ddcf868887b1dda1755c82cf1a3a58a}
+      \strng{fullhashraw}{4ddcf868887b1dda1755c82cf1a3a58a}
+      \strng{bibnamehash}{0606238d8b835d48664072ea2ee5b7b0}
+      \strng{authorbibnamehash}{0606238d8b835d48664072ea2ee5b7b0}
+      \strng{authornamehash}{0606238d8b835d48664072ea2ee5b7b0}
+      \strng{authorfullhash}{4ddcf868887b1dda1755c82cf1a3a58a}
+      \strng{authorfullhashraw}{4ddcf868887b1dda1755c82cf1a3a58a}
+      \field{sortinit}{C}
+      \field{sortinithash}{4d103a86280481745c9c897c925753c0}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{shorttitle}
+      \field{abstract}{In many developing tissues, adjacent cells diverge in character so as to create a fine-grained pattern of cells in contrasting states of differentiation. It has been proposed that such patterns can be generated through lateral inhibition—a type cells–cell interaction whereby a cell that adopts a particular fate inhibits its immediate neighbours from doing likewise. Lateral inhibition is well documented in flies, worms and vertebrates. In all of these organisms, the transmembrane proteins Notch and Delta (or their homologues) have been identified as mediators of the interaction—Notch as receptor, Delta as its ligand on adjacent cells. However, it is not clear under precisely what conditions the Delta-Notch mechanism of lateral inhibition can generate the observed types of pattern, or indeed whether this mechanism is capable of generating such patterns by itself. Here we construct and analyse a simple and general mathematical model of such contact-mediated lateral inhibition. In accordance with experimental data, the model postulates that receipt of inhibition (i.e. activation of Notch) diminishes the ability to deliver inhibition (i.e. to produce active Delta). This gives rise to a feedback loop that can amplify differences between adjacent cells. We investigate the pattern-forming potential and temporal behavior of this model both analytically and through numerical simulation. Inhomogeneities are self-amplifying and develop without need of any other machinery, provided the feedback is sufficiently strong. For a wide range of initial and boundary conditions, the model generates fine-grained patterns similar to those observed in living systems.}
+      \field{day}{21}
+      \field{issn}{0022-5193}
+      \field{journaltitle}{Journal of Theoretical Biology}
+      \field{month}{12}
+      \field{number}{4}
+      \field{shortjournal}{Journal of Theoretical Biology}
+      \field{shorttitle}{Pattern Formation by Lateral Inhibition with Feedback}
+      \field{title}{Pattern Formation by Lateral Inhibition with Feedback: a Mathematical Model of Delta-Notch Intercellular Signalling}
+      \field{urlday}{14}
+      \field{urlmonth}{3}
+      \field{urlyear}{2025}
+      \field{volume}{183}
+      \field{year}{1996}
+      \field{dateera}{ce}
+      \field{urldateera}{ce}
+      \field{pages}{429\bibrangedash 446}
+      \range{pages}{18}
+      \verb{doi}
+      \verb 10.1006/jtbi.1996.0233
+      \endverb
+      \verb{file}
+      \verb ScienceDirect Snapshot:/home/rileywheadon/Zotero/storage/SUDWHXSE/S0022519396902337.html:text/html;Submitted Version:/home/rileywheadon/Zotero/storage/MU8ED72M/Collier et al. - 1996 - Pattern Formation by Lateral Inhibition with Feedback a Mathematical Model of Delta-Notch Intercell.pdf:application/pdf
+      \endverb
+      \verb{urlraw}
+      \verb https://www.sciencedirect.com/science/article/pii/S0022519396902337
+      \endverb
+      \verb{url}
+      \verb https://www.sciencedirect.com/science/article/pii/S0022519396902337
+      \endverb
+    \endentry
+  \enddatalist
+\endrefsection
+\endinput
+

@@ -104,7 +104,7 @@ def update_state(state, event, neighbours):
 
 # Runs a single simulation 
 @numba.njit
-def gillespie(domain, initial, params = DEFAULT):
+def gillespie(domain, initial, params = DEFAULT, stop = 10 ** 5):
 
     # Initialize the simulation
     t = 0
@@ -114,7 +114,7 @@ def gillespie(domain, initial, params = DEFAULT):
 
     # Initialize the state and time vectors
     vT, vS = [], []
-    while t <= TIME and len(vT) < 100000:
+    while t <= TIME and len(vT) < stop:
 
         # Update reaction rates
         rates = update_reaction_rates(state, neighbours, params)

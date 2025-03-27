@@ -270,16 +270,135 @@ def ex13():
     print("\nExperiment Completed!\n")
 
 
-# Experiment 14: Linear model pattern analysis
-def ex14():
+# Helper function to compute the "structure" of a linear pattern
+def get_structure(pattern):
 
-    print("\nRunning Experiment 14\n")
+    # We want to return a tuple of tuples (x, y) where x contains the multiset
+    # of groups sizes of consecutive 0's and y contains the multiset of group
+    # sizes of consecutive 1's
+
+    # EXAMPLE: ((), ()) means there are no consecutive 0's and no consecutive 1's
+    # EXAMPLE: ((3, 2), ()) means there is a triplet and a pair of consecutive 0's
+    # EXAMPLE: ((2, 2), (3)) means there are two pairs of 0's and one triplet of 1's
+
+    # prev is an (index, value) pair
+    prev = (0, pattern[0]) 
+    structure = [[], []]
+
+    # Add a dummy variable to pattern, then find duplicates
+    pattern.append(-1)
+    for i in range(1, len(pattern)):
+
+        # If cell is the same as prev, do nothing
+        if pattern[i] == prev[1]:
+            continue
+
+        # If prev is sufficiently old, add a duplicate to zeros or ones
+        if i - prev[0] > 1:
+            structure[prev[1]].append(i - prev[0])
+
+        # Reset prev
+        prev = (i, pattern[i])
+
+    x = sorted(structure[0], reverse = True)
+    y = sorted(structure[1], reverse = True)
+    return (tuple(x), tuple(y))
+
+
+# Test cases for get_structure
+# print(get_structure([0, 1, 0, 1, 0, 1, 0, 1, 0])) # ((), ())
+# print(get_structure([0, 0, 0, 1, 0, 0, 1, 0, 1])) # ((3, 2), ())
+# print(get_structure([0, 0, 1, 0, 1, 1, 1, 0, 0])) # ((2, 2), (3))
+# print(get_structure([1, 1, 1, 1, 1, 0, 0, 0, 0])) # ((4), (5))
+
+
+# Helper function to run structure analysis for a specific model
+def structure_analysis(domain, model, samples = 1000, file = "results/ex14.txt"):
+
+    structures = {}
+    name, neighbours, size = domain
+
+    # Run samples with the given model
+    for i in trange(samples):
+
+        # Set the initial condition (adding 2% initial perturbation for deterministic)
+        initial = np.tile(DEFAULT_CELL, (size, 1))
+        if model == "Deterministic":
+            initial += np.random.normal(0, DEFAULT_CELL * 0.02, (size, 3))
+
+        # Run a simulation with the given model (with 2% noise for stochastic ODE)
+        vT, vS = None, None
+        if model == "Deterministic":
+            vT, vS = ode.ode(domain, initial)
+        if model == "Stochastic":
+            vT, vS = ode.ode(domain, initial, noise = 0.02)
+        if model == "Gillespie":
+            vT, vS = gillespie.gillespie(domain, initial, stop = 10 ** 7)
+            vS = np.array(vS)
+
+        # Compute the structure of this simulation
+        s = get_structure(list(pattern(vS)))
+        if s in structures:
+            structures[s] += 1
+        else:
+            structures[s] = 1
+
+    # Write the results to the given text file
+    with open(file, "a") as f:
+
+        # Sort the patterns
+        print(f"{model} Model", file = f)
+        result = sorted(structures.items(), key = lambda kv: kv[1], reverse = True)
+
+        # Print the results in a readable format 
+        for s, count in result:
+            print(f" - ({count})  0: {list(s[0])}  1: {list(s[1])}", file = f)
+
+    return result
+
+
+
+# Experiment 14: Linear model pattern analysis
+def ex14(file = "results/ex14.txt"):
+
+    with open(file, "w") as f:
+        print("\n-----------------------", file = f)
+        print("9-CELL DIRICHLET DOMAIN", file = f)
+        print("-----------------------\n", file = f)
 
     domain = domains.linear(9, "Dirichlet")
-    vT, vS = ode.ode(domain, DEFAULT_CELL, noise = 0.02)
-    print(pattern(vS))
+    structure_analysis(domain, "Deterministic")
+    structure_analysis(domain, "Stochastic")
+    structure_analysis(domain, "Gillespie")
 
+    with open(file, "a") as f:
+        print("\n------------------------", file = f)
+        print("10-CELL DIRICHLET DOMAIN", file = f)
+        print("------------------------\n", file = f)
 
-    print("\nExperiment Completed!\n")
+    domain = domains.linear(10, "Dirichlet")
+    structure_analysis(domain, "Deterministic")
+    structure_analysis(domain, "Stochastic")
+    structure_analysis(domain, "Gillespie")
+
+    with open(file, "a") as f:
+        print("\n-----------------------", file = f)
+        print("9-CELL PERIODIC DOMAIN", file = f)
+        print("-----------------------\n", file =f)
+
+    domain = domains.linear(9, "Periodic")
+    structure_analysis(domain, "Deterministic")
+    structure_analysis(domain, "Stochastic")
+    structure_analysis(domain, "Gillespie")
+
+    with open(file, "a") as f:
+        print("\n------------------------", file = f)
+        print("10-CELL PERIODIC DOMAIN", file = f)
+        print("------------------------\n", file = f)
+
+    domain = domains.linear(10, "Periodic")
+    structure_analysis(domain, "Deterministic")
+    structure_analysis(domain, "Stochastic")
+    structure_analysis(domain, "Gillespie")
 
 

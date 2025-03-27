@@ -12,7 +12,7 @@
 \usepackage[backend=biber]{biblatex}
 \bibliography{sources.bib}
 
-\title{Mathematical Models of Delta-Notch Signalling}  
+\title{Comparing Models of Delta-Notch Signalling}  
 \author{Riley Wheadon, Edwin Huras, Ziyi Zhuang}
 
 \begin{document}
@@ -23,18 +23,27 @@
 
 \section{Abstract}
 
-The Delta-Notch signalling pathway plays a critical role in determining the cell fate of initially homogeneous cells in diverse biological systems. Early deterministic models of Delta-Notch interactions, such as that by Collier et al. (1996), achieved cell differentiation in linear and 2D cell arrays. In this paper, we develop a simple – yet more biologically realistic – ODE model of Delta-Notch signalling and compare the deterministic behaviour with the Collier et al. model. We derive a probabilistic framework via Kolmogorov forward equations, demonstrating that, in expectation, it converges to our ODE model under appropriate limiting conditions. By comparing deterministic ODEs, stochastic ODEs, and Gillespie simulations, we show that natural perturbations in receptor-ligand binding dynamics are sufficient to produce differentiation, even from identical initial conditions. Numerical experiments across parameter regimes highlight the robustness of this behaviour and bifurcation analysis further reveals the parameter-dependent bistability.
+The Delta-Notch signalling pathway plays a critical role in determining the cell fate of initially homogeneous cells in diverse biological systems.
+Early deterministic models of Delta-Notch interactions, such as that of Collier et al. \cite{collier_pattern_1996}, achieved cell differentiation in linear and 2D cell arrays.
+In this paper, we develop a simple yet more biologically realistic model of Delta-Notch signalling and test it using three modelling formalisms: deterministic ODE, stochastic ODE, and agent-based.
+Using the Kolmogorov forward equations, we show that the agent-based formalisms converges to the system of deterministic ODEs in expectation.
+We also demonstrate that the stochastic ODE and agent-based formalisms can produce cell differentiation even from identical initial conditions.
+Finally, we study the effect of parameters such as stochastic noise, domain size, and boundary conditions on the behaviour of our models.
+Our findings provide important insights into how different mathematical formalisms can affect simulations of the Delta-Notch signalling network with significant implications for future modelling work. 
 
 \section{Introduction}
 
+The Delta-Notch signalling network plays
+
 \medskip
 
-Binding of the Delta ligand from cell $B$ to the Notch receptor on cell $A$ results in the \emph{cleavage} (removal) of both the ligand and receptor \cite{collier_pattern_1996}. This interaction triggers the release of NICD (Notch Intracellular Domain) in cell $A$, which \emph{promotes} Notch and \emph{inhibits} Delta.
+Binding of the Delta ligand from cell $B$ to the Notch receptor on cell $A$ results in the \emph{cleavage} (removal) of both the ligand and receptor \cite{bray_notch_2006}.
+This interaction triggers the release of NICD (Notch Intracellular Domain) in cell $A$, which \emph{promotes} Notch and \emph{inhibits} Delta.
+It is also possible for a Delta ligand to bind to a Notch receptor on the same cell. This phenomenon, known as \emph{cis-inhibition}, cleaves the Notch receptor but does not release NICD.
+Serrate (Jagged) is a ligand similar to Delta which can also bind to Notch.
+However, NICD promotes Serrate, which creates a double-positive feedaback loop.
 
-\begin{itemize}
-  \item The Serrate (Jagged) ligand can also bind to Notch. Unlike Delta, NICD promotes Jagged, which creates a double-positive feedback loop.
-  \item Interaction between Delta ligands and Notch receptors from the same cell (cis-interaction) removes both molecules and does not trigger the release of NICD.
-\end{itemize}
+\medskip
 
 \subsection{Model}
 

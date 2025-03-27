@@ -14,7 +14,7 @@ DEFAULT = np.array([
 ])
 
 # Default initial cell state
-DEFAULT_CELL = np.array([200, 200, 100])
+DEFAULT_CELL = np.array([200, 200, 100], dtype = np.float64)
 
 # Default simulation length and time steps
 TIME = 1500
