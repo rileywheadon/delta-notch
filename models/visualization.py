@@ -46,6 +46,7 @@ def vis_01_03(times, states, means, stds, name, title):
     # Save to the img/ foler
     plt.tight_layout()
     plt.savefig(f"img/{name}.pdf", dpi = 200)
+    plt.savefig(f"img/{name}.png", dpi = 300)
     plt.close(fig)
 
 
@@ -112,6 +113,7 @@ def vis_04_06(vT, vS, name, title):
 
     # Display the plot
     plt.savefig(f"img/{name}.pdf", dpi = 200)
+    plt.savefig(f"img/{name}.png", dpi = 300)
     plt.close()  
 
 
@@ -137,6 +139,7 @@ def vis10(shifts, dtimes):
     # Save to the img/ folder
     plt.tight_layout()
     plt.savefig(f"img/vis10.pdf", dpi = 200)
+    plt.savefig(f"img/vis10.png", dpi = 300)
     plt.close()
 
 
@@ -157,6 +160,7 @@ def vis11(noise, dtimes):
     # Save to the img/ folder
     plt.tight_layout()
     plt.savefig(f"img/vis11.pdf", dpi = 200)
+    plt.savefig(f"img/vis11.png", dpi = 300)
     plt.close()
 
 
@@ -171,6 +175,7 @@ def vis12(shift, fates):
     # Save to the img/ folder
     plt.tight_layout()
     plt.savefig(f"img/vis12.pdf", dpi = 200)
+    plt.savefig(f"img/vis12.png", dpi = 300)
     plt.close()
 
 
@@ -261,6 +266,7 @@ def vis13(grids, pairs):
     # Save to the img/ folder
     plt.tight_layout()
     plt.savefig(f"img/vis13.pdf", dpi = 200)
+    plt.savefig(f"img/vis13.png", dpi = 300)
     plt.close()
 
 #  Produces a visualization of the cell pattern for either hexagonal or linear domains

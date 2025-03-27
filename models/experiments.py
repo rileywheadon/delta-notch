@@ -181,7 +181,7 @@ def ex11(runs = 500, noise = [0, 0.001, 0.002, 0.005, 0.01, 0.02, 0.05]):
 
 
 # Experiment 12: Effect of initial perturbation on cell fates in agent-based model
-def ex12(runs = 100, shift = np.linspace(0, 100, 6)):
+def ex12(runs = 250, shift = np.linspace(0, 100, 11)):
 
     # Run simulations of the agent-based model
     print("\nRunning Experiment 12\n")
@@ -195,7 +195,7 @@ def ex12(runs = 100, shift = np.linspace(0, 100, 6)):
         initial = np.array([DEFAULT_CELL + S, DEFAULT_CELL - S])
 
         # Run the simulation
-        vT, vS = gillespie.gillespie(domain, initial)
+        vT, vS = gillespie.gillespie(domain, initial, stop = 10 ** 6)
         vT, vS = np.array(vT), np.array(vS)
 
         # Append 0 to fates if the first cell had 0 Notch, 1 otherwise

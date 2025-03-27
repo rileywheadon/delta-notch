@@ -1,10 +1,12 @@
 \documentclass{article}
 
 \usepackage[left=1.5in, right=1.5in, top=1in, bottom=1in]{geometry}
+\usepackage{lscape}
 \usepackage{graphicx}
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{hyperref}
+\usepackage{array}
 
 \usepackage{graphicx}
 \graphicspath{ {./img/} }
@@ -21,19 +23,29 @@
 
 \begin{flushleft}
 
-\section{Abstract}
+\section*{Abstract}
 
-The Delta-Notch signalling pathway plays a critical role in determining the cell fate of initially homogeneous cells in diverse biological systems.
-Early deterministic models of Delta-Notch interactions, such as that of Collier et al. \cite{collier_pattern_1996}, achieved cell differentiation in linear and 2D cell arrays.
-In this paper, we develop a simple yet more biologically realistic model of Delta-Notch signalling and test it using three modelling formalisms: deterministic ODE, stochastic ODE, and agent-based.
+The Delta-Notch signalling pathway plays a crucial role in determining the cell fate of initially homogeneous cells in a wide array biological systems.
+Early deterministic models of the Delta-Notch pathway achieved cell differentiation in linear and 2D cell arrays using highly simplified equations that abstracted away the biochemistry of the system.
+In this paper, we present a simple yet biologically realistic model of Delta-Notch signalling and test it using three modelling formalisms: deterministic ODE, stochastic ODE, and agent-based.
 Using the Kolmogorov forward equations, we show that the agent-based formalisms converges to the system of deterministic ODEs in expectation.
 We also demonstrate that the stochastic ODE and agent-based formalisms can produce cell differentiation even from identical initial conditions.
 Finally, we study the effect of parameters such as stochastic noise, domain size, and boundary conditions on the behaviour of our models.
 Our findings provide important insights into how different mathematical formalisms can affect simulations of the Delta-Notch signalling network with significant implications for future modelling work. 
 
-\section{Introduction}
+\section*{Introduction}
 
-The Delta-Notch signalling network plays
+Cell differentiation is essential for the creation of structure in all complex organisms.
+Surprisingly, only a small number of signalling pathways are responsible for this essential functions \cite{bray_notch_2006}.
+One of these pathways is the Delta-Notch signalling network, which is unique because its ligands Delta and Jagged are transmembrane proteins.
+This means that Delta-Notch signalling is largely restricted to neighbouring cells. 
+However, new findings suggest that cellular protrusions can allow a small fraction of Delta-Notch signals to travel longer distances \cite{berkemeier_coupling_2023}.
+The Delta-Notch signalling network has been shown to affect neurogenesis in vertebrates by determining which cells adopt neural or glial fates. 
+Furthermore, mutations in Notch activity has been shown to be a contributing factor to many cancers \cite{bray_notch_2006}.
+
+\medskip
+
+% TODO: Insert a figure here. The paragraph below should be a caption.
 
 \medskip
 
@@ -45,89 +57,229 @@ However, NICD promotes Serrate, which creates a double-positive feedaback loop.
 
 \medskip
 
-\subsection{Model}
+Previous models of Delta-Notch signalling \cite{collier_pattern_1996, boareto_jaggeddelta_2015} have made a number of assumptions which we also use for our models.
+First, cells interact through Delta-Notch signalling if and only if they are adjacent.
+Production of Notch is an increasing hill function of Delta in neighbouring cells.
+Production of Delta is a decreasing hill function of Notch in the same cell.
+Both Notch and Delta decay at a rate proportional to their concentration.
+Low levels of Notch cause the primary fate, high levels cause the secondary fate.
+The behaviour   of cells with a specific fate depends on the specifics of the organism and organ, which is outside the scope of these models. 
 
-Collier et al. make the following five modelling assumptions:
-\begin{enumerate}
-  \item Cells interact through Delta-Notch signalling if and only if they are adjacent.
-  \item Production of Notch is an increasing (hill) function of Delta in neighbouring cells.
-  \item Production of Delta is a decreasing (hill) function of Notch in the same cell.
-  \item Production of Notch and Delta is balanced by decay proportional to concentration.
-  \item Low levels of Notch cause the primary fate, high levels cause the secondary fate.
-\end{enumerate}
+\medskip
 
-Then they define the following variables:
+The model of Delta-Notch signalling proposed by Collier et al. \cite{collier_pattern_1996} makes other simplifications which violate our current understanding of the Notch signalling pathways.
+These simplifications make it difficult to identify how individual chemical reactions are captured by the model.
+For instance, production of activated Notch (NICD) is exclusively a function of the Delta concentration in neighbouring cells, with no regard for the concentration of Notch receptors.
+This violates the mass-balance equations, since the quantity of Notch receptors changes dynamically in response to the concentration of Delta ligands in nearby cells.
+There are smaller issues, like the absence of cis-inhibition and the Serrate (Jagged)
+protein, but these aren’t necessary to capture the fundamental behaviour of the
+system.
 
-\begin{itemize}
-  \item $\tau$: time
-  \item $N_{P}$: notch activity (concentration) in cell $P$
-  \item $D_{P}$: delta activity (concentration) in cell $P$
-  \item $\overline{D}_{P}$: average delta activity in neighbours of $P$
-  \item $N_{0}$: typical notch activity (across all cells)
-  \item $D_{0}$: typical delta activity (across all cells)
-  \item $\mu$: The decay rate for notch (assumed constant)
-  \item $\rho$: The decay rate for delta (assumed constant)
-\end{itemize}
+\medskip
 
-Then, define the following system of differential equations, where $F:[0, \infty) \rightarrow [0, \infty)$ is a continuous increasing function and $G: [0, \infty)\rightarrow [0, \infty)$ is a continuous decreasing function.
+In this paper, we develop three models of the Delta-Notch signalling network based on a modern understanding of the biochemistry of the system. 
+Our first model is an agent-based simulation of individual Delta and Notch molecules. 
+While this model is more accurate to the biology than an ODE model, it is impossible to analyze analytically and slow to test numerically.
+Then, we define two ODE models. 
+The deterministic ODE model defines the behaviour of the agent-based model in expectation (see the Appendix for a proof).
+The stochastic ODE model is an extension to the deterministic ODE model which contains noise terms that are intended to simulate the randomness of the agent-based model.
+We compare these models with each other using a combination of analytical and numerical methods in a variety of different domains and boundary conditions.
+Furthermore, we show that our models qualitatively replicate the results of Collier et al. \cite{collier_pattern_1996}. 
+In particular we show that a if linear array of cells is given no-flux boundary conditions, the pattern of alternating cell fates arises on the outside edges before gradually spreading inwards towards the center of the domain.
+Additionally, both our model and the Collier et al. model exhibit different ratios of primary to secondary fated cells depending on the parameters on a two-dimensional hexagonal lattice. 
+
+\section*{Methods}
+
+From the literature \cite{collier_pattern_1996, boareto_jaggeddelta_2015}, we assume Notch ($N$) receptor production has the form $H^{+}(I) = n_{m}I^2/(n_{0}^2 + I^2)$ where $I$ is the NICD concentration and $n_{m}, n_{0}$ are hill function parameters.
+Similarly, Delta ligand ($D$) production is governed by a decreasing hill function of the for production has the form $H^{-}(I) = d_{m}d_{0}^2/(d_{0}^2 + I^2)$.
+Furthermore, we will asume that Notch and Delta both have decay rate $\gamma$.
+The variable $k_{T}$ will denote the binding rate between Notch receptors and Delta ligands.
+$\gamma_{I}$ is the decay rate of NICD.
+We will also assume that there is no cis-interaction and no Serrate ligand. 
+
+\begin{table}[!htp]
+\centering
+\begin{tabular}{|m{8em}|m{5em}|m{20em}|} 
+ \hline
+ Reaction & Rate & Description \\ 
+ \hline
+ $N_{A} + D_{B} \rightarrow I_{A}$ & 
+ $k_{T} N_{A}D_{B}$ &
+ A Notch receptor from cell $A$ binds to a delta ligand from cell $B$, triggering the release of NICD in cell $A$. \\
+ \hline
+ $N_{A} \rightarrow \emptyset$ & 
+ $\gamma N_{A}$ & 
+ A Notch receptor from cell $A$ decays. \\
+ \hline
+ $D_{A} \rightarrow \emptyset$ & 
+ $\gamma D_{A}$ & 
+ A Delta receptor from cell $A$ decays. \\
+ \hline
+ $I_{A} \rightarrow \emptyset$ &
+ $\gamma_{I} I_{A}$ &
+ A NICD molecule from cell $A$ decays.  \\
+ \hline
+ $\emptyset \rightarrow N_{A}$ & 
+ $H^{+}(I_{A})$ &
+ A Notch receptor in cell $A$ is produced \\
+ \hline
+ $\emptyset \rightarrow D_{A}$ &
+ $H^{-}(I_{A})$ &
+ A Delta ligand in cell $A$ is produced \\
+ \hline
+\end{tabular}
+\caption{
+  A list of possible reactions and their rates in a cell $A$ with neighbour $B$.
+  Since there are $6$ possible reactions per cell, a system with $n$ cells will have $6n$ possible reactions to keep track of.
+}
+\label{tb:reactions}
+\end{table}
+
+\medskip
+
+We will make the assumption that reaction times follow a Poisson point process.
+Let $E$ be the set of all possible reaction events (i.e. the $6$ reactions above for all cells).
+Furthermore, let $|E| = N$ be the number of possible reactions.
+For each event, let $X_{i} \sim \text{Exp}(\lambda_{i})$ denote the time until the next event of type $i$, where $1 \leq i \leq N$.
+Then, the waiting time $T$ in between \emph{any} two events is:
 
 $$
+T = \text{min} \{ X_{1}, \dots, X_{N} \} \sim \text{Exp}\left( \sum_{i = 1}^{N} \lambda_{i} \right) 
+$$
+
+This results follows from the definition of an exponential distribution and the memoryless property.
+Then, we can use Gillespie's algorithm to simulate the system.
+This is the \emph{agent-based} model.
+Details of the computational implementation of this model can be found in Appendix \ref{sec:gillespie}.
+
+\medskip
+
+In expectation, the agent-based model converges to the system of ODEs shown in Equation \ref{eq:deterministic}.
+A proof of this fact can be found in the appendix.
+This is the \emph{deterministic ODE} model, which is described below for a single cell in a two-cell system.
+However, this model can be extended to arbitrary domains by defining equations $dN_{i}/dt$, $dD_{i}/dt$, and $dI_{i}/dt$ for each $i \in \{ 1, \dots, n \}$, where $n$ is the number of cells.
+Then, simply replace $N_{ext}$ and $D_{ext}$ with the average Notch and Delta concentration over all neighbours.
+
+\begin{equation}
 \begin{aligned}
-  \frac{d(N_{P} / N_{0})}{d\tau} = F(\overline{D}_{P} / D_{0}) - \mu N_{P} / N_{0} \\[5pt]
-  \frac{d(D_{P} / D_{0})}{d\tau} = G(N_{P} / N_{0}) - \rho D_{P} / D_{0}
+  \frac{dN}{dt} &= \frac{n_{m}I^2}{n_{0}^2 + I^2} - k_{T}ND_{ext} - \gamma N \\[5pt]
+  \frac{dD}{dt} &= \frac{d_{m}d_{0}^2}{d_{0}^2 + I^2} - k_{T}DN_{ext} - \gamma D \\[5pt]
+  \frac{dI}{dt} &= k_{T}ND_{ext} - \gamma_{I}I
 \end{aligned}
-$$
+\label{eq:deterministic}
+\end{equation}
 
-This equation is inherently nondimensional, since $N_{P} / N_{0}$ and $D_{P} / D_{0}$ have no units.
+This model is a simplification of Boareto et al. \cite{boareto_jaggeddelta_2015}, which included an additonal equation for the Jagged molecule and kept track of cis-inhibition.
+To more directly compare our results with those of Collier et al. \cite{collier_pattern_1996}, we ignore Jagged interactions and cis-inhibition.
+Adding NICD, which was absent from Collier et al., was necessary for the assignment of probabilities to each reaction event.
+A bifurcation analysis of the system of ODEs in Equation \ref{eq:deterministic} reveals that ...
 
-\subsection{Issues}
+\medskip
 
-The Collier et al. model makes numerous simplifications that violate our current understanding of the delta-notch signalling network. These simplifications make it difficult to derive a probabilistic model from the Collier et al. model, since the biological implications of such a model would be contradictory. Some of the issues include:
+To capture the inherent randomness in receptor-ligand interactions while maintaining computational efficiency, we implement a \emph{stochastic ODE} model based on the chemical Langevin equation formalism.
+This approach represents an intermediate level of detail between the deterministic ODE model and the fully discrete Gillespie algorithm.
+Starting from the deterministic ODE model described in Equation \ref{eq:deterministic}, we incorporate stochastic fluctuations by adding noise terms proportional to the square root of the reaction rates to get Equation \ref{eq:stochastic}.
 
-\begin{itemize}
-  \item Production of activated Notch (NICD) is exclusively a function of the Delta concentration in neighbouring cells, with no regard for the concentration of extracellular Notch receptors.
-  \item Furthermore, the concentration of extracellular Notch isn't accounted for at all, which means there is no way to create a meaningful reaction term that captures the dynamics of the system.
-  \item There are smaller issues, like the absence of cis-inhibition and the Serrate (Jagged) protein, but these aren't necessary to capture the fundamental behaviour of the system.
-\end{itemize}
+\begin{equation}
+\begin{aligned}
+  dN &= \left( \frac{n_{m}I^2}{n_{0}^2 + I^2} - k_{T}ND_{ext} - \gamma N \right) dt + \sigma \cdot N \cdot dW_{N} \\[5pt]
+  dD &= \left( \frac{d_{m}d_{0}^2}{d_{0}^2 + I^2} - k_{T}DN_{ext} - \gamma D \right)  dt + \sigma \cdot D \cdot dW_{D}  \\[5pt]
+  dI &= \left( k_{T}ND_{ext} - \gamma_{I}I \right) dt + \sigma \cdot I \cdot dW_{I}
+\end{aligned}
+\label{eq:stochastic}
+\end{equation}
 
-\subsection{Qualitative Results}
+where $dW_N$, $dW_D$, and $dW_I$ are independent Wiener processes representing white noise.
+The structure of the noise terms follows from the assumption that noise in each reaction channel is proportional to the current concentration of those molecules.
 
-In the two-cell periodic boundary condition case, Collier et al. show that there always exists a homogeneous steady state, although this state is unstable if the feedback in the Delta-Notch signalling network is sufficiently strong. If the line of cells is given Dirichlet boundary conditions, the inhomogeneity arises on the outside edges before gradually spreading inwards to the center of the domain. On the two-dimensional hexagonal lattice, the system exhibits different ratios of primary to secondary fated cells depending on the parameters. In particular, Collier et al. observed ratios of $1/2$, $1/3$, $1/4$, $1/5$, and $1/6$.
+\medskip
 
-\section{Methods}
+To implement these models computationally, we employed the Euler-Maruyama scheme with time step $dt$.
+The deterministic step is first calculated, and then the Wiener increments are sampled from a normal distribution with mean 0 and standard deviation $\sqrt{dt}$.
+Each increment is scaled by the its respective variable and added to the results of the deterministic step.
 
-\subsection{Parameters and Assumptions}
+\section*{Results}
 
-Assume \emph{a priori} (i.e. from previous research) the following, where $I$ is NICD:
+% TODO: Write some filler text to connect the different experiments.
 
-\begin{itemize}
-  \item Basal extracellular Notch ($N$) production has the form $H^{+}(I) = n_{m}I^2/(n_{0}^2 + I^2)$. 
-  \item Basal extracellular Delta ($D$) production has the form $H^{-}(I) = d_{m}d_{0}^2/(d_{0}^2 + I^2)$.
-  \item Extracellular Notch and Delta have the same decay rate, $\gamma$.
-\end{itemize}
+\begin{figure}
+  \includegraphics[width=\textwidth]{img/vis11.png}
+  \caption{A plot of the KDE approximation of the distribution of differentiation times for the agent-based model and the stochastic ODE model with different levels of noise. All simulations were done on a two-cell domain with periodic boundary conditions. These simulations show that higher values of the noise parameter significantly decrease the average time it takes for the two cells to adopt different fates. Notably, a noise parameter of $2\%$ causes the stochastic ODE model to align most closely with the results of agent-based simulations. }
+\end{figure}
 
-Then, define the following parameters:
+\begin{figure}
+  \includegraphics[width=\textwidth]{img/vis12.png}
+  \caption{A \emph{Primary Outcome} occurs when the cell with the lower initial Notch concentration ends up adopting the primary (low Notch) fate. This plot shows the relationship between initial perturbation and the sample proportion of primary outcomes for the agent-based model on a two-cell domain. Prior to the perturbation, each cell has $200$ Notch molecules. A perturbation of $x$ molecules removes $x/2$ Notch molecules from the first cell and adds $x/2$ Notch molecules to the second. Unsurprisingly, larger initial perturbations result in a higher proportion of primary outcomes, although this effect is not as extreme as we expected. Even in the largest perturbation we tested ($\pm 25\%$), only $80\%$ of the simulations had the primary outcome. This suggests that it is difficult to reliably control cell fate by perturbation alone.}
+\end{figure}
 
-\begin{itemize}
-  \item $N_{0}$ and $D_{0}$ are the maximum rates of Notch/Delta production.
-  \item $k_{T}$ is the binding rate between extracellular Notch and Delta.
-  \item $N_{ext}$ and $D_{ext}$ refer to the average Notch/Delta levels in neighbouring cells.
-  \item $\gamma_{I}$ is the decay rate of NICD.
-\end{itemize}
+\begin{figure}[!ht]
+   \makebox[\textwidth][c]{\includegraphics[width=1.3\textwidth]{img/vis13.png}}
+   \caption{Results of two-at-a-time stability analysis of the deterministic, stochastic, and agent-based modelling formalisms on a two-cell domain with periodic boundary conditions. The regions enclosed by the red, blue, and green lines are regions in which cell differentiation occurs for each of the three models. Regions were obtained by simulating a $25 \times 25$ grid of test points and taking the convex hull of the points at which cell differentiation occurred. This analysis suggests that the deterministic and stochastic ODE models are on average less sensitive to changes in parameter values than the agent-based model. In particular, the agent-based model does not achieve cell differentiation for large values of the Notch and Delta production parameters $n_{m}$ and $d_{m}$.} 
+\end{figure}
 
-Furthermore, we will assume that there is no cis-interaction and no Serrate ligand. This gives us the following set of chemical reactions that can occur in a single time step:
+\begin{table}[!htp]
+\centering
+\begin{tabular}{|c|c|c|c|} 
+ \hline
+ Pattern & Frequency (Odd Domain) & Frequency (Even Domain)  \\
+ \hline
+ $0: [], \, 1: []$ & $87$ & $403$ \\
+ $0: [], \, 1: [2]$ & $801$ & $123$ \\
+ $0: [], \, 1: [2, 2]$ & $27$ & $424$ \\
+ $0: [], \, 1: [2, 2, 2]$ & $48$ & $1$ \\
+ \hline
+\end{tabular}
+\caption{
+  Frequency of selected cell patterns in $1000$ simulations of the agent-based model on $9$-cell (even) and $10$-cell (odd) domains with zero-flux boundary conditions. A \emph{pattern} describes the contiguous groups of cells which share a fate. The pattern $0: [], \, 1: []$ means that cells have alternating fates. The pattern $0: [], \, 1: [2, 2]$ means there are two adjacent pairs of cells with the secondary fate $1$. We observe significant variations in patterns accross even and odd domains. Similarly drastic variation is observed accross different modelling formalisms and boundary conditions (not shown).
+}
+\label{tb:patterns}
+\end{table}
 
-\begin{enumerate}
-  \item A Notch receptor (from cell $A$) binds to a Delta ligand (from cell $B$), triggering the release of NICD in cell $A$. This can be written as $N_{A} + D_{B} \rightarrow I_{A}$. The probability of this event is $k_{T}N_{A}D_{B}$.
-  \item A Notch receptor in cell $A$ decays ($N_{A} \rightarrow \emptyset$) with probability $\gamma N_{A}$.
-  \item A Delta ligand in cell $A$ decays ($D_{A} \rightarrow \emptyset$) with probability $\gamma D_{A}$.
-  \item A NICD molecule in cell $A$ decays ($I_{A} \rightarrow \emptyset$) with probability $\gamma_{I}I_{A}$.
-  \item A Notch receptor in cell $A$ is produced ($\emptyset \rightarrow N_{A}$) with probability $H^{+}(I)$.
-  \item A Delta ligand in cell $A$ is produced ($\emptyset \rightarrow D_{A}$) with probability $H^{-}(I)$.
-\end{enumerate}
+% TODO: Add results on hexagonal domains.
 
-\subsection{Kolmogorov Forward Equations}
-\subsubsection{Derivation of Kolmogorov Forward Equation}
+\section*{Discussion}
+
+% TODO: Write this section. Should only need 2-3 paragraphs.
+
+\nocite{*}
+\printbibliography
+
+\appendix
+
+\section{Gillespie's Algorithm} \label{sec:gillespie}
+
+Gillespie's algorithm allows us to simulate many types reactions simultaneously using random time steps. Recall that $T_{i}$ is a random variable that represents the distribution of the next reaction of any type. The random variables $X_{1}, \dots, X_{N}$ are the waiting time distributions for each reaction $1, \dots, N$, where $N = (6 \times \text{\# Cells})$.
+
+\medskip
+
+\textbf{Step 1}: Sample a value $t_{i}$ from $T$ using inverse transform sampling. 
+
+\medskip
+
+\textbf{Step 2}: Increment the current time $t$ by $t_{i}$.
+
+\medskip
+
+\textbf{Step 3}: Determine which event took place. To do this, recall that:
+
+$$P(X_{k} = \text{min} \{  X_{1}, \dots, X_{N} \}) = \frac{\lambda_{k}}{\lambda_{1} + \dots + \lambda_{N}}$$
+
+Use this fact to partition the interval $[0, 1]$. Then sample $y_{i}$ from a $\text{Unif}(0, 1)$ distribution, identify its partition, and find the corresponding event.
+
+\medskip
+
+\textbf{Step 4}: Update the state based on the event determined in the previous step.
+
+\medskip
+
+\textbf{Remark}: The expected time for reaction $i$ to occur is given by $\mathbb{E}[X_{i}] = 1/\lambda_{i}$. Therefore, the rate at which event $i$ occurs is $\lambda_{i}$, which is equal to the rate at which the event occurs in the original ODE. This means that the trajectories generated from the Gillespie's algorithm implementation of the agent-based  model can be compared directly to the trajectories generated from the ODE itself, without any need for scaling.
+
+\section{Kolmogorov Forward Equations}
+\label{sec:kfe}
+
+% TODO: Revise this section to incorporate Eric's feedback.
+
+\subsection*{Derivation of Kolmogorov Forward Equation}
 
 Let us define $P(n,d,i,t)$ to be the probability of having $n$ Notch receptors, $d$ Delta ligands, and $i$ NICD molecules at time $t$. The Kolmogorov forward equation describes how $P(n,d,i,t)$ changes over a small time step $\Delta t$:
 
@@ -166,7 +318,7 @@ Taking the limit as $\Delta t \rightarrow 0$:
 &- P(n,d,i,t) \cdot [H^+(i) + H^-(i) + \gamma n + \gamma d + \gamma_I i + k_T n D_{ext}]
 \end{align*}
 
-\subsubsection{Matrix Formulation}
+\subsection*{Matrix Formulation}
 The Kolmogorov forward equation can be expressed in matrix form as:
 \[
 \frac{d\vec{P}(t)}{dt} = \mathbf{A} \vec{P}(t)
@@ -302,71 +454,11 @@ $(0,0,0)$, $(0,0,1)$, $(0,1,0)$, $(0,1,1)$, $(1,0,0)$, $(1,0,1)$, $(1,1,0)$, $(1
 
 The matrix element $A_{j,i}$ represents the transition rate from state $i$ to state $j$. The diagonal elements $A_{i,i}$ contain the negative sum of all outgoing rates from state $i$.
 
-\subsection{Deterministic ODE Model}
 
-We implemented the following deterministic ODE model adapted from Boareto et al. (2015): 
+\section{Theoretical Justification}
+\label{sec:theoretical-justification}
 
-$$
-\begin{aligned}
-  \frac{dN}{dt} &= \frac{n_{m}I^2}{n_{0}^2 + I^2} - k_{T}ND_{ext} - \gamma N \\[5pt]
-  \frac{dD}{dt} &= \frac{d_{m}d_{0}^2}{d_{0}^2 + I^2} - k_{T}DN_{ext} - \gamma D \\[5pt]
-  \frac{dI}{dt} &= k_{T}ND_{ext} - \gamma_{I}I
-\end{aligned}
-$$
-
-where $N$ is the number of intracellular Notch molecules, $D$ is the number of intracellular Delta molecules, and $I$ is the number of NICD molecules (see $3.1$ reference). This model is a simplification of the model found in Boareto et al. That model included an additonal equation for the Jagged molecule and kept track of cis-inhibition: where a Notch and Delta bind together inside the same cell, resulting in the degradation of both cells without contributing to the amount of NICD. So as to more directly compare our results with those of Collier et al., we ignore Jagged interactions and cis-inhibition. Including an NICD variable was necessary, however, as this additional interaction allowed for the assignment of probabilities to each reaction event and thus for the derivation of the Kolmogorov Equations and Gillespie algorithm.
-
-\subsection{Stochastic ODE Model}
-
-To capture the inherent randomness in cellular processes while maintaining computational efficiency, we implement a stochastic differential equation (SDE) model based on the chemical Langevin equation formalism. This approach represents an intermediate level of detail between the deterministic ODE model and the fully discrete Gillespie algorithm.
-
-Starting from the deterministic ODEs described in Section 3.3, we incorporate stochastic fluctuations by adding noise terms proportional to the square root of the reaction propensities:
-$$
-\begin{aligned}
-  dN &= \left( \frac{n_{m}I^2}{n_{0}^2 + I^2} - k_{T}ND_{ext} - \gamma N \right) dt + \sigma \cdot N \cdot dW_{N} \\ \\[5pt]
-  dD &= \left( \frac{d_{m}d_{0}^2}{d_{0}^2 + I^2} - k_{T}DN_{ext} - \gamma D \right)  dt + \sigma \cdot D \cdot dW_{D}  \\[5pt]
-  dI &= \left( k_{T}ND_{ext} - \gamma_{I}I \right) dt + \sigma \cdot I \cdot dW_{I}
-\end{aligned}
-$$
-where $dW_N$, $dW_D$, and $dW_I$ are independent Wiener processes representing white noise. The structure of the noise terms follows from the assumption that noise in each reaction channel is proportional to the current concentration of those molecules. \par
-
-For numerical implementation, we employ the Euler-Maruyama scheme with time step $dt$. The deterministic step is first calculated, and then the Wiener increments are sampled from a normal distribution with mean 0 and standard deviation $\sqrt{dt}$. Each increment is scaled by the its respective variable and added to the results of the deterministic step.
-
-\subsection{Gillespie Algorithm}
-
-We will make the assumption that reaction times follow a Poisson point process. Let $E$ be the set of all possible reaction events (i.e. reactions 1-6 above for all cells). Furthermore, let $|E| = N$ be the number of possible reactions. For each event, let $X_{i} \sim \text{Exp}(\lambda_{i})$ denote the time until the next event of type $i$, where $1 \leq i \leq N$. Then, the waiting time $T$ in between \emph{any} two events is:
-
-$$
-T = \text{min} \{ X_{1}, \dots, X_{N} \} \sim \text{Exp}\left( \sum_{i = 1}^{N} \lambda_{i} \right) 
-$$
-
-This results follows from the definition of an exponential distribution and the memoryless property. Then, we can use Gillespie's algorithm to simulate the system as follows:
-
-\medskip
-
-\textbf{Step 1}: Sample a value $t_{i}$ from $T$ using inverse transform sampling. 
-
-\medskip
-
-\textbf{Step 2}: Increment the current time $t$ by $t_{i}$.
-
-\medskip
-
-\textbf{Step 3}: Determine which event took place. To do this, recall that:
-
-$$P(X_{k} = \text{min} \{  X_{1}, \dots, X_{N} \}) = \frac{\lambda_{k}}{\lambda_{1} + \dots + \lambda_{N}}$$
-
-Use this fact to partition the interval $[0, 1]$. Then sample $y_{i}$ from a $\text{Unif}(0, 1)$ distribution, identify its partition, and find the corresponding event.
-
-\medskip
-
-\textbf{Step 4}: Update the state based on the event determined in the previous step.
-
-\medskip
-
-\textbf{Remark}: The expected time for event $i$ to occur is given by $\mathbb{E}[X_{i}] = 1/\lambda_{i}$. Therefore, the rate at which event $i$ occurs is $\lambda_{i}$, which is equal to the rate at which the event occurs in the original ODE. This means that the trajectories generated from the Gillespie's algorithm implementation of the model can be compared directly to the trajectories generated from the ODE itself, without any need for scaling.
-
-\subsection{Theoretical Justification}
+% TODO: Revise this section to incorporate Eric's feedback.
 
 In this section, we need to show that in expectation, the model above converges to the following system of ODEs (adapted from Boareto et al., 2015):
 
@@ -378,7 +470,7 @@ $$
 \end{aligned}
 $$
 
-\subsubsection{Setup and Notation}
+\subsection*{Setup and Notation}
 
 Let us define:
 \begin{itemize}
@@ -386,7 +478,8 @@ Let us define:
   \item $\langle D \rangle = \sum_{n,d,i} d \cdot P(n,d,i,t)$ = expected number of Delta ligands
   \item $\langle I \rangle = \sum_{n,d,i} i \cdot P(n,d,i,t)$ = expected number of NICD molecules
 \end{itemize}
-\subsubsection{Deriving ODEs for Expected Values}
+
+\subsection*{Deriving ODEs for Expected Values}
 
 \textbf{Now we derive the ODE for the expected value of Notch:}
 
@@ -660,7 +753,7 @@ Which can be written as:
 \frac{dI}{dt} = k_T D_{ext} N - \gamma_I I
 \]
 
-\subsubsection{Final System of ODEs}
+\subsection*{Final System of ODEs}
 
 Combining our three derived equations, we get the following system of ODEs:
 
@@ -678,7 +771,7 @@ This matches the system presented in section 3.6 of the document:
 \frac{dI}{dt} &= k_T N D_{ext} - \gamma_I I
 \end{align*}
 
-\subsubsection{Mapping Between Probabilities and Rates}
+\subsection*{Mapping Between Probabilities and Rates}
 
 To relate the probabilistic formulation to the deterministic ODE system, we need to understand how reaction probabilities map to reaction rates. In the stochastic formulation, the probability of a reaction occurring in a small time interval $\Delta t$ is:
 \begin{align*}
@@ -693,7 +786,10 @@ P(\emptyset \rightarrow N_A) = H^+(I) \Delta t = \frac{n_m I^2}{n_0^2 + I^2} \De
 
 In the limit as $\Delta t \rightarrow 0$, these probabilities per unit time become rates, which appear directly in the deterministic ODEs. The ODE system essentially tracks the expected values of these stochastic processes under the assumption that fluctuations are small compared to the means.
 
-\subsection{Bifurcation Analysis}
+\section{Bifurcation Analysis}
+\label{sec:bifurcation}
+
+% TODO: Revise this section to incorporate Eric's feedback.
 
 We perform a bifurcation analysis for the two-cell system, where $D_{ext}$ and $N_{ext}$ are treated as parameters. In other words, we will examine the steady states for one cell as a function of the Notch and Delta levels of the other cell. For simplicity, assume all parameters other than $D_{ext}, N_{ext}$ are fixed.
 
@@ -738,55 +834,8 @@ As a general rule of thumb, increasing $n_{m}$ is a reliable way to recover thes
   \caption{Approximate bifurcation diagram of the equilibrium Notch concentration of a single cell under the influence of fixed extracellular Delta from a neighbour.}
 \end{figure}
 
-\section{Results}
-
-\subsection{Two-Cell Domain}
-
-\begin{figure}
-  \includegraphics[width=\textwidth]{img/two_cell_deterministic.pdf}
-  \caption{Results of the two-cell deterministic ODE model.}
-\end{figure}
-
-\begin{figure}
-  \includegraphics[width=\textwidth]{img/two_cell_stochastic.pdf}
-  \caption{Results of the two-cell stochastic ODE model.}
-\end{figure}
-
-\begin{figure}
-  \includegraphics[width=\textwidth]{img/two_cell_gillespie.pdf}
-  \caption{Results of the two-cell Gillespie model.}
-\end{figure}
-
-\begin{figure}
-  \includegraphics[width=\textwidth]{img/two_cell_comparison.pdf}
-  \caption{Comparison of Notch concentrations in deterministic ODE, stochastic ODE, and Gillespie models. All models follow roughly the same trajectory and have similar differentiation times, although the Gillespie model appears to converge slightly faster.}
-\end{figure}
-
-\subsection{Linear Domain}
-
-\begin{figure}
-  \includegraphics[width=\textwidth]{img/ODEModel_TwoCell_Heatmap.png}
-  \caption{Results of the linear domain deterministic ODE model. Heatmap shows Notch levels in each of 8 cells over 1000 time steps.}
-\end{figure}
-
-\begin{figure}
-  \includegraphics[width=\textwidth]{img/SDE_CellLine_HeatMap.png}
-  \caption{Results of the linear domain SDE model. Heatmap shows Notch levels in each of 8 cells over 1000 time steps.}
-\end{figure}
-
-\subsection{Hexagonal Domain}
-
-\begin{figure}
-  \includegraphics[width=\textwidth]{img/ODE_HexGrid.png}
-  \caption{Results of the 8x8 hexagonal domain ODE model showing final Notch values per cell.}
-\end{figure}
-
-\section{Discussion}
 
 \end{flushleft}
-
-\nocite{*}
-\printbibliography
 
 \end{document}
 

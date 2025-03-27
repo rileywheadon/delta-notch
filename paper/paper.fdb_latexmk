@@ -1,12 +1,12 @@
 # Fdb version 4
-["biber paper"] 1742966000.89586 "paper.bcf" "paper.bbl" "paper" 1742966756.88299 0
-  "paper.bcf" 1742966756.73495 108686 a96d73a1166493c3b4be21d587e4a0c4 "pdflatex"
-  "sources.bib" 1741921951.29873 7529 68ef1e39ffd98bbc8b72bf68fd65e52f ""
+["biber paper"] 1743048176.67095 "paper.bcf" "paper.bbl" "paper" 1743058274.53747 0
+  "paper.bcf" 1743058274.39132 109444 d4ccc3caa66f3b8cd8b8c45ff8682dad "pdflatex"
+  "sources.bib" 1743042777.10462 9353 6ac92d38fdd57acae2bbabae4467adf4 ""
   (generated)
   "paper.bbl"
   "paper.blg"
   (rewritten before read)
-["pdflatex"] 1742966751.76569 "paper.tex" "paper.pdf" "paper" 1742966756.88357 0
+["pdflatex"] 1743058270.34573 "paper.tex" "paper.pdf" "paper" 1743058274.53797 0
   "/usr/share/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc" 1741938398 2900 1537cc8184ad1792082cd229ecc269f4 ""
   "/usr/share/texmf-dist/fonts/map/fontname/texfonts.map" 1741938398 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "/usr/share/texmf-dist/fonts/tfm/jknappen/ec/tcrm1000.tfm" 1741938398 1536 e07581a4bb3136ece9eeb4c3ffab8233 ""
@@ -116,6 +116,7 @@
   "/usr/share/texmf-dist/tex/latex/graphics/graphics.sty" 1741938398 18363 dee506cb8d56825d8a4d020f5d5f8704 ""
   "/usr/share/texmf-dist/tex/latex/graphics/graphicx.sty" 1741938398 8010 6f2ad8c2b2ffbd607af6475441c7b5e4 ""
   "/usr/share/texmf-dist/tex/latex/graphics/keyval.sty" 1741938398 2671 70891d50dac933918b827d326687c6e8 ""
+  "/usr/share/texmf-dist/tex/latex/graphics/lscape.sty" 1741938398 1822 ce7e39e35ea3027d24b527bd5c5034d5 ""
   "/usr/share/texmf-dist/tex/latex/graphics/trig.sty" 1741938398 4023 2c9f39712cf7b43d3eb93a8bbd5c8f67 ""
   "/usr/share/texmf-dist/tex/latex/hycolor/hycolor.sty" 1741938398 17914 4c28a13fc3d975e6e81c9bea1d697276 ""
   "/usr/share/texmf-dist/tex/latex/hyperref/hpdftex.def" 1741938398 48154 82da9991b9f0390b3a9d3af6c8618af4 ""
@@ -133,23 +134,20 @@
   "/usr/share/texmf-dist/tex/latex/logreq/logreq.sty" 1741938398 6187 b27afc771af565d3a9ff1ca7d16d0d46 ""
   "/usr/share/texmf-dist/tex/latex/refcount/refcount.sty" 1741938398 9878 9e94e8fa600d95f9c7731bb21dfb67a4 ""
   "/usr/share/texmf-dist/tex/latex/rerunfilecheck/rerunfilecheck.sty" 1741938398 9714 ba3194bd52c8499b3f1e3eb91d409670 ""
+  "/usr/share/texmf-dist/tex/latex/tools/array.sty" 1741938398 14552 27664839421e418b87f56fa4c6f66b1a ""
   "/usr/share/texmf-dist/tex/latex/url/url.sty" 1741938398 12796 8edb7d69a20b857904dd0ea757c14ec9 ""
   "/usr/share/texmf-dist/web2c/texmf.cnf" 1741938398 42087 b0f9697c952c8f5a8eede4134282cb0d ""
   "/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map" 1742161582 5311557 9da84c45f5b388655502706482323571 ""
   "/var/lib/texmf/web2c/pdftex/pdflatex.fmt" 1742161496 2008249 32c187c105deb2cf47be9f931b43b3fa ""
-  "img/ODEModel_TwoCell_Heatmap.png" 1742014883.06471 1969084 01487b2083895b50d2a08ad5c49735d0 ""
-  "img/ODE_HexGrid.png" 1742014883.07971 1190101 84ca3a5cf5b4309800c3a6e3409007b9 ""
-  "img/SDE_CellLine_HeatMap.png" 1742014883.10271 2331954 6d9d86ce2c8af492dea309d501de25b5 ""
   "img/bifurcation-diagram.png" 1741482440.34403 54906 86831681033cc32912fc5a8a35d8800f ""
-  "img/two_cell_comparison.pdf" 1741919668.24377 2868238 e9fafd07d7797c73a8e9df881651ea24 ""
-  "img/two_cell_deterministic.pdf" 1742243166.89589 68831 e17f4bdb9a591e45915629145d787514 ""
-  "img/two_cell_gillespie.pdf" 1741919666.77776 4373724 e210a5d3a38522a9ef2bfdb534a8346c ""
-  "img/two_cell_stochastic.pdf" 1741919660.75772 5238012 bf09cf837c12ab3ef06d590cf736c435 ""
-  "paper.aux" 1742966756.73295 5480 39bdfc6a7f0df9b45a49421bf95f48e7 "pdflatex"
-  "paper.bbl" 1742966002.09618 13776 36e3ddb2abdf1649a4dcc0d3912a70ff "biber paper"
-  "paper.out" 1742966756.73427 3712 40f557c800fe584c5a1e596af138a190 "pdflatex"
-  "paper.run.xml" 1742966756.73738 2309 89f93da09bc1f9b75cae122e26edfc57 "pdflatex"
-  "paper.tex" 1742966750.01691 39707 fdaf54ee417a965ea8a5878026412e31 ""
+  "img/vis11.png" 1743050208.64016 318941 710175146411b9b2bad05686549fe91d ""
+  "img/vis12.png" 1743052722.57251 135208 e2a3a41c650e5bd9ed38317aabff57b0 ""
+  "img/vis13.png" 1743051309.1434 552549 b536b9970ac8fc248bcd323040559d20 ""
+  "paper.aux" 1743058274.38832 7222 2e4827a4c5f9c9f69acbe5b1bae6370b "pdflatex"
+  "paper.bbl" 1743048177.5922 17111 d4d75f3176eec15f001fb76dd06cd1c6 "biber paper"
+  "paper.out" 1743058274.38932 661 15105aeb3e6f24dab05889d745e7ffce "pdflatex"
+  "paper.run.xml" 1743058274.3937 2309 89f93da09bc1f9b75cae122e26edfc57 "pdflatex"
+  "paper.tex" 1743058267.24532 43587 f4ac6f8e4c04c57a5368b84cbc4c274e ""
   (generated)
   "paper.aux"
   "paper.bcf"
