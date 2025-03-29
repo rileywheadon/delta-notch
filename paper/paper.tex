@@ -1,6 +1,8 @@
 \documentclass{article}
 
 \usepackage[left=1.5in, right=1.5in, top=1in, bottom=1in]{geometry}
+
+\usepackage{tikz}
 \usepackage{lscape}
 \usepackage{graphicx}
 \usepackage{amsmath}
@@ -158,7 +160,7 @@ In expectation, the agent-based model converges to the system of ODEs shown in E
 A proof of this fact can be found in the appendix.
 This is the \emph{deterministic ODE} model, which is described below for a single cell in a two-cell system.
 However, this model can be extended to arbitrary domains by defining equations $dN_{i}/dt$, $dD_{i}/dt$, and $dI_{i}/dt$ for each $i \in \{ 1, \dots, n \}$, where $n$ is the number of cells.
-Then, simply replace $N_{ext}$ and $D_{ext}$ with the average Notch and Delta concentration over all neighbours.
+In a domain of arbitrary size, $N_{ext}$ and $D_{ext}$ denote the average Notch and Delta concentration over all neighbours.
 
 \begin{equation}
 \begin{aligned}
@@ -172,7 +174,9 @@ Then, simply replace $N_{ext}$ and $D_{ext}$ with the average Notch and Delta co
 This model is a simplification of Boareto et al. \cite{boareto_jaggeddelta_2015}, which included an additonal equation for the Jagged molecule and kept track of cis-inhibition.
 To more directly compare our results with those of Collier et al. \cite{collier_pattern_1996}, we ignore Jagged interactions and cis-inhibition.
 Adding NICD, which was absent from Collier et al., was necessary for the assignment of probabilities to each reaction event.
-A bifurcation analysis of the system of ODEs in Equation \ref{eq:deterministic} reveals that ...
+An analysis of the system of ODEs in Equation \ref{eq:deterministic} for fixed values of $N_{ext}, D_{ext}$ reveals an $N = 0$ steady state (the \emph{primary fate}) for all parameter values.
+There is also a high Notch steady state (the \emph{secondary fate}) which emerges from a fold bifurcation when $D_{ext}$ is sufficiently large.
+See Appendix \ref{sec:bifurcation} for more information.
 
 \medskip
 
@@ -789,51 +793,75 @@ In the limit as $\Delta t \rightarrow 0$, these probabilities per unit time beco
 \section{Bifurcation Analysis}
 \label{sec:bifurcation}
 
-% TODO: Revise this section to incorporate Eric's feedback.
+\subsection*{One-Cell System}
 
-We perform a bifurcation analysis for the two-cell system, where $D_{ext}$ and $N_{ext}$ are treated as parameters. In other words, we will examine the steady states for one cell as a function of the Notch and Delta levels of the other cell. For simplicity, assume all parameters other than $D_{ext}, N_{ext}$ are fixed.
+First, we consider the one-cell system under the influence of a second, static cell. In this model, the Notch and Delta concentrations in the second cell ($N_{ext}$ and $D_{ext}$) are treated as parameters. Equations \ref{eq:one-cell-notch}, \ref{eq:one-cell-delta}, and \ref{eq:one-cell-nicd} define this system.
 
-$$
-\begin{aligned}
+\begin{align}
+  \label{eq:one-cell-notch}
   \frac{dN}{dt} &= \frac{n_{m}I^2}{n_{0}^2 + I^2} - (k_{T}D_{ext} + \gamma)N \\[5pt]
+  \label{eq:one-cell-delta}
   \frac{dD}{dt} &= \frac{d_{m}d_{0}^2}{d_{0}^2 + I^2} - (k_{T}N_{ext} + \gamma)D \\[5pt]
-  \frac{dI}{dt} &= k_{T}ND_{ext} - \gamma_{I}I \\[5pt]
-\end{aligned}
-$$
+  \label{eq:one-cell-nicd}
+  \frac{dI}{dt} &= k_{T}ND_{ext} - \gamma_{I}I
+\end{align}
 
-Solving for the nullclines gives us the following:
+Observe that $dN/dt$ and $dI/dt$ do not depend on $D$. Therefore, we can analyze the $N-I$ phase plane to learn more about the system. First, we find the nullclines of Equations \ref{eq:one-cell-notch} and \ref{eq:one-cell-nicd} as functions of $I$. The results of this calculation are shown in Equations \ref{eq:one-cell-notch-nullcline} and \ref{eq:one-cell-nicd-nullcline}.
 
-$$
-\begin{aligned}
-  N &= \frac{1}{\gamma + k_{T}D_{ext}}\left(\frac{n_{m}I^2}{n_{0}^2 + I^2}\right) \\[5pt]
-  D &= \frac{1}{\gamma + k_{T}N_{ext}}\left( \frac{d_{m}d_{0}^2}{d_{0}^2 + I^2} \right) \\[5pt]
-  I &= \frac{k_{T}ND_{ext}}{\gamma_{I}}
-\end{aligned}
-$$
+\begin{align}
+  \label{eq:one-cell-notch-nullcline}
+  f_{N}(I) &= \frac{1}{\gamma + k_{T}D_{ext}}\left(\frac{n_{m}I^2}{n_{0}^2 + I^2}\right) \\[5pt]
+  \label{eq:one-cell-nicd-nullcline}
+  f_{I}(I) &= \frac{\gamma_{I}I}{k_{T}D_{ext}}
+\end{align}
 
-Note that each nullcline defines a surface in $\mathbb{R}^3$. To express different cell fates, we need at least two stable steady states. We know that $I^{*} = k_{T}ND_{ext} / \gamma_{I}$ is the unique steady state value of $I$. Furthermore, by substituting $I^{*}$ into the $D$-nullcline, we get the unique steady-state value of $D$. There also exists a trivial stable steady state at $N = I = 0$. 
+Plotting the nullclines in Equations \ref{eq:one-cell-notch-nullcline} and \ref{eq:one-cell-nicd-nullcline} on the $N-I$ plane for small and large values of $D_{ext}$ (assuming the other parameters are suitably chosen) reveals a fold bifurcation. 
 
-\medskip
-
-It remains to find the other steady-state values of $N$ as a function of $D_{ext}$. To do this, we use the computer algebra system sympy. Substituting the equation for $I^{*}$ into the $N$-nullcline gives us the following nonzero steady-state values of $N$:
-
-\medskip
-
-$$
-N^{*} = \frac{n_{m}}{2(D_{ext}k_{T} + \gamma)} \pm \sqrt{\frac{(D_{ext}k_{T}n_{m})^2 - 4(D_{ext}\gamma_{I}k_{T}n_{0} + \gamma \gamma_{I}n_{0})^2}{2D_{ext}k_{T}(D_{ext}k_{T} + \gamma)}}
-$$
-
-\textbf{Remark}: As mentioned above, we need two non-zero stable steady states for $N$ in order to represent the two different cell fates. This requires that the discriminant is positive:
-
-$$D_{ext}k_{T}n_{m} > 2D_{ext}\gamma_{I}k_{T}n_{0} + 2\gamma \gamma_{I} n_{0} \Rightarrow D_{ext}k_{T}(n_{m} - 2\gamma_{I}n_{0}) - 2\gamma \gamma_{I} n_{0} > 0$$
-
-As a general rule of thumb, increasing $n_{m}$ is a reliable way to recover these steady states. If we replace the $>$ sign with $=$ in the equation above, we find the location of a fold bifurcation. The lower branch corresponds to the $N = N_{ext}$, $D = D_{ext}$ unstable steady state. If the system is in this state, any perturbation will cause one cell to collapse to the high notch steady state and the other to collapse to the $N = 0$ steady state. Shown below is a rough sketch of the bifurcation diagram, including the corresponding cell fates.
-
-\begin{figure}
-  \includegraphics[width=\textwidth]{img/bifurcation-diagram.png}
-  \caption{Approximate bifurcation diagram of the equilibrium Notch concentration of a single cell under the influence of fixed extracellular Delta from a neighbour.}
+\begin{figure}[!htp]
+  \label{fig:one-cell-phase-plane}
+  \centering
+  \begin{tikzpicture}[scale=1.75]
+    \node[draw] at (1.5,2.5) {Low $D_{ext}$};
+    \draw[->] (0, 0) -- (3, 0) node[right] {$I$};
+    \draw[->] (0, 0) -- (0, 2) node[above] {$N$};
+    \draw[domain= 0:2, smooth, variable=\x, blue] 
+      plot ({\x}, {\x});
+    \draw[domain= 0:3, smooth, variable=\x, red] 
+      plot ({\x}, {(2*\x*\x)/(2 + \x*\x)});
+    \draw (0, 0) node[circle,fill,scale=0.5] {};
+  \end{tikzpicture}
+  \begin{tikzpicture}[scale=1.75]
+    \node[draw] at (1.5,2.5) {High $D_{ext}$};
+    \draw[->] (0, 0) -- (3, 0) node[right] {$I$};
+    \draw[->] (0, 0) -- (0, 2) node[above] {$N$};
+    \draw[domain= 0:3, smooth, variable=\x, blue] 
+      plot ({\x}, {0.45 * \x});
+    \draw[domain= 0:3, smooth, variable=\x, red] 
+      plot ({\x}, {(1.5*\x*\x)/(2 + \x*\x)});
+    \draw (0, 0) node[circle,fill,scale=0.5] {};
+    \draw (0.78475, 0.35314) node[circle,draw=black,fill=white,thick,scale=0.5] {};
+    \draw (2.54858, 1.14686) node[circle,fill,scale=0.5] {};
+  \end{tikzpicture}
+  \caption{Approximate $N-I$ phase planes for the one-cell ODE model under the influence of low and high Delta from a static neighbour. The $N$-nullcline is shown in red and the $I$-nullcline is shown in blue. Below a critical value of $D_{ext}$, the system undergoes a fold bifurcation which results in the annihalation of the high Notch steady state. The high Notch steady state is also absent for qualitativley high values of $\gamma_{I}$, low values of $k_{T}$, and low values of $n_{m}$.}
 \end{figure}
 
+\subsection*{Two-Cell System}
+
+Now, we will consider the coupled two-cell system in which both cells respond to the Delta-Notch signalling of the other. Let $N_{1}, D_{1}, I_{1}$ and $N_{2}, D_{2}, I_{2}$ denote the Notch, Delta, and NICD concentrations in the first and second cells respectively. Our previous analysis reveals that the $N_{1} = I_{1} = 0$ steady state exists for all values of $D_{2}$. The steady state concentrations $\{ N_{1}^{*}, D_{1}^{*}, I_{1}^{*}, N_{2}^{*}, D_{2}^{*}, I_{2}^{*} \}$ for this case are given in Equation \ref{eq:two-cell-steady-states}.
+
+\begin{equation}
+\label{eq:two-cell-steady-states}
+\begin{aligned}
+  N_{1}^{*} &= 0  &
+  N_{2}^{*} &= \frac{1}{\gamma + k_{T}D_{1}^{*}}\left( \frac{n_{m}(I_{2}^{*})^2}{n_{0}^2 + (I_{2}^{*})^2} \right)  \\[5pt]
+  D_{1}^{*} &= \frac{d_{m}}{\gamma + k_{T}N_{2}^{*}} &
+  D_{2}^{*} &= \frac{1}{\gamma} \left( \frac{d_{m}d_{0}^2}{d_{0}^2 + (I_{2}^{*})^2} \right)  \\[5pt]
+  I_{1}^{*} &= 0 &
+  I_{2}^{*} &= \frac{k_{T}N_{2}^{*}D_{1}^{*}}{\gamma_{I}}
+\end{aligned}
+\end{equation}
+
+There is a second steady state occurs when $N_{1}^{*} = N_{2}^{*}$, $D_{1}^{*} = D_{2}^{*}$, and $I_{1}^{*} = I_{2}^{*}$. While it is difficult to analytically determine the steady state concentrations, we can verify that this steady state exists and is unstable using computer simulations.
 
 \end{flushleft}
 
