@@ -3,6 +3,7 @@ from scipy.stats import gaussian_kde
 from scipy.spatial import ConvexHull
 from matplotlib.colors import LinearSegmentedColormap
 from matplotlib.patches import Polygon, RegularPolygon, Rectangle
+import matplotlib.animation as animation
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 import numpy as np
@@ -453,3 +454,145 @@ def visualize_pattern(pattern, domain='hexagonal', ny=7, nx=7, radius=1.0):
     # linear_pattern = np.array([0, 0, 1, 1, 0, 1, 0, 1, 1, 1])
     # visualize_pattern(linear_pattern, domain='linear')
 
+# Produce an animation of Notch levels in a hexagonal grid
+def animation_hexagonal(vT, vS, nx, ny, animation_title='notch_animation.gif'):
+
+    # --- Extract Notch levels for visualization ---
+    time_points = vT
+    steps = len(time_points)
+    # Reshape and transpose vS to get Notch levels in correct form
+    # (steps, size, 3) -> (ny, nx, steps)
+    notch_data = vS[:, :, 0].reshape(steps, ny, nx).transpose(1, 2, 0)
+
+    # Create a custom colormap for Notch levels 
+    notch_cmap = LinearSegmentedColormap.from_list("NotchMap", ["white", "grey", "black"])
+
+    # Calculate global min and max for consistent coloring
+    vmin = np.min(notch_data)
+    vmax = np.max(notch_data)*0.75
+    print(f"Notch value range: {vmin:.2f} to {vmax:.2f}")
+
+    # --- Create animation of the hexagonal grid over time ---
+    print("Creating animation...")
+    # Set up the figure
+    fig, ax = plt.subplots(figsize=(12, 8))
+    ax.set_aspect('equal')
+    plt.subplots_adjust(left=0.05, right=0.95, bottom=0.05, top=0.95)
+
+    # Hexagon dimensions
+    radius = 1.0
+    hex_height = np.sqrt(3) * radius
+
+    # Create dictionary to hold hexagon patches and text objects
+    hexagons = {}
+    hex_texts = {}
+    coord_texts = {}  # For showing coordinates
+
+    # Initialize hexagons in a parallelogram grid with shift to the right
+    for j in range(ny):
+        for l in range(nx):
+            # Calculate hexagon center position for parallelogram grid
+            # Each row is shifted to the right by the offset of one hexagon
+            x = l * np.sqrt(3) * radius - j * 0.866 * radius  # Shift each row to right
+            y = j * hex_height * 0.866  # Slightly adjust vertical spacing for better appearance
+            
+            # Create hexagon patch
+            hexagon = RegularPolygon(
+                (x, y), 
+                numVertices=6, 
+                radius=radius,
+                orientation=0,  # Flat-topped hexagon
+                facecolor='white',
+                edgecolor='black',
+                linewidth=2.0
+            )
+            ax.add_patch(hexagon)
+            hexagons[(j, l)] = hexagon
+            
+            # Add text for Notch value (centered)
+            hex_texts[(j, l)] = ax.text(x, y, "", ha='center', va='center', fontsize=8)
+            
+            # Add coordinate labels (bottom left corner of each cell)
+            # Only add for the leftmost column and bottom row to avoid clutter
+            if l == 0 or j == ny-1:
+                coord_texts[(j, l)] = ax.text(
+                    x - 0.45 * radius, 
+                    y - 0.45 * radius, 
+                    f"{ny-j},{l+1}", 
+                    ha='center', 
+                    va='center', 
+                    fontsize=8,
+                    color='gray'
+                )
+
+    # Set axis limits based on the parallelogram grid dimensions
+    max_x = (nx - 1) * 1.5 * radius + (ny - 1) * 0.75 * radius + 0 * radius 
+    max_y = (ny - 1) * hex_height * 0.866 + 2 * radius
+    ax.set_xlim(-nx*radius, max_x + radius)
+    ax.set_ylim(-radius*2, max_y + radius)
+
+    # Add grid title and remove ticks
+    ax.set_title(f"Parallelogram Grid ({nx}×{ny}): Notch Expression Pattern")
+    ax.set_xticks([])
+    ax.set_yticks([])
+    ax.set_frame_on(False) # Remove plot frame
+
+    # Add time text display
+    time_text = ax.text(0.02, 0.98, '', transform=ax.transAxes, fontsize=12)
+
+    # Add colorbar
+    cax = fig.add_axes([0.92, 0.2, 0.02, 0.6])  # Adjust position as needed
+    norm = plt.Normalize(vmin, vmax)
+    sm = plt.cm.ScalarMappable(cmap=notch_cmap, norm=norm)
+    sm.set_array([])
+    cbar = fig.colorbar(sm, cax=cax)
+    cbar.set_label('Notch Level')
+
+    # Animation update function
+    def update(frame):
+        # Extract current Notch values at this time frame
+        current_data = notch_data[:, :, frame]
+        
+        # Update all hexagons and texts
+        objects_to_update = []
+        
+        for j in range(ny):
+            for l in range(nx):
+                # Get current notch value
+                notch_val = current_data[j, l]
+                
+                # Normalize value for color mapping
+                normalized_val = (notch_val - vmin) / (vmax - vmin)
+                
+                # Update hexagon color
+                hexagons[(j, l)].set_facecolor(notch_cmap(normalized_val))
+                objects_to_update.append(hexagons[(j, l)])
+                
+                # Update text
+                hex_texts[(j, l)].set_text(f"{notch_val:.1f}")
+                
+                # Set text color based on background brightness
+                text_color = 'white' if normalized_val > 0.4 else 'black'
+                hex_texts[(j, l)].set_color(text_color)
+                objects_to_update.append(hex_texts[(j, l)])
+        
+        # Update time text
+        time_text.set_text(f'Time: {time_points[frame]:.1f}')
+        objects_to_update.append(time_text)
+        
+        return objects_to_update
+
+    # Create animation
+    frame_skip = 30
+    frames = range(0, len(time_points), frame_skip)
+    ani = animation.FuncAnimation(fig, update, frames=frames, blit=True, interval=100)
+
+    # Save animation
+    if animation_title:
+        print("Saving animation...")
+        ani.save(animation_title, writer='pillow', fps=15)
+        print("Animation saved!")
+
+    plt.close()
+
+    print("Animation complete!")

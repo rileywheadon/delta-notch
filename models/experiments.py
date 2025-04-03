@@ -420,3 +420,16 @@ def ex15(nx = 11, ny = 11):
     # Use the updated pattern_hexagonal function
     vis.vis15(periodic_pattern, dirichlet_pattern, nx, ny)
     print("\nExperiment Completed!\n")
+
+
+# Experiment 16: Hexagonal simulation with animation
+def ex16(nx = 7, ny = 7):
+    
+    print("\nRunning Experiment 16\n")
+
+    # Run the stochastic ODE model with dirichlet BCs
+    domain = domains.hexagonal(nx, ny, "dirichlet")
+    vT, vS = ode.ode(domain, DEFAULT_CELL, noise = 0.02)
+
+    vis.animation_hexagonal(vT, vS, nx, ny, animation_title=None)
+    print("\nExperiment Completed!\n")

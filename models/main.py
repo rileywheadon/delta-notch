@@ -23,6 +23,7 @@ def main():
     # ex.ex14()
 
     # Hexagonal Domain Tests
-    ex.ex15()
+    # ex.ex15()
+    ex.ex16()
 
 main()
