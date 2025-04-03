@@ -269,7 +269,77 @@ def vis13(grids, pairs):
     plt.savefig(f"img/vis13.png", dpi = 300)
     plt.close()
 
-#  Produces a visualization of the cell pattern for either hexagonal or linear domains
+
+# Helper function to plot a hexagon (based on visualize_pattern below)
+def plot_hexagonal_pattern(pattern, ax, nx, ny):
+
+    # Initialize hexagons in a parallelogram grid
+    pattern_index = 0
+    for i in range(ny):
+        for j in range(nx):
+
+            # Shift each row to right (we start from top)
+            x = j * np.sqrt(3) + i * np.sqrt(3) / 2
+
+            # Invert y to start from top
+            y = (ny - 1 - i) * 1.5  
+            
+            # Determine color based on the grid value
+            facecolor = 'black' if pattern[pattern_index] == 0 else 'white'
+            
+            # Create hexagon patch
+            hexagon = RegularPolygon(
+                (x, y), 
+                numVertices=6, 
+                radius=1,
+                orientation=0,  # Flat-topped hexagon
+                facecolor=facecolor,
+                edgecolor='gray',
+                linewidth=2.0
+            )
+
+            ax.add_patch(hexagon)
+            pattern_index += 1
+
+    # Set the axis limits
+    max_x = nx * np.sqrt(3) + ny * np.sqrt(3) / 2
+    max_y = (ny - 1) * 1.5
+    ax.set_xlim(-2, max_x + 2)
+    ax.set_ylim(-2, max_y + 2)
+    ax.axis('off')
+
+    # Disable the axis spines and ticks
+    # ax.set_xticks([])
+    # ax.set_yticks([])
+    # ax.spines['top'].set_visible(False)
+    # ax.spines['right'].set_visible(False)
+    # ax.spines['bottom'].set_visible(False)
+    # ax.spines['left'].set_visible(False)
+    return ax
+
+
+# Produce a side-by-side comparison of hexagonal domain with boundary conditions
+def vis15(periodic_pattern, dirichlet_pattern, nx, ny):
+
+    # Create the figure and plot the pattern
+    fig, (ax1, ax2) = plt.subplots(nrows = 1, ncols = 2, figsize=(16, 8))
+    plot_hexagonal_pattern(periodic_pattern, ax1, nx, ny)
+    plot_hexagonal_pattern(dirichlet_pattern, ax2, nx, ny)
+
+    # Set axis and figure titles
+    ax1.set_title("Periodic Boundary Conditions")
+    ax2.set_title("Dirichlet Boundary Conditions")
+    fig.suptitle(f'Comparison of Hexagonal Cell Patterns ({nx}x{ny})')
+
+    # Save everything to /img
+    plt.tight_layout()
+    plt.savefig(f"img/vis15.pdf", dpi = 200)
+    plt.savefig(f"img/vis15.png", dpi = 300)
+    plt.close()
+
+
+
+# Produces a visualization of the cell pattern for either hexagonal or linear domains
 def visualize_pattern(pattern, domain='hexagonal', ny=7, nx=7, radius=1.0):
     """
     Visualize a pattern in either hexagonal or linear mode:

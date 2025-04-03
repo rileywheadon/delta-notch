@@ -18,11 +18,11 @@ def main():
     # Two-Cell Experiments
     # ex.ex10()
     # ex.ex11()
-    ex.ex12()
+    # ex.ex12()
     # ex.ex13()
     # ex.ex14()
 
     # Hexagonal Domain Tests
-    # ex.ex15()
+    ex.ex15()
 
 main()

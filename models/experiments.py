@@ -402,32 +402,21 @@ def ex14(file = "results/ex14.txt"):
     structure_analysis(domain, "Gillespie")
 
 
-# Experiment 15: Hexagonal model pattern for visualization
-def ex15(runs = 1, pb = 0.05):
-    # Run 1 simulation of the stochastic ODE model
-    print("\nRunning15\n")
-    times = np.empty((100))
-    domain = domains.hexagonal_periodic(7,7)
-    size = domain[2]
-    states = np.empty((runs, 100, size, 3))
-    
-    for i in trange(runs):
-        # Generate initial conditions
-        # Create initial conditions for the entire domain
-        size = domain[2] 
-        perturbations = np.random.normal(0, DEFAULT_CELL * pb, (size, 3))
-        initial = DEFAULT_CELL + perturbations
-        
-        # Run the simulation, sort the cells, interpolate the results
-        vT, vS = ode.ode(domain, initial, noise = 0.02)
-        #vS = vS[:, vS[-1, :, 0].argsort(), :]
-        times, states[i] = interpolate(100, vT, vS)
+# Experiment 15: Hexagonal simulations with different boundary conditions
+def ex15(nx = 11, ny = 11):
+
+    print("\nRunning Experiment 15\n")
+
+    # Run the stochastic ODE model with periodic BCs
+    domain = domains.hexagonal(nx, ny, "periodic")
+    vT, vS = ode.ode(domain, DEFAULT_CELL, noise = 0.02)
+    periodic_pattern = pattern(vS)
+
+    # Run the stochastic ODE model with dirichlet BCs
+    domain = domains.hexagonal(nx, ny, "dirichlet")
+    vT, vS = ode.ode(domain, DEFAULT_CELL, noise = 0.02)
+    dirichlet_pattern = pattern(vS)
     
     # Use the updated pattern_hexagonal function
-    cell_pattern = pattern(vS)
-    print(cell_pattern)
-    vis.visualize_pattern(cell_pattern, domain='hexagonal', ny=7, nx=7)
-    #print(vS[-1, :, 0])        
-    
+    vis.vis15(periodic_pattern, dirichlet_pattern, nx, ny)
     print("\nExperiment Completed!\n")
-    return cell_pattern
