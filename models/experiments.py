@@ -34,6 +34,7 @@ def ex01(runs = 10, pb = 0.05):
     # Compute summary statistics, plot the results
     means, stds = summarize(states)
     vis.vis01(times, states, means, stds)
+    return times, states, means
     print("\nExperiment Completed!\n")
 
 
@@ -55,6 +56,7 @@ def ex02(runs = 10, noise = 0.02):
     # Compute summary statistics, plot the results
     means, stds = summarize(states)
     vis.vis02(times, states, means, stds)
+    return times, states, means
     print("\nExperiment Completed!\n")
 
 
@@ -78,7 +80,16 @@ def ex03(runs = 10):
     # Compute summary statistics, plot the results
     means, stds = summarize(states)
     vis.vis03(times, states, means, stds)
+    return times, states, means
     print("\nExperiment Completed!\n")
+
+
+# Experiment 123: Comparison of two-cell models
+def ex123(runs = 10):
+    ode_data = ex01(runs = runs)
+    sde_data = ex02(runs = runs)
+    abm_data = ex03(runs = runs)
+    vis.vis123(ode_data, sde_data, abm_data)
 
 
 # Experiment 04: Deterministic ODE model, linear domain
@@ -403,18 +414,21 @@ def ex14(file = "results/ex14.txt"):
 
 
 # Experiment 15: Hexagonal simulations with different boundary conditions
-def ex15(nx = 11, ny = 11):
+def ex15(g = 0.02, nx = 11, ny = 11):
 
     print("\nRunning Experiment 15\n")
 
+    # Set the parameters based on g
+    params = DEFAULT
+
     # Run the stochastic ODE model with periodic BCs
     domain = domains.hexagonal(nx, ny, "periodic")
-    vT, vS = ode.ode(domain, DEFAULT_CELL, noise = 0.02)
+    vT, vS = ode.ode(domain, DEFAULT_CELL, params = params, noise = 0.02)
     periodic_pattern = pattern(vS)
 
     # Run the stochastic ODE model with dirichlet BCs
     domain = domains.hexagonal(nx, ny, "dirichlet")
-    vT, vS = ode.ode(domain, DEFAULT_CELL, noise = 0.02)
+    vT, vS = ode.ode(domain, DEFAULT_CELL, params = params, noise = 0.02)
     dirichlet_pattern = pattern(vS)
     
     # Use the updated pattern_hexagonal function

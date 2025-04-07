@@ -60,6 +60,47 @@ def vis03(times, states, means, stds):
     vis_01_03(times, states, means, stds, "vis03", "Agent-Based Model")
 
 
+# Visualization 123 (comparison of two-cell models)
+def vis123(ode_data, sde_data, abm_data):
+
+    # Set default line width and font size
+    mpl.rcParams['lines.linewidth'] = 2
+    mpl.rcParams.update({'font.size': 20}) 
+
+    # Iterate through axes (0: ODE, 1: SDE, 2: agent-based)
+    fig, axs = plt.subplots(nrows = 3, sharex = True, figsize = (16, 9))
+    for i, data in enumerate([ode_data, sde_data, abm_data]):
+
+        # Unpack the data for the current model
+        times, states, means = data
+
+        # Plot the trajectories for each sample
+        for j in range(len(states)):
+            axs[i].plot(times, states[j, :, 0, 0], color = "green", alpha = 0.2)
+            axs[i].plot(times, states[j, :, 1, 0], color = "orange", alpha = 0.2)
+
+        # Plot the means at full opacity
+        axs[i].plot(times, means[:, 0, 0], color = "darkgreen")
+        axs[i].plot(times, means[:, 1, 0], color = "darkorange")
+        axs[i].set_xlim(0, 1500)
+
+    # Set axis labels
+    axs[0].set_ylabel("ODE")
+    axs[1].set_ylabel("SDE")
+    axs[2].set_ylabel("Agent-Based")
+
+    # Add title and labels to the graph
+    fig.supxlabel("Time")
+    fig.supylabel("Notch Molecules")
+    fig.suptitle("Comparison of Models on Two-Cell Domain", fontsize = 24)
+
+    # Save to the img/ foler
+    plt.tight_layout()
+    plt.savefig(f"img/vis123.pdf", dpi = 300)
+    plt.savefig(f"img/vis123.png", dpi = 300)
+    plt.close(fig)
+
+
 # Visualization 04-06 helper function:
 def vis_04_06(vT, vS, name, title):
 
@@ -213,15 +254,27 @@ def stability_visualization(ax, grids, pair):
     ax.add_patch(s_poly)
     ax.add_patch(g_poly)
    
-    # Set tick formatters
-    ax.xaxis.set_major_formatter(mpl.ticker.StrMethodFormatter("{x:.1e}"))
-    ax.yaxis.set_major_formatter(mpl.ticker.StrMethodFormatter("{x:.1e}"))
+    # Set the x/y scales and axis limits
+    ax.set_xscale('log')
+    ax.set_yscale('log')
+    ax.set_xlim(DEFAULT[i1] * 0.1, DEFAULT[i1] * 10)
+    ax.set_ylim(DEFAULT[i2] * 0.1, DEFAULT[i2] * 10)
 
-    # Set the x and y limits, titles, labels, etc.
-    ax.xaxis.set_ticks(np.linspace(0, DEFAULT[i1] * 10, 3))
-    ax.yaxis.set_ticks(np.linspace(0, DEFAULT[i2] * 10, 3))
-    ax.set_xlim(0, DEFAULT[i1] * 10)
-    ax.set_ylim(0, DEFAULT[i2] * 10)
+    # Set ticks and tick formatters
+    def format_sci(x, _):
+        return "{:.1e}".format(x)
+
+    ax.xaxis.set_major_formatter(mpl.ticker.FuncFormatter(format_sci))
+    ax.xaxis.set_ticks([DEFAULT[i1] * 0.1, DEFAULT[i1], DEFAULT[i1] * 10])
+    ax.get_xaxis().set_tick_params(which='minor', size=0)
+    ax.get_xaxis().set_tick_params(which='minor', width=0)
+
+    ax.yaxis.set_major_formatter(mpl.ticker.FuncFormatter(format_sci))
+    ax.yaxis.set_ticks([DEFAULT[i2] * 0.1, DEFAULT[i2], DEFAULT[i2] * 10])
+    ax.get_yaxis().set_tick_params(which='minor', size=0)
+    ax.get_yaxis().set_tick_params(which='minor', width=0)
+
+    # Set the x and y titles, labels, etc.
     ax.set_xlabel(NAMES[i1])
     ax.set_ylabel(NAMES[i2])
     ax.set_title(f"{NAMES[i1]} vs. {NAMES[i2]}")

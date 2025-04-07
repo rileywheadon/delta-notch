@@ -9,6 +9,7 @@ def main():
     # ex.ex01()
     # ex.ex02()
     # ex.ex03()
+    # ex.ex123()
 
     # Linear Domain Tests
     # ex.ex04()
@@ -19,10 +20,10 @@ def main():
     # ex.ex10()
     # ex.ex11()
     # ex.ex12()
-    # ex.ex13()
+    ex.ex13()
     # ex.ex14()
 
     # Hexagonal Domain Tests
-    ex.ex15()
+    # ex.ex15()
 
 main()

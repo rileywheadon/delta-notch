@@ -27,23 +27,22 @@
 
 \section*{Abstract}
 
-The Delta-Notch signalling pathway plays a crucial role in determining the cell fate of initially homogeneous cells in a wide array biological systems.
-Early deterministic models of the Delta-Notch pathway achieved cell differentiation in linear and 2D cell arrays using highly simplified equations that abstracted away the biochemistry of the system.
-In this paper, we present a simple yet biologically realistic model of Delta-Notch signalling and test it using three modelling formalisms: deterministic ODE, stochastic ODE, and agent-based.
-Using the Kolmogorov forward equations, we show that the agent-based formalisms converges to the system of deterministic ODEs in expectation.
-We also demonstrate that the stochastic ODE and agent-based formalisms can produce cell differentiation even from identical initial conditions.
+The Delta-Notch signalling pathway plays a crucial role in determining the fate of initially homogeneous cells in a wide array of biological systems.
+In this paper, we present a simple yet biologically realistic representation of Delta-Notch signalling and test it using three models: ODE, SDE, and agent-based.
+Using the Kolmogorov forward equations, we show that the agent-based model converges to the ODE model in expectation.
+We also demonstrate that the SDE and agent-based models can produce cell differentiation even from identical initial conditions.
 Finally, we study the effect of parameters such as stochastic noise, domain size, and boundary conditions on the behaviour of our models.
-Our findings provide important insights into how different mathematical formalisms can affect simulations of the Delta-Notch signalling network with significant implications for future modelling work. 
+Our findings provide insight into how modelling formalisms can affect simulations of the Delta-Notch signalling network with significant implications for future research. 
 
 \section*{Introduction}
 
-Cell differentiation is essential for the creation of structure in all complex organisms.
-Surprisingly, only a small number of signalling pathways are responsible for this essential functions \cite{bray_notch_2006}.
-One of these pathways is the Delta-Notch signalling network, which is unique because its ligands Delta and Jagged are transmembrane proteins.
+Cell differentiation is essential for the formation of structure in complex organisms.
+But surprisingly, only a small number of signalling pathways are responsible for this important function \cite{bray_notch_2006}.
+One of these pathways is the Delta-Notch signalling network, which has been shown to affect neurogenesis in vertebrates by determining which cells adopt neural or glial fates. 
+Furthermore, mutations in Notch activity has been shown to be a contributing factor to many cancers \cite{bray_notch_2006}.
+The Delta-Notch signalling network is unique because its ligands Delta and Jagged are transmembrane proteins.
 This means that Delta-Notch signalling is largely restricted to neighbouring cells. 
 However, new findings suggest that cellular protrusions can allow a small fraction of Delta-Notch signals to travel longer distances \cite{berkemeier_coupling_2023}.
-The Delta-Notch signalling network has been shown to affect neurogenesis in vertebrates by determining which cells adopt neural or glial fates. 
-Furthermore, mutations in Notch activity has been shown to be a contributing factor to many cancers \cite{bray_notch_2006}.
 
 \medskip
 
@@ -61,43 +60,44 @@ However, NICD promotes Serrate, which creates a double-positive feedaback loop.
 
 Previous models of Delta-Notch signalling \cite{collier_pattern_1996, boareto_jaggeddelta_2015} have made a number of assumptions which we also use for our models.
 First, cells interact through Delta-Notch signalling if and only if they are adjacent.
-Production of Notch is an increasing hill function of Delta in neighbouring cells.
-Production of Delta is a decreasing hill function of Notch in the same cell.
+Production of Notch is an increasing hill function of NICD.
+Production of Delta is a decreasing hill function of NICD.
 Both Notch and Delta decay at a rate proportional to their concentration.
-Low levels of Notch cause the primary fate, high levels cause the secondary fate.
-The behaviour   of cells with a specific fate depends on the specifics of the organism and organ, which is outside the scope of these models. 
+Low levels of Notch cause the primary cell fate, while high levels cause the secondary cell fate.
+The behaviour of cells with a specific fate depends on the organism and organ, which is outside the scope of these models. 
 
 \medskip
 
-The model of Delta-Notch signalling proposed by Collier et al. \cite{collier_pattern_1996} makes other simplifications which violate our current understanding of the Notch signalling pathways.
+The model of Delta-Notch signalling proposed by Collier et al. \cite{collier_pattern_1996} makes other simplifications which violate the modern understanding of the signalling pathway.
 These simplifications make it difficult to identify how individual chemical reactions are captured by the model.
 For instance, production of activated Notch (NICD) is exclusively a function of the Delta concentration in neighbouring cells, with no regard for the concentration of Notch receptors.
 This violates the mass-balance equations, since the quantity of Notch receptors changes dynamically in response to the concentration of Delta ligands in nearby cells.
 There are smaller issues, like the absence of cis-inhibition and the Serrate (Jagged)
-protein, but these aren’t necessary to capture the fundamental behaviour of the
+protein, but these omissions are not necessary to capture the behaviour of the
 system.
 
 \medskip
 
 In this paper, we develop three models of the Delta-Notch signalling network based on a modern understanding of the biochemistry of the system. 
-Our first model is an agent-based simulation of individual Delta and Notch molecules. 
-While this model is more accurate to the biology than an ODE model, it is impossible to analyze analytically and slow to test numerically.
-Then, we define two ODE models. 
-The deterministic ODE model defines the behaviour of the agent-based model in expectation (see the Appendix for a proof).
-The stochastic ODE model is an extension to the deterministic ODE model which contains noise terms that are intended to simulate the randomness of the agent-based model.
-We compare these models with each other using a combination of analytical and numerical methods in a variety of different domains and boundary conditions.
+Our first model is an agent-based simulation of individual Delta, Notch, and NICD molecules. 
+While this model precisely simulates the reaction kinetics under our assumptions, it is impossible to analyze analytically and slow to simulate computationally.
+Then, we define two models based on differential equations. 
+The ordinary differential equation (ODE) model is equivalent the expected behaviour of the agent-based model (see Appendix \ref{sec:theoretical-justification} for a proof).
+The stochastic differential equation (SDE) model is an extension to the ODE model which contains additional noise terms.
+These terms are intended to simulate the stochasticity of the agent-based model.
+We compare these models with each other using a combination of analytical and computational methods in a variety of different domains.
 Furthermore, we show that our models qualitatively replicate the results of Collier et al. \cite{collier_pattern_1996}. 
-In particular we show that a if linear array of cells is given no-flux boundary conditions, the pattern of alternating cell fates arises on the outside edges before gradually spreading inwards towards the center of the domain.
+In particular we show that if a linear array of cells is given zero-flux boundary conditions, the pattern of alternating cell fates arises on the outside edges before gradually spreading inwards towards the center of the domain.
 Additionally, both our model and the Collier et al. model exhibit different ratios of primary to secondary fated cells depending on the parameters on a two-dimensional hexagonal lattice. 
 
 \section*{Methods}
 
 From the literature \cite{collier_pattern_1996, boareto_jaggeddelta_2015}, we assume Notch ($N$) receptor production has the form $H^{+}(I) = n_{m}I^2/(n_{0}^2 + I^2)$ where $I$ is the NICD concentration and $n_{m}, n_{0}$ are hill function parameters.
 Similarly, Delta ligand ($D$) production is governed by a decreasing hill function of the for production has the form $H^{-}(I) = d_{m}d_{0}^2/(d_{0}^2 + I^2)$.
-Furthermore, we will asume that Notch and Delta both have decay rate $\gamma$.
+Furthermore, we will assume that Notch and Delta both have decay rate $\gamma$.
 The variable $k_{T}$ will denote the binding rate between Notch receptors and Delta ligands.
 $\gamma_{I}$ is the decay rate of NICD.
-We will also assume that there is no cis-interaction and no Serrate ligand. 
+We will also assume that there is no cis-inhibition and no Serrate ligand. 
 
 \begin{table}[!htp]
 \centering
@@ -132,33 +132,33 @@ We will also assume that there is no cis-interaction and no Serrate ligand.
 \end{tabular}
 \caption{
   A list of possible reactions and their rates in a cell $A$ with neighbour $B$.
-  Since there are $6$ possible reactions per cell, a system with $n$ cells will have $6n$ possible reactions to keep track of.
+  Since there are $6$ possible reactions per cell, a system with $n$ cells will have $6n$ possible reactions.
 }
 \label{tb:reactions}
 \end{table}
 
 \medskip
 
-We will make the assumption that reaction times follow a Poisson point process.
-Let $E$ be the set of all possible reaction events (i.e. the $6$ reactions above for all cells).
+We will assume that reaction times follow a Poisson point process.
+Suppose $E$ is the set of all possible reaction events (the $6$ reactions above for all cells).
 Furthermore, let $|E| = N$ be the number of possible reactions.
 For each event, let $X_{i} \sim \text{Exp}(\lambda_{i})$ denote the time until the next event of type $i$, where $1 \leq i \leq N$.
-Then, the waiting time $T$ in between \emph{any} two events is:
+Then, the waiting time $T$ in between any two events is:
 
 $$
 T = \text{min} \{ X_{1}, \dots, X_{N} \} \sim \text{Exp}\left( \sum_{i = 1}^{N} \lambda_{i} \right) 
 $$
 
 This results follows from the definition of an exponential distribution and the memoryless property.
-Then, we can use Gillespie's algorithm to simulate the system.
+We can use Gillespie's algorithm to simulate the system.
 This is the \emph{agent-based} model.
-Details of the computational implementation of this model can be found in Appendix \ref{sec:gillespie}.
+Details of the computational implementation can be found in Appendix \ref{sec:gillespie}.
 
 \medskip
 
-In expectation, the agent-based model converges to the system of ODEs shown in Equation \ref{eq:deterministic}.
+In expectation, the agent-based model converges to the system of ordinary differential equations shown in Equation \ref{eq:deterministic}.
 A proof of this fact can be found in the appendix.
-This is the \emph{deterministic ODE} model, which is described below for a single cell in a two-cell system.
+This is the \emph{ODE} model, which is described below for a single cell in a two-cell system.
 However, this model can be extended to arbitrary domains by defining equations $dN_{i}/dt$, $dD_{i}/dt$, and $dI_{i}/dt$ for each $i \in \{ 1, \dots, n \}$, where $n$ is the number of cells.
 In a domain of arbitrary size, $N_{ext}$ and $D_{ext}$ denote the average Notch and Delta concentration over all neighbours.
 
@@ -171,8 +171,8 @@ In a domain of arbitrary size, $N_{ext}$ and $D_{ext}$ denote the average Notch 
 \label{eq:deterministic}
 \end{equation}
 
-This model is a simplification of Boareto et al. \cite{boareto_jaggeddelta_2015}, which included an additonal equation for the Jagged molecule and kept track of cis-inhibition.
-To more directly compare our results with those of Collier et al. \cite{collier_pattern_1996}, we ignore Jagged interactions and cis-inhibition.
+This model is a simplification of a model by Boareto et al. \cite{boareto_jaggeddelta_2015}.
+However, to more directly compare our results with those of Collier et al. \cite{collier_pattern_1996}, we chose to ignore Serrate and cis-inhibition.
 Adding NICD, which was absent from Collier et al., was necessary for the assignment of probabilities to each reaction event.
 An analysis of the system of ODEs in Equation \ref{eq:deterministic} for fixed values of $N_{ext}, D_{ext}$ reveals an $N = 0$ steady state (the \emph{primary fate}) for all parameter values.
 There is also a high Notch steady state (the \emph{secondary fate}) which emerges from a fold bifurcation when $D_{ext}$ is sufficiently large.
@@ -180,9 +180,9 @@ See Appendix \ref{sec:bifurcation} for more information.
 
 \medskip
 
-To capture the inherent randomness in receptor-ligand interactions while maintaining computational efficiency, we implement a \emph{stochastic ODE} model based on the chemical Langevin equation formalism.
-This approach represents an intermediate level of detail between the deterministic ODE model and the fully discrete Gillespie algorithm.
-Starting from the deterministic ODE model described in Equation \ref{eq:deterministic}, we incorporate stochastic fluctuations by adding noise terms proportional to the square root of the reaction rates to get Equation \ref{eq:stochastic}.
+To capture the inherent randomness in receptor-ligand interactions while maintaining computational efficiency, we implement a stochastic differential equation \emph{SDE} model based on the Langevin equation formalism.
+This approach represents an intermediate level of detail between the ODE model and the fully discrete agent-based model.
+Starting from the ODE model described in Equation \ref{eq:deterministic}, we incorporate stochastic fluctuations by adding noise terms proportional to the square root of the reaction rates to get Equation \ref{eq:stochastic}.
 
 \begin{equation}
 \begin{aligned}
@@ -193,33 +193,97 @@ Starting from the deterministic ODE model described in Equation \ref{eq:determin
 \label{eq:stochastic}
 \end{equation}
 
-where $dW_N$, $dW_D$, and $dW_I$ are independent Wiener processes representing white noise.
+In Equation \ref{eq:stochastic}, $dW_N$, $dW_D$, and $dW_I$ are independent Wiener processes representing white noise.
 The structure of the noise terms follows from the assumption that noise in each reaction channel is proportional to the current concentration of those molecules.
 
 \medskip
 
-To implement these models computationally, we employed the Euler-Maruyama scheme with time step $dt$.
-The deterministic step is first calculated, and then the Wiener increments are sampled from a normal distribution with mean 0 and standard deviation $\sqrt{dt}$.
-Each increment is scaled by the its respective variable and added to the results of the deterministic step.
+To implement these models computationally, we employed the Euler-Maruyama method with time step $dt$.
+The deterministic increment calculated first, and then the Wiener increments are sampled from a normal distribution with mean $0$ and standard deviation $\sqrt{dt}$.
+Then, each Wiener increment is scaled by its respective variable and added to the deterministic increment.
 
 \section*{Results}
 
 % TODO: Write some filler text to connect the different experiments.
 
-\begin{figure}
-  \includegraphics[width=\textwidth]{img/vis11.png}
-  \caption{A plot of the KDE approximation of the distribution of differentiation times for the agent-based model and the stochastic ODE model with different levels of noise. All simulations were done on a two-cell domain with periodic boundary conditions. These simulations show that higher values of the noise parameter significantly decrease the average time it takes for the two cells to adopt different fates. Notably, a noise parameter of $2\%$ causes the stochastic ODE model to align most closely with the results of agent-based simulations. }
+\subsection*{Two-Cell Domains}
+
+Collier et al. \cite{collier_pattern_1996} observed cell differentiation in their ODE model under small initial perturbations on a two-cell domain.
+In our first experiment, we attempted to replicate this result under all three modelling formalisms.
+Since the SDE and agent-based models are stochastic, we did not apply an initial perturbation to them.
+For the ODE model, which is deterministic, we perturbed the initial Notch concentration by a factor of $X$, where $X$ is sampled from a $\mathcal{N}(1, 0.1)$ random variable.
+The results of this experiment are shown in Figure \ref{fig:two-cell-simulations}.
+
+\begin{figure}[!htp]
+  \includegraphics[width=\textwidth]{img/vis123.png}
+  \caption{Results of ten simulations of each modelling formalism (ODE, SDE, agent-based) on a two-cell domain with periodic boundary conditions. An initial perturbation was applied to the ODE model to move the system off of an unstable steady state. In all simulations, the system eventually converged to a differentiated state. The number of Notch molecules in the primary-fated and secondary-fated cells  are shown in green and yellow respectively. The bold line denotes the mean number of Notch molecules over all simulations.}
+  \label{fig:two-cell-simulations}
 \end{figure}
 
-\begin{figure}
+\medskip
+
+Using stochastic formalisms such as the SDE and agent-based models, we can investigate more nuanced questions about the behaviour of the Delta-Notch signalling network. 
+For our next experiment, we attempted to quantify how easy it would be force the two-cell system to adopt a certain outcome by perturbing the initial Notch concentration.
+We predicted that the cell with the lower initial number of Notch molecules would adopt the primary (low Notch) fate, while the other cell would adopt the secondary (high Notch) fate.
+While our prediction was generally true, it turns out the randomness of the agent-based model makes difficult to influence the outcome of a simulation using an initial perturbation.
+The results of this experiment are shown in Figure \ref{fig:outcome-forcing}.
+
+\begin{figure}[!htp]
   \includegraphics[width=\textwidth]{img/vis12.png}
   \caption{A \emph{Primary Outcome} occurs when the cell with the lower initial Notch concentration ends up adopting the primary (low Notch) fate. This plot shows the relationship between initial perturbation and the sample proportion of primary outcomes for the agent-based model on a two-cell domain. Prior to the perturbation, each cell has $200$ Notch molecules. A perturbation of $x$ molecules removes $x/2$ Notch molecules from the first cell and adds $x/2$ Notch molecules to the second. Unsurprisingly, larger initial perturbations result in a higher proportion of primary outcomes, although this effect is not as extreme as we expected. Even in the largest perturbation we tested ($\pm 25\%$), only $80\%$ of the simulations had the primary outcome. This suggests that it is difficult to reliably control cell fate by perturbation alone.}
+  \label{fig:outcome-forcing}
 \end{figure}
 
-\begin{figure}[!ht]
+\medskip
+
+When we defined the SDE model in Equation \ref{eq:stochastic}, we introduced a parameter $\sigma$ that represents the amount of noise.
+However, with the methods we know, it is difficult to estimate the value of this parameter analytically or numerically.
+Here, we present a computational method to get a qualitative estimate of $\sigma$ which uses the differentiation time of the two-cell system.
+We define the differentiation time $t^{*}$ to be the time at which one cell adopts the primary fate ($N < 1$).
+Through our experiments, we noticed that higher levels of noise lower the average differentiation time by rapidly perturbing the system into more ``extreme'' states.
+Using this relationship, we estimated that $\sigma = 0.02$ by comparing simulations of the SDE model with the agent-based model.
+See Figure \ref{fig:noise-estimate} for a summary of this result.
+
+\begin{figure}[!htp]
+  \includegraphics[width=\textwidth]{img/vis11.png}
+  \caption{A plot of the KDE approximation of the distribution of differentiation times for the agent-based model and the stochastic ODE model with different levels of noise. All simulations were done on a two-cell domain with periodic boundary conditions. These simulations show that higher values of the noise parameter significantly decrease the average time it takes for the two cells to adopt different fates. Notably, a noise parameter of $2\%$ causes the stochastic ODE model to align most closely with the results of agent-based simulations. }
+  \label{fig:noise-estimate}
+\end{figure}
+
+\medskip
+
+All of the previous experiments were run using a fixed set of parameter values.
+However, in order to evaluate the quality of our model, we wanted to see if we could replicate the key result of cell differentiation under different parameter regimes.
+We identified five main parameters which effect whether the two-cell system differentiates.
+These parameters are the maximum rates of Notch and Delta production $n_{m}$ and $d_{m}$, the binding rate $k_{T}$, the Notch and Delta decay rate $\gamma$, and the NICD decay rate $\gamma_{I}$.
+Due to computational limitations, we could not perform a complete grid search of the $5$-dimensional parameter space.
+Instead, we opted to explore all $10$ of the $2$-dimensional subspaces of our parameter space.
+The results of our stability analysis are shown in Figure \ref{fig:stability-analysis}.
+
+\begin{figure}[!htp]
    \makebox[\textwidth][c]{\includegraphics[width=1.3\textwidth]{img/vis13.png}}
    \caption{Results of two-at-a-time stability analysis of the deterministic, stochastic, and agent-based modelling formalisms on a two-cell domain with periodic boundary conditions. The regions enclosed by the red, blue, and green lines are regions in which cell differentiation occurs for each of the three models. Regions were obtained by simulating a $25 \times 25$ grid of test points and taking the convex hull of the points at which cell differentiation occurred. This analysis suggests that the deterministic and stochastic ODE models are on average less sensitive to changes in parameter values than the agent-based model. In particular, the agent-based model does not achieve cell differentiation for large values of the Notch and Delta production parameters $n_{m}$ and $d_{m}$.} 
+   \label{fig:stability-analysis}
 \end{figure}
+
+\subsection*{Linear Domains}
+
+A linear domain is an array of cells in which each cell receives and emits Delta-Notch signals to $2$ neighbours ($1$ if the cell is on the boundary of domain).
+Collier et al. \cite{collier_pattern_1996} tested their model on linear domains of up to $40$ cells with zero-flux boundary conditions.
+They observed that cells on the boundary of the domain adopted the primary fate first.
+Then, the alternating pattern of primary and secondary fate cells gradually spread inwards towards the center of the domain.
+In our first experiment on a linear domain, we replicated this result as shown in Figure.
+
+% TODO: Add linear domain figure here.
+
+\medskip
+
+We also attempted to broadly classify the types of patterns we observed on linear domains.
+In order to do this, we first need to define the notion of a \emph{pattern}.
+Since the ``default'' or ``regular'' outcome of a simulation on a linear domain is an alternating array of cells with each fate, we will call this pattern $0: [],\, 1: []$.
+Then, each contiguous group of cells with the same fate (where $0$ is the primary fate and $1$ is the secondary fate) will add entries to the pattern arrays.
+For example, if there are $2$ contiguous pairs of cells with the primary fate and $1$ contiguous triplet of cells with the secondary fate, the simulation will have the pattern $0: [2, 2], \, 1: [3]$. 
+There is a lot more nuance related to pattern formation that we didn't have time to explore, but one interesting result is shown in Table \ref{tb:patterns}.
 
 \begin{table}[!htp]
 \centering
@@ -234,10 +298,12 @@ Each increment is scaled by the its respective variable and added to the results
  \hline
 \end{tabular}
 \caption{
-  Frequency of selected cell patterns in $1000$ simulations of the agent-based model on $9$-cell (even) and $10$-cell (odd) domains with zero-flux boundary conditions. A \emph{pattern} describes the contiguous groups of cells which share a fate. The pattern $0: [], \, 1: []$ means that cells have alternating fates. The pattern $0: [], \, 1: [2, 2]$ means there are two adjacent pairs of cells with the secondary fate $1$. We observe significant variations in patterns accross even and odd domains. Similarly drastic variation is observed accross different modelling formalisms and boundary conditions (not shown).
+  Frequency of selected cell patterns in $1000$ simulations of the agent-based model on $9$-cell (even) and $10$-cell (odd) domains with zero-flux boundary conditions. We observe significant variations in patterns across even and odd domains. Similarly drastic variation is observed across different modelling formalisms and boundary conditions (not shown).
 }
 \label{tb:patterns}
 \end{table}
+
+\subsection*{Hexagonal Domains}
 
 % TODO: Add results on hexagonal domains.
 
@@ -815,7 +881,7 @@ Observe that $dN/dt$ and $dI/dt$ do not depend on $D$. Therefore, we can analyze
   f_{I}(I) &= \frac{\gamma_{I}I}{k_{T}D_{ext}}
 \end{align}
 
-Plotting the nullclines in Equations \ref{eq:one-cell-notch-nullcline} and \ref{eq:one-cell-nicd-nullcline} on the $N-I$ plane for small and large values of $D_{ext}$ (assuming the other parameters are suitably chosen) reveals a fold bifurcation. 
+Plotting the nullclines in Equations \ref{eq:one-cell-notch-nullcline} and \ref{eq:one-cell-nicd-nullcline} on the $N-I$ plane for small and large values of $D_{ext}$ (assuming the other parameters are suitably chosen) reveals a fold bifurcation. This is shown in Figure \ref{fig:one-cell-phase-plane}.
 
 \begin{figure}[!htp]
   \label{fig:one-cell-phase-plane}
@@ -842,7 +908,7 @@ Plotting the nullclines in Equations \ref{eq:one-cell-notch-nullcline} and \ref{
     \draw (0.78475, 0.35314) node[circle,draw=black,fill=white,thick,scale=0.5] {};
     \draw (2.54858, 1.14686) node[circle,fill,scale=0.5] {};
   \end{tikzpicture}
-  \caption{Approximate $N-I$ phase planes for the one-cell ODE model under the influence of low and high Delta from a static neighbour. The $N$-nullcline is shown in red and the $I$-nullcline is shown in blue. Below a critical value of $D_{ext}$, the system undergoes a fold bifurcation which results in the annihalation of the high Notch steady state. The high Notch steady state is also absent for qualitativley high values of $\gamma_{I}$, low values of $k_{T}$, and low values of $n_{m}$.}
+  \caption{Approximate $N-I$ phase planes for the one-cell ODE model under the influence of low and high Delta from a static neighbour. The $N$-nullcline is shown in red and the $I$-nullcline is shown in blue. Below a critical value of $D_{ext}$, the system undergoes a fold bifurcation which results in the annihilation of the high Notch steady state. The high Notch steady state is also absent for qualitatively high values of $\gamma_{I}$, low values of $k_{T}$, and low values of $n_{m}$.}
 \end{figure}
 
 \subsection*{Two-Cell System}
