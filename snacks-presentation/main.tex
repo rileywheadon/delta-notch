@@ -134,7 +134,6 @@
 
 % SECTION 2: DORA (15m?)
 \section{Derivation}
-
 \begin{frame}{Preliminaries and Assumptions}
 \begin{figure}
     \centering
@@ -206,6 +205,7 @@ We flatten the 3D state space into a 1D list.\\
 
 \begin{frame}{Matrix Formulation}
 To construct the matrix $\mathbf{A}$, we first establish a one-to-one mapping between the three-dimensional state space $(n,d,i)$ and a one-dimensional index $k$. \\~\\
+
 We set $n_{max}$, $d_{max}$, and $i_{max}$ as large enough bounds for Notch, Delta, and NICD in cell $A$. These define the size of our 3D ``box" of possible states. \\
 \textit{Remark:} These are not strict limits but chosen large enough to technically capture all relevant dynamics.
 \end{frame}
@@ -245,10 +245,13 @@ k_T(n)D_{ext} & \text{if } (n',d',i') = (n-1,d,i+1) \quad \text{(Trans-activatio
 Note that $A_{k,k'}$ represents the transition rate from state $k$ to state $k'$. The diagonal elements $A_{k,k}$ are the negative sum of all outgoing rates from state $k$:
 
 \[
-A_{k,k} = -v=-[H^+(i) + H^-(i) + \gamma n + \gamma d + \gamma_I i + k_T n D_{ext} + k_T d N_{ext}]
+A_{k,k} = -v_k =-[H^+(i) + H^-(i) + \gamma n + \gamma d + \gamma_I i + k_T n D_{ext} + k_T d N_{ext}]
 \]
 
 where $(n,d,i)$ is the state corresponding to index $k$.\\
+\textit{Recall:} We assume that reaction times follow a Poisson point process.\\~\\
+
+\pause
 
 The resulting matrix $\mathbf{A}$ is a sparse matrix with the following properties:
 \begin{itemize}
@@ -260,7 +263,7 @@ The resulting matrix $\mathbf{A}$ is a sparse matrix with the following properti
 \begin{frame}{Matrix Formulation}
 The corresponding transition matrix $\mathbf{A}$ would be:
 
-\begin{align*}
+\small \begin{align*}
 \mathbf{A} = 
 \begin{pmatrix}
 -v_{000} & \alpha_{000,001} & \alpha_{000,010} & \alpha_{000,011} & \alpha_{000,100} & \alpha_{000,101} & \alpha_{000,110} & \alpha_{000,111} \\
@@ -269,15 +272,19 @@ The corresponding transition matrix $\mathbf{A}$ would be:
 \alpha_{011,000} & \alpha_{011,001} & \alpha_{011,010} & -v_{011} & \alpha_{011,100} & \alpha_{011,101} & \alpha_{011,110} & \alpha_{011,111} \\
 \alpha_{100,000} & \alpha_{100,001} & \alpha_{100,010} & \alpha_{100,011} & -v_{100} & \alpha_{100,101} & \alpha_{100,110} & \alpha_{100,111} \\
 \alpha_{101,000} & \alpha_{101,001} & \alpha_{101,010} & \alpha_{101,011} & \alpha_{101,100} & -v_{101} & \alpha_{101,110} & \alpha_{101,111} \\
-\alpha_{110,000} & 0 & H^+(0) & 0 & H^-(1) & 0 & -v_{110} & \gamma_I \\
-\alpha_{111,000} & 0 & 0 & H^+(0) & 0 & H^-(1) & H^+(1) & -v_{111}
+\alpha_{110,000} & \alpha_{110,001} & \alpha_{110,010} & \alpha_{110,011} & \alpha_{110,100} & \alpha_{110,101} & -v_{110} & \alpha_{110,111} \\
+\alpha_{111,000} & \alpha_{111,001} & \alpha_{111,010} & \alpha_{111,011} & \alpha_{111,100} & \alpha_{111,101} & \alpha_{111,110} & -v_{111}
 \end{pmatrix}
 \end{align*}
 
 where:
-\[
-\alpha_{ndi,n'd'i'} = H^+(i) + H^-(i) + \gamma n + \gamma d + \gamma_I i + k_T n D_{ext} + k_T d N_{ext}
-\]
+\begin{align*}
+\alpha_{ndi,n'd'i'} = 
+\begin{cases}
+H^+(i) + H^-(i) + \gamma n + \gamma d + \gamma_I i + k_T n D_{ext} + k_T d N_{ext} & \text{if } (n,d,i) \rightarrow (n',d',i') \\
+0 & \text{otherwise}
+\end{cases}
+\end{align*}
 
 \end{frame}
 
@@ -287,13 +294,12 @@ Let us consider
 \begin{itemize}
     \item A one-cell system: $P(n,d,i,t+\Delta t)$ \\
     A $k$-cell system: $P(n_1,d_1,i_1,n_2,d_2,i_2,...,n_k,d_k,i_k,t+\Delta t)$\\
-    \item $D_{ext}$ (the average Delta concentration over all neighbours of cell $A$).
+    \item $D_{ext}$ (the average Delta concentration over all neighbours of cell $A$)\\ can vary depending on the choice of domain.
 \end{itemize}
 \vfill
 \pause
 The complexity of a single cell highlights the need for numerical methods to model interactions between cells.
 \end{frame}
-
 
 % SECTION 3: EDWIN (20m?)
 \section{Results}
