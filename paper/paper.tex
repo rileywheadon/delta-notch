@@ -490,11 +490,11 @@ We define the following expected values:
 \subsection*{Key Assumptions}
 Throughout this derivation, we make the following assumptions:
 \begin{enumerate}
-  \item Fluctuations in molecular counts are small relative to their mean values; that is, $\sqrt{\text{Var}(N)} \ll \langle n \rangle$, $\sqrt{\text{Var}(D)} \ll \langle d \rangle$, and $\sqrt{\text{Var}(I)} \ll \langle i \rangle$.
+  \item The standard deviation of molecular counts is small compared to their mean values, $\sqrt{\text{Var}(N)} \ll \langle n \rangle$, $\sqrt{\text{Var}(D)} \ll \langle d \rangle$, and $\sqrt{\text{Var}(I)} \ll \langle i \rangle$.
   
-  \item Second moments can be approximated by the squares of the means, i.e., $\langle n^2 \rangle \approx \langle n \rangle^2$, $\langle d^2 \rangle \approx \langle d \rangle^2$, and $\langle i^2 \rangle \approx \langle i \rangle^2$.
+  \item The second moments can be approximated by the squares of the means, i.e., $\langle n^2 \rangle \approx \langle n \rangle^2$, $\langle d^2 \rangle \approx \langle d \rangle^2$, and $\langle i^2 \rangle \approx \langle i \rangle^2$.
   
-  \item Molecular species are approximately uncorrelated, so that joint moments factorize, e.g., $\langle n \cdot d \rangle \approx \langle n \rangle \langle d \rangle$.
+  \item Molecular counts are approximately independent, so that joint moments factorize, e.g., $\langle n \cdot d \rangle \approx \langle n \rangle \langle d \rangle$.
   
   \item For Hill functions $H^+$ and $H^-$, we approximate expectation values by evaluating the function at the mean, i.e., $\langle H(i) \rangle \approx H(\langle i \rangle)$, and similarly $\langle x \cdot H(i) \rangle \approx \langle x \rangle H(\langle i \rangle)$.
 \end{enumerate}
