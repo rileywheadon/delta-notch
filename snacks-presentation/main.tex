@@ -102,8 +102,13 @@
 \end{frame}
 
 \begin{frame}
+
   \frametitle{Our Chemical Equations}
-  Consider a cell $A$ with neighbour $B$. The Notch, Delta, and NICD concentrations of cell $A$ are given by $N_{A}$, $D_{A}$, and $I_{A}$ respectively (and similarly for cell $B$).
+
+  \onslide<1->{Consider a cell $A$ with neighbour $B$. The Notch, Delta, and NICD concentrations of cell $A$ are given by $N_{A}$, $D_{A}$, and $I_{A}$ respectively (and similarly for cell $B$).
+  
+  \bigskip
+
   \begin{enumerate} 
     \item $N_{A} + D_{B} \rightarrow I_{A}$: Binding event. 
     \item $N_{A} \rightarrow \emptyset$: Notch decay.
@@ -111,26 +116,33 @@
     \item $I_{A} \rightarrow \emptyset$: NICD decay.
     \item $\emptyset \rightarrow N_{A}$: Notch production.
     \item $\emptyset \rightarrow D_{A}$: Delta production.
-  \end{enumerate}
+\end{enumerate}}
+
+  \bigskip
+
+  \onslide<2->{In the \textbf{Agent-Based} model, we simulate these reactions directly using the \emph{Gillespie Algorithm}. Under our assumptions, this is the most accurate model.}
+
 \end{frame}
 
 \begin{frame}
 
-  \frametitle{Our Models}
+  \frametitle{Differential Equation Models}
 
-  \onslide<1->{In the \textbf{Agent-Based} model, we simulate the chemical reactions directly using the \emph{Gillespie Algorithm}. Under our assumptions, this is the most accurate model.}
+  \onslide<1->{In the \textbf{ODE} model, we approximate the reaction kinetics by simulating the agent-based model \emph{in expectation}. Since this model is deterministic, we ensure cell differentiation with an initial perturbation before all simulations.
+
+$$\begin{aligned}
+  \frac{dN}{dt} &= \frac{n_{m}I^2}{n_{0}^2 + I^2} - k_{T}ND_{ext} - \gamma N \\
+  \frac{dD}{dt} &= \frac{d_{m}d_{0}^2}{d_{0}^2 + I^2} - k_{T}DN_{ext} - \gamma D \\
+  \frac{dI}{dt} &= k_{T}ND_{ext} - \gamma_{I}I
+\end{aligned}$$
+
+  }
 
   \bigskip
 
-  \onslide<2->{In the \textbf{ODE} model, we approximate the reaction kinetics by simulating the agent-based model \emph{in expectation}. To ensure cell differentiation, we apply an \emph{initial perturbation} to all simulations.}
-
-  \bigskip
-
-  \onslide<3->{In the \textbf{SDE} model, we reintroduce randomness by adding an independent \emph{Wiener Process} to each equation in the ODE model. This recreates some the stochasticity of the agent-based model.}
+  \onslide<2->{In the \textbf{SDE} model, we recreate some of the stochasticity of the agent-based model by adding an independent \emph{Wiener Process} to each equation above.}
 
 \end{frame}
-
-% NOTE: I can extend this section by talking about the Gillespie algorithm.
 
 % SECTION 2: DORA (15m?)
 \section{Derivation}
@@ -316,15 +328,13 @@ The complexity of a single cell highlights the need for numerical methods to mod
   \frametitle{Stability Analysis}
 
   \onslide<1->{
-    We tested model stability by perturbing $5$ parameters: $N_{m}$, $D_{m}$, $K_{T}$, $\gamma$, and $\gamma_{I}$.
-    \begin{itemize}
-      \item $N_{m}$, $D_{m}$ are the maximum rates of Notch/Delta production.
-      \item $K_{T}$ is the binding rate.
-      \item $\gamma$, $\gamma_{I}$ are the Notch/Delta and NICD decay rates.
-    \end{itemize}
+    We tested model stability by perturbing $N_{m}$, $D_{m}$, $K_{T}$, $\gamma$, and $\gamma_{I}$.
+$$\begin{aligned}
+  \frac{dN}{dt} &= \frac{n_{m}I^2}{n_{0}^2 + I^2} - k_{T}ND_{ext} - \gamma N \\
+  \frac{dD}{dt} &= \frac{d_{m}d_{0}^2}{d_{0}^2 + I^2} - k_{T}DN_{ext} - \gamma D \\
+  \frac{dI}{dt} &= k_{T}ND_{ext} - \gamma_{I}I
+\end{aligned}$$
   }
-
-  \bigskip
 
   \onslide<2->{
     Due to computational limitations, we investigated the $2$-dimensional subspaces of our $5$-dimensional parameter space using the following algorithm:
@@ -337,11 +347,7 @@ The complexity of a single cell highlights the need for numerical methods to mod
 \end{frame}
 
 \begin{frame}
-  \frametitle{Stability Analysis}
-\end{frame}
-
-\begin{frame}
-  \frametitle{Simulations on Linear Domains}
+  \frametitle{Stability Analysis Results}
 \end{frame}
 
 \begin{frame}
@@ -360,20 +366,6 @@ The complexity of a single cell highlights the need for numerical methods to mod
   \frametitle{Patterns on Hexagonal Domains}
 \end{frame}
 
-\begin{frame}
-  \frametitle{Patterns on Hexagonal Domains}
-\end{frame}
-
-\begin{frame}
-  \frametitle{Patterns on Hexagonal Domains}
-\end{frame}
-
-\begin{frame}
-  \frametitle{Patterns on Hexagonal Domains}
-\end{frame}
-
-\begin{frame}
-  \frametitle{Patterns on Hexagonal Domains}
-\end{frame}
+\section{End}
 
 \end{document}

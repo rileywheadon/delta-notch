@@ -1,15 +1,15 @@
 [0] Config.pm:308> INFO - This is Biber 2.20
 [0] Config.pm:311> INFO - Logfile is 'paper.blg'
-[81] biber:340> INFO - === Mon Apr  7, 2025, 14:26:24
-[95] Biber.pm:420> INFO - Reading 'paper.bcf'
-[159] Biber.pm:991> INFO - Using all citekeys in bib section 0
-[175] Biber.pm:4463> INFO - Processing section 0
-[185] Biber.pm:4654> INFO - Looking for bibtex file 'sources.bib' for section 0
-[186] bibtex.pm:1713> INFO - LaTeX decoding ...
-[196] bibtex.pm:1519> INFO - Found BibTeX data source 'sources.bib'
-[257] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'normalization = NFD' with 'normalization = prenormalized'
-[258] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'variable = shifted' with 'variable = non-ignorable'
-[258] Biber.pm:4283> INFO - Sorting list 'nty/global//global/global/global' of type 'entry' with template 'nty' and locale 'en-US'
-[258] Biber.pm:4289> INFO - No sort tailoring available for locale 'en-US'
-[266] bbl.pm:676> INFO - Writing 'paper.bbl' with encoding 'UTF-8'
-[269] bbl.pm:779> INFO - Output to paper.bbl
+[148] biber:340> INFO - === Fri Apr 11, 2025, 13:40:04
+[170] Biber.pm:420> INFO - Reading 'paper.bcf'
+[267] Biber.pm:991> INFO - Using all citekeys in bib section 0
+[290] Biber.pm:4463> INFO - Processing section 0
+[304] Biber.pm:4654> INFO - Looking for bibtex file 'sources.bib' for section 0
+[306] bibtex.pm:1713> INFO - LaTeX decoding ...
+[321] bibtex.pm:1519> INFO - Found BibTeX data source 'sources.bib'
+[409] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'normalization = NFD' with 'normalization = prenormalized'
+[410] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'variable = shifted' with 'variable = non-ignorable'
+[410] Biber.pm:4283> INFO - Sorting list 'nty/global//global/global/global' of type 'entry' with template 'nty' and locale 'en-US'
+[410] Biber.pm:4289> INFO - No sort tailoring available for locale 'en-US'
+[422] bbl.pm:676> INFO - Writing 'paper.bbl' with encoding 'UTF-8'
+[426] bbl.pm:779> INFO - Output to paper.bbl
