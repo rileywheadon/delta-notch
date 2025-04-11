@@ -133,6 +133,7 @@ We will also assume that there is no cis-inhibition and no Serrate ligand.
 \caption{
   A list of possible reactions and their rates in a cell $A$ with neighbour $B$.
   Since there are $6$ possible reactions per cell, a system with $n$ cells will have $6n$ possible reactions.
+  \textbf{Note:} In the Reaction column, $N_A$, $D_B$, and $I_A$ represent one Notch, Delta, and NICD, respectively. In the Rate column, $N_A$, $D_B$, and $I_A$ refer to the number of Notch molecules in cell A, Delta in cell B, and NICD in cell A, respectively.
 }
 \label{tb:reactions}
 \end{table}
@@ -347,12 +348,16 @@ Use this fact to partition the interval $[0, 1]$. Then sample $y_{i}$ from a $\t
 \section{Kolmogorov Forward Equations}
 \label{sec:kfe}
 
-% TODO: Revise this section to incorporate Eric's feedback.
-
 \subsection*{Derivation of Kolmogorov Forward Equation}
+For simplicity, we consider the dynamics of a single cell (cell $A$) in the following derivations.
 
-Let us define $P(n,d,i,t)$ to be the probability of having $n$ Notch receptors, $d$ Delta ligands, and $i$ NICD molecules at time $t$. The Kolmogorov forward equation describes how $P(n,d,i,t)$ changes over a small time step $\Delta t$:
+Let us define:
+\begin{itemize}
+    \item $P(n,d,i,t)$: the probability of having $n$ Notch receptors, $d$ Delta ligands, and $i$ NICD molecules in cell $A$ at time $t$.
+    \item $D_{ext}$: the average number of Delta molecules in the neighbourhood of cell $A$.
+\end{itemize}
 
+The Kolmogorov forward equation describes how $P(n,d,i,t)$ changes over a small time step $\Delta t$:
 \begin{align*}
 P(n,d,i,t+\Delta t) &= P(n,d,i,t) \\
 &+ P(n-1,d,i,t) \cdot H^+(i) \Delta t \quad \text{(Notch production)} \\
@@ -364,20 +369,7 @@ P(n,d,i,t+\Delta t) &= P(n,d,i,t) \\
 &- P(n,d,i,t) \cdot [H^+(i) + H^-(i) + \gamma n + \gamma d + \gamma_I i + k_T n D_{ext}]\Delta t
 \end{align*}
 
-Rearranging to find the time derivative:
-
-\begin{align*}
-\frac{P(n,d,i,t+\Delta t) - P(n,d,i,t)}{\Delta t} &= P(n-1,d,i,t) \cdot H^+(i) \\
-&+ P(n,d-1,i,t) \cdot H^-(i) \\
-&+ P(n+1,d,i,t) \cdot \gamma(n+1) \\
-&+ P(n,d+1,i,t) \cdot \gamma(d+1) \\
-&+ P(n,d,i+1,t) \cdot \gamma_I(i+1) \\
-&+ P(n+1,d,i-1,t) \cdot k_T(n+1)D_{ext} \\
-&- P(n,d,i,t) \cdot [H^+(i) + H^-(i) + \gamma n + \gamma d + \gamma_I i + k_T n D_{ext}]
-\end{align*}
-
-Taking the limit as $\Delta t \rightarrow 0$:
-
+Rearranging to find the time derivative and taking the limit as $\Delta t \rightarrow 0$:
 \begin{align*}
 \frac{\partial P(n,d,i,t)}{\partial t} &= P(n-1,d,i,t) \cdot H^+(i) \\
 &+ P(n,d-1,i,t) \cdot H^-(i) \\
@@ -391,12 +383,16 @@ Taking the limit as $\Delta t \rightarrow 0$:
 \subsection*{Matrix Formulation}
 The Kolmogorov forward equation can be expressed in matrix form as:
 \[
-\frac{d\vec{P}(t)}{dt} = \mathbf{A} \vec{P}(t)
+\frac{d\vec{P}(t)}{dt} = \vec{P}(t)\mathbf{A}
 \]
+where $\vec{P}(t)$ is a row vector containing the probabilities for all possible states, and $\mathbf{A}$ is the transition rate matrix with $A_{i,j}$ giving the transition rate from state $i$ to $j$. The diagonal elements $A_{i,i}$ contain the negative sum of all outgoing rates from state $i$.
 
-where $\vec{P}(t)$ is a column vector containing the probabilities for all possible states, and $\mathbf{A}$ is the transition rate matrix. \\
+To construct the matrix $\mathbf{A}$, we first establish a one-to-one mapping between the three-dimensional state space $(n,d,i)$ and a one-dimensional index $k$. We set $n_{max}$, $d_{max}$, and $i_{max}$ as sufficiently large upper bounds for the number of Notch, Delta, and NICD molecules in cell $A$, respectively.  These define the size of our 3D ``box" of possible states. 
 
-To construct the matrix $\mathbf{A}$, we first establish a one-to-one mapping between the three-dimensional state space $(n,d,i)$ and a one-dimensional index $k$. For a system with maximum values $n_{max}$, $d_{max}$, and $i_{max}$, we define:
+\textbf{Remark}: These are not strict limits but chosen large enough to technically capture all relevant dynamics.
+
+For a system with sufficiently large values $n_{max}$, $d_{max}$, and $i_{max}$, we now define:
+
 \[
 k(n,d,i) = n \cdot (d_{max}+1) \cdot (i_{max}+1) + d \cdot (i_{max}+1) + i
 \]
@@ -412,7 +408,7 @@ i(k) &= k \bmod (i_{max}+1)
 With this mapping, we can now define the elements of matrix $\mathbf{A}$. Let $k$ and $k'$ be the indices corresponding to states $(n,d,i)$ and $(n',d',i')$ respectively:
 
 \begin{align*}
-A_{k',k} = 
+A_{k,k'} = 
 \begin{cases}
 H^+(i) & \text{if } (n',d',i') = (n+1,d,i) \quad \text{(Notch production)} \\
 H^-(i) & \text{if } (n',d',i') = (n,d+1,i) \quad \text{(Delta production)} \\
@@ -420,17 +416,18 @@ H^-(i) & \text{if } (n',d',i') = (n,d+1,i) \quad \text{(Delta production)} \\
 \gamma(d) & \text{if } (n',d',i') = (n,d-1,i) \quad \text{(Delta decay)} \\
 \gamma_I(i) & \text{if } (n',d',i') = (n,d,i-1) \quad \text{(NICD decay)} \\
 k_T(n)D_{ext} & \text{if } (n',d',i') = (n-1,d,i+1) \quad \text{(Trans-activation)} \\
--\sum_{k'' \neq k} A_{k'',k} & \text{if } k' = k \quad \text{(Diagonal terms)}
+-v_k & \text{if } k' = k \quad \text{(Diagonal terms)}
 \end{cases}
 \end{align*}
 
-Note that $A_{k',k}$ represents the transition rate from state $k$ to state $k'$. The diagonal elements $A_{k,k}$ are the negative sum of all outgoing rates from state $k$:
+Note that $A_{k,k'}$ represents the transition rate from state $k$ to state $k'$. The diagonal elements $A_{k,k}$ are the negative sum of all outgoing rates from state $k$:
 
 \[
-A_{k,k} = -[H^+(i) + H^-(i) + \gamma n + \gamma d + \gamma_I i + k_T n D_{ext} + k_T d N_{ext}]
+A_{k,k} = -v_k =-[H^+(i) + H^-(i) + \gamma n + \gamma d + \gamma_I i + k_T n D_{ext}]
 \]
 
 where $(n,d,i)$ is the state corresponding to index $k$.\\
+\textbf{Recall}: We assume that reaction times follow a Poisson point process.
 
 The resulting matrix $\mathbf{A}$ is a sparse matrix with the following properties:
 \begin{itemize}
@@ -438,100 +435,57 @@ The resulting matrix $\mathbf{A}$ is a sparse matrix with the following properti
     \item Number of non-zero elements: $\approx 7 \cdot (n_{max}+1) \cdot (d_{max}+1) \cdot (i_{max}+1)$
 \end{itemize}
 
-To illustrate, let's consider a minimal system with $n_{max} = d_{max} = i_{max} = 1$. This gives us 8 possible states:
-$(0,0,0)$, $(0,0,1)$, $(0,1,0)$, $(0,1,1)$, $(1,0,0)$, $(1,0,1)$, $(1,1,0)$, $(1,1,1)$
+To illustrate, we consider a minimal system with $n_{max} = d_{max} = i_{max} = 1$. This gives us 8 possible states:
+$(0,0,0)$, $(0,0,1)$, $(0,1,0)$, $(0,1,1)$, $(1,0,0)$, $(1,0,1)$, $(1,1,0)$, $(1,1,1).$
 
 The corresponding transition matrix $\mathbf{A}$ would be:
 
-\begin{align*}
+\small \begin{align*}
 \mathbf{A} = 
 \begin{pmatrix}
--\alpha_{000} & \gamma_I & \gamma & 0 & \gamma & 0 & 0 & 0 \\
-H^+(0) & -\alpha_{001} & 0 & \gamma & 0 & \gamma & 0 & 0 \\
-H^-(0) & 0 & -\alpha_{010} & \gamma_I & 0 & 0 & \gamma & 0 \\
-0 & H^-(0) & H^+(0) & -\alpha_{011} & 0 & 0 & 0 & \gamma \\
-H^+(0) & 0 & 0 & 0 & -\alpha_{100} & \gamma_I & \gamma & 0 \\
-0 & H^+(0) & 0 & 0 & H^+(1) & -\alpha_{101} & 0 & \gamma \\
-0 & 0 & H^+(0) & 0 & H^-(1) & 0 & -\alpha_{110} & \gamma_I \\
-0 & 0 & 0 & H^+(0) & 0 & H^-(1) & H^+(1) & -\alpha_{111}
+-v_{000} & \alpha_{000,001} & \alpha_{000,010} & \alpha_{000,011} & \alpha_{000,100} & \alpha_{000,101} & \alpha_{000,110} & \alpha_{000,111} \\
+\alpha_{001,000} & -v_{001} & \alpha_{001,010} & \alpha_{001,011} & \alpha_{001,100} & \alpha_{001,101} & \alpha_{001,110} & \alpha_{001,111} \\
+\alpha_{010,000} & \alpha_{010,001} & -v_{010} & \alpha_{010,011} & \alpha_{010,100} & \alpha_{010,101} & \alpha_{010,110} & \alpha_{010,111} \\
+\alpha_{011,000} & \alpha_{011,001} & \alpha_{011,010} & -v_{011} & \alpha_{011,100} & \alpha_{011,101} & \alpha_{011,110} & \alpha_{011,111} \\
+\alpha_{100,000} & \alpha_{100,001} & \alpha_{100,010} & \alpha_{100,011} & -v_{100} & \alpha_{100,101} & \alpha_{100,110} & \alpha_{100,111} \\
+\alpha_{101,000} & \alpha_{101,001} & \alpha_{101,010} & \alpha_{101,011} & \alpha_{101,100} & -v_{101} & \alpha_{101,110} & \alpha_{101,111} \\
+\alpha_{110,000} & \alpha_{110,001} & \alpha_{110,010} & \alpha_{110,011} & \alpha_{110,100} & \alpha_{110,101} & -v_{110} & \alpha_{110,111} \\
+\alpha_{111,000} & \alpha_{111,001} & \alpha_{111,010} & \alpha_{111,011} & \alpha_{111,100} & \alpha_{111,101} & \alpha_{111,110} & -v_{111}
 \end{pmatrix}
 \end{align*}
 
 where:
-\[
-\alpha_{ndi} = H^+(i) + H^-(i) + \gamma n + \gamma d + \gamma_I i + k_T n D_{ext} + k_T d N_{ext}
-\]
-
-Additionally, we need to add the terms for trans-activation, which would connect states like $(1,0,0)$ to $(0,0,1)$ with rate $k_T \cdot 1 \cdot D_{ext}$.\\
-
-For a fully labelled matrix with all transitions explicitly shown, the matrix for $n_{max} = d_{max} = i_{max} = 1$ would be:
-
-\[
-\mathbf{A} = 
-\begin{bmatrix}
-A_{11} & A_{12} & A_{13} & A_{14} & A_{15} & A_{16} & A_{17} & A_{18} \\
-B_{11} & B_{12} & B_{13} & B_{14} & B_{15} & B_{16} & B_{17} & B_{18} \\
-C_{11} & C_{12} & C_{13} & C_{14} & C_{15} & C_{16} & C_{17} & C_{18} \\
-D_{11} & D_{12} & D_{13} & D_{14} & D_{15} & D_{16} & D_{17} & D_{18} \\
-E_{11} & E_{12} & E_{13} & E_{14} & E_{15} & E_{16} & E_{17} & E_{18} \\
-F_{11} & F_{12} & F_{13} & F_{14} & F_{15} & F_{16} & F_{17} & F_{18} \\
-G_{11} & G_{12} & G_{13} & G_{14} & G_{15} & G_{16} & G_{17} & G_{18} \\
-H_{11} & H_{12} & H_{13} & H_{14} & H_{15} & H_{16} & H_{17} & H_{18}
-\end{bmatrix}
-\]
-
-where  
-
-\begin{tiny}
 \begin{align*}
-A_{11} &= -(H^+(0) + H^-(0)),  & A_{12} &= \gamma_I,  \\
-A_{13} &= \gamma,  & A_{14} &= 0,  \\
-A_{15} &= \gamma,  & A_{16} &= 0,  \\
-A_{17} &= 0,  & A_{18} &= 0,  \\[5pt]
-B_{11} &= H^+(0),  & B_{12} &= -(H^+(1) + H^-(1) + \gamma_I),  \\
-B_{13} &= 0,  & B_{14} &= \gamma,  \\
-B_{15} &= k_T D_{ext},  & B_{16} &= \gamma,  \\
-B_{17} &= 0,  & B_{18} &= 0,  \\[5pt]
-C_{11} &= H^-(0),  & C_{12} &= 0,  \\
-C_{13} &= -(H^+(0) + H^-(0) + \gamma + k_T N_{ext}),  & C_{14} &= \gamma_I,  \\
-C_{15} &= 0,  & C_{16} &= 0,  \\
-C_{17} &= \gamma,  & C_{18} &= 0,  \\[5pt]
-D_{11} &= 0,  & D_{12} &= H^-(1),  \\
-D_{13} &= H^+(0),  & D_{14} &= -(H^+(1) + H^-(1) + \gamma + \gamma_I + k_T N_{ext}),  \\
-D_{15} &= 0,  & D_{16} &= k_T D_{ext},  \\
-D_{17} &= 0,  & D_{18} &= \gamma,  \\[5pt]
-E_{11} &= H^+(0),  & E_{12} &= 0,  \\
-E_{13} &= 0,  & E_{14} &= 0,  \\
-E_{15} &= -(H^+(0) + H^-(0) + \gamma + k_T D_{ext}),  & E_{16} &= \gamma_I,  \\
-E_{17} &= \gamma,  & E_{18} &= 0,  \\[5pt]
-F_{11} &= 0,  & F_{12} &= H^+(1),  \\
-F_{13} &= 0,  & F_{14} &= 0,  \\
-F_{15} &= H^+(0),  & F_{16} &= -(H^+(1) + H^-(1) + \gamma + \gamma_I + k_T D_{ext}),  \\
-F_{17} &= 0,  & F_{18} &= \gamma,  \\[5pt]
-G_{11} &= 0,  & G_{12} &= 0,  \\
-G_{13} &= H^+(0),  & G_{14} &= 0,  \\
-G_{15} &= H^-(0),  & G_{16} &= 0,  \\
-G_{17} &= -(H^+(0) + H^-(0) + \gamma + \gamma + k_T D_{ext} + k_T N_{ext}),  & G_{18} &= \gamma_I,  \\[5pt]
-H_{11} &= 0,  & H_{12} &= 0,  \\
-H_{13} &= 0,  & H_{14} &= H^+(1),  \\
-H_{15} &= 0,  & H_{16} &= H^-(1),  \\
-H_{17} &= H^+(0),  & H_{18} &= -(H^+(1) + H^-(1) + \gamma + \gamma + \gamma_I + k_T D_{ext} + k_T N_{ext}).
+\alpha_{ndi,n'd'i'} = 
+\begin{cases}
+H^+(i) + H^-(i) + \gamma n + \gamma d + \gamma_I i + k_T n D_{ext} & \text{if } (n,d,i) \rightarrow (n',d',i') \\
+0 & \text{otherwise}
+\end{cases}
 \end{align*}
-\end{tiny}
 
-Each row and column corresponds to a state in the order:
-$(0,0,0)$, $(0,0,1)$, $(0,1,0)$, $(0,1,1)$, $(1,0,0)$, $(1,0,1)$, $(1,1,0)$, $(1,1,1)$
+\textbf{Remark}:\\
+Let us consider:
 
-The matrix element $A_{j,i}$ represents the transition rate from state $i$ to state $j$. The diagonal elements $A_{i,i}$ contain the negative sum of all outgoing rates from state $i$.
+\begin{itemize}
+    
+    \item A $k$-cell system with $P(n_1,d_1,i_1,n_2,d_2,i_2,\dots,n_k,d_k,i_k,t+\Delta t)$.\\
+    For a one-cell system with $P(n,d,i,t+\Delta t)$ (as shown above), even this simplest case leads to a highly complex system. Extending to $k$ cells leads to a rapid growth in the dimensionality of the state space, making the system increasingly intractable.
+    
+    \item To reduce this complexity, we introduce $D_{\text{ext}}$, representing the average number of Delta molecules in the neighbourhood of cell $A$. The exact value of $D_{\text{ext}}$ can vary depending on the choice of domain:
+    \begin{itemize}
+        \item For two cells, $D_{\text{ext}}$ is the number of Delta molecules in the other cell (cell $B$).
+        \item In a linear chain, $D_{\text{ext}}$ is the average over two neighbours.
+        \item In a hexagonal lattice, $D_{\text{ext}}$ is the average over six neighbours.
+    \end{itemize}
+\end{itemize}
+
+Altogether, the complexity of the Kolmogorov forward equation, even for a single cell, motivates the use of numerical methods to model multi-cellular interactions.
 
 
 \section{Theoretical Justification}
 \label{sec:theoretical-justification}
 
-% TODO: Revise this section to incorporate Eric's feedback.
-
-In this section, we need to show that in expectation, the model above converges to the following system of ODEs (adapted from Boareto et al., 2015):
-
+In this section, we demonstrate that our stochastic model converges in expectation to the following system of ODEs, adapted from Boareto et al. (2015):
 $$
 \begin{aligned}
   \frac{dN}{dt} &= \frac{n_{m}I^2}{n_{0}^2 + I^2} - k_{T}ND_{ext} - \gamma N \\[5pt]
@@ -540,305 +494,168 @@ $$
 \end{aligned}
 $$
 
+This system of ODEs represents the deterministic approximation of the underlying stochastic process, valid when molecular counts are sufficiently large that fluctuations are small compared to mean values.
+
 \subsection*{Setup and Notation}
 
-Let us define:
+We define the following expected values:
 \begin{itemize}
-  \item $\langle N \rangle = \sum_{n,d,i} n \cdot P(n,d,i,t)$ = expected number of Notch receptors
-  \item $\langle D \rangle = \sum_{n,d,i} d \cdot P(n,d,i,t)$ = expected number of Delta ligands
-  \item $\langle I \rangle = \sum_{n,d,i} i \cdot P(n,d,i,t)$ = expected number of NICD molecules
+  \item $\langle n \rangle = \sum_{n,d,i} n \cdot P(n,d,i,t)$ = expected number of Notch receptors
+  \item $\langle d \rangle = \sum_{n,d,i} d \cdot P(n,d,i,t)$ = expected number of Delta ligands
+  \item $\langle i \rangle = \sum_{n,d,i} i \cdot P(n,d,i,t)$ = expected number of NICD molecules
 \end{itemize}
 
-\subsection*{Deriving ODEs for Expected Values}
+\subsection*{Key Assumptions}
 
-\textbf{Now we derive the ODE for the expected value of Notch:}
+Throughout this derivation, we make the following assumptions:
 
-\begin{align*}
-\frac{d\langle N \rangle}{dt} &= \frac{d}{dt}\sum_{n,d,i} n \cdot P(n,d,i,t) \\
-&= \sum_{n,d,i} n \cdot \frac{\partial P(n,d,i,t)}{\partial t}
-\end{align*}
+\begin{enumerate}
+  \item The standard deviation of the molecular counts is small compared to their mean values. Specifically:
+  \begin{itemize}
+    \item $\sqrt{\text{Var}(N)} \ll \langle n \rangle$
+    \item $\sqrt{\text{Var}(D)} \ll \langle d \rangle$
+    \item $\sqrt{\text{Var}(I)} \ll \langle i \rangle$
+  \end{itemize}
+  
+  \item As a consequence of assumption 1, we can approximate:
+  \begin{itemize}
+    \item $\langle n^2 \rangle \approx \langle n \rangle^2$
+    \item $\langle d^2 \rangle \approx \langle d \rangle^2$
+    \item $\langle i^2 \rangle \approx \langle i \rangle^2$
+  \end{itemize}
+  
+  \item The molecular counts are approximately independent, allowing us to factorize expected values:
+  \begin{itemize}
+    \item $\langle n \cdot d \rangle \approx \langle n \rangle \cdot \langle d \rangle$
+    \item $\langle n \cdot i \rangle \approx \langle n \rangle \cdot \langle i \rangle$
+    \item $\langle d \cdot i \rangle \approx \langle d \rangle \cdot \langle i \rangle$
+  \end{itemize}
+  
+  \item For functions $H^+$ and $H^-$, we approximate:
+  \begin{itemize}
+    \item $\langle H^+(i) \rangle \approx H^+(\langle i \rangle)$
+    \item $\langle H^-(i) \rangle \approx H^-(\langle i \rangle)$
+    \item $\langle n \cdot H^+(i) \rangle \approx \langle n \rangle \cdot H^+(\langle i \rangle)$
+    \item $\langle d \cdot H^-(i) \rangle \approx \langle d \rangle \cdot H^-(\langle i \rangle)$
+  \end{itemize}
+\end{enumerate}
 
-Substituting the Kolmogorov forward equation:
+\subsection*{Derivation of ODE for Expected Notch ($\langle n \rangle$)}
 
-\begin{align*}
-\frac{d\langle N \rangle}{dt} &= \sum_{n,d,i} n \cdot \Big[ P(n-1,d,i,t) \cdot H^+(i) \\
-&+ P(n,d-1,i,t) \cdot H^-(i) \\
-&+ P(n+1,d,i,t) \cdot \gamma(n+1) \\
-&+ P(n,d+1,i,t) \cdot \gamma(d+1) \\
-&+ P(n,d,i+1,t) \cdot \gamma_I(i+1) \\
-&+ P(n+1,d,i-1,t) \cdot k_T(n+1)D_{ext} \\
-&- P(n,d,i,t) \cdot [H^+(i) + H^-(i) + \gamma n + \gamma d + \gamma_I i + k_T n D_{ext}] \Big]
-\end{align*}
+Starting with the time derivative of the expected value of Notch:
+$$\frac{d\langle n \rangle}{dt} = \frac{d}{dt}\sum_{n,d,i} n \cdot P(n,d,i,t) = \sum_{n,d,i} n \cdot \frac{\partial P(n,d,i,t)}{\partial t}$$
+Substituting the Kolmogorov forward equation and analysing each term:
 
-Now we use index shifting to simplify.\\~\\
-
-\textbf{(A) Notch Production} \\
-Let's substitute $n' = n-1$ (so $n = n'+1$):
+\subsubsection*{Notch Production Term}
+Using index shifting with $n' = n-1$ (so $n = n'+1$):
 \begin{align*}
 \sum_{n,d,i} n \cdot P(n-1,d,i,t) \cdot H^+(i) &= \sum_{n',d,i} (n'+1) \cdot P(n',d,i,t) \cdot H^+(i) \\
 &= \sum_{n',d,i} n' \cdot P(n',d,i,t) \cdot H^+(i) + \sum_{n',d,i} P(n',d,i,t) \cdot H^+(i) \\
-&= \sum_{n,d,i} n \cdot P(n,d,i,t) \cdot H^+(i) + \sum_{n,d,i} P(n,d,i,t) \cdot H^+(i) \\
+&= \langle n \cdot H^+(i) \rangle + \langle H^+(i) \rangle \\
+&\approx \langle n \rangle \cdot H^+(\langle i \rangle) + H^+(\langle i \rangle) \\
+&= H^+(\langle i \rangle) \cdot (1 + \langle n \rangle)
 \end{align*}
 
-The first term is $\langle N \cdot H^+(I) \rangle$. If we assume that $H^+(I)$ is approximately $H^+(\langle I \rangle)$, then this term becomes $\langle N \rangle \cdot H^+(\langle I \rangle)$. The second term is $\langle H^+(I) \rangle \approx H^+(\langle I \rangle)$. 
-
-So the contribution of this term is:
-\[
-\sum_{n,d,i} n \cdot P(n-1,d,i,t) \cdot H^+(i) \approx \langle N \rangle \cdot H^+(\langle I \rangle) + H^+(\langle I \rangle)
-\]
-
-Since we are indexing from 0, and $n-1$ could be negative, the sum should start from $n=1$:
-
-\begin{small}
+\subsubsection*{Delta Production Term}
+This term does not affect $\langle n \rangle$ directly:
 \begin{align*}
-\sum_{n \geq 1,d,i} n \cdot P(n-1,d,i,t) \cdot H^+(i) &= \sum_{n' \geq 0,d,i} (n'+1) \cdot P(n',d,i,t) \cdot H^+(i) \\
-&= \sum_{n' \geq 0,d,i} n' \cdot P(n',d,i,t) \cdot H^+(i) + \sum_{n' \geq 0,d,i} P(n',d,i,t) \cdot H^+(i) \\
-&= \langle N \rangle \cdot H^+(\langle I \rangle) + H^+(\langle I \rangle) \\
-&= H^+(\langle I \rangle) \cdot (1 + \langle N \rangle)
-\end{align*}
-\end{small}
-
-\textbf{(B) Delta Production}\\
-This term does not affect $N$, so the prefactor $n$ remains with the original probability:
-\begin{align*}
-\sum_{n,d,i} n \cdot P(n,d-1,i,t) \cdot H^-(i) &= \sum_{n,d',i} n \cdot P(n,d',i,t) \cdot H^-(i) \\
-&= \langle N \cdot H^-(I) \rangle \\
-&\approx \langle N \rangle \cdot H^-(\langle I \rangle)
+\sum_{n,d,i} n \cdot P(n,d-1,i,t) \cdot H^-(i) &= \langle n \cdot H^-(i) \rangle
+\approx \langle n \rangle \cdot H^-(\langle i \rangle)
 \end{align*}
 
-\textbf{(C) Notch Decay}
+\subsubsection*{Notch Decay Term}
+Using index shifting with $n' = n+1$ (so $n = n'-1$):
 \begin{align*}
 \sum_{n,d,i} n \cdot P(n+1,d,i,t) \cdot \gamma(n+1) &= \sum_{n',d,i} (n'-1) \cdot P(n',d,i,t) \cdot \gamma n' \\
 &= \gamma \sum_{n',d,i} (n'-1)n' \cdot P(n',d,i,t) \\
 &= \gamma \sum_{n',d,i} n'^2 \cdot P(n',d,i,t) - \gamma \sum_{n',d,i} n' \cdot P(n',d,i,t) \\
-&= \gamma(\langle N^2 \rangle - \langle N \rangle)
+&= \gamma(\langle n^2 \rangle - \langle n \rangle) \\
+&\approx \gamma(\langle n \rangle^2 - \langle n \rangle) \\
+&= \gamma \langle n \rangle (\langle n \rangle - 1)
 \end{align*}
 
-If we assume that the variance of $N$ is small compared to its mean (which is reasonable for high molecule counts), then $\langle N^2 \rangle \approx \langle N \rangle^2$. So:
+\subsubsection*{Delta Decay Term}
 \begin{align*}
-\gamma(\langle N^2 \rangle - \langle N \rangle) &\approx \gamma(\langle N \rangle^2 - \langle N \rangle) \\
-&= \gamma \langle N \rangle (\langle N \rangle - 1)
+\sum_{n,d,i} n \cdot P(n,d+1,i,t) \cdot \gamma(d+1) &= \gamma \sum_{n,d',i} n \cdot P(n,d',i,t) \cdot d' = \gamma \langle n \cdot d \rangle \approx \gamma \langle n \rangle \langle d \rangle
 \end{align*}
 
-\textbf{(D) Delta Decay}
+\subsubsection*{NICD Decay Term}
 \begin{align*}
-\sum_{n,d,i} n \cdot P(n,d+1,i,t) \cdot \gamma(d+1) &= \gamma \sum_{n,d',i} n \cdot P(n,d',i,t) \cdot d' \\
-&= \gamma \langle N \cdot D \rangle \\
-&\approx \gamma \langle N \rangle \langle D \rangle
+\sum_{n,d,i} n \cdot P(n,d,i+1,t) \cdot \gamma_I(i+1) &= \gamma_I \sum_{n,d,i'} n \cdot P(n,d,i',t) \cdot i' = \gamma_I \langle n \cdot i \rangle \approx \gamma_I \langle n \rangle \langle i \rangle
 \end{align*}
 
-\textbf{(E) NICD Decay}
-\begin{align*}
-\sum_{n,d,i} n \cdot P(n,d,i+1,t) \cdot \gamma_I(i+1) &= \gamma_I \sum_{n,d,i'} n \cdot P(n,d,i',t) \cdot i' \\
-&= \gamma_I \langle N \cdot I \rangle \\
-&\approx \gamma_I \langle N \rangle \langle I \rangle
-\end{align*}
-
-\textbf{(F) Trans-activation}
+\subsubsection*{Trans-activation Term}
 \begin{align*}
 \sum_{n,d,i} n \cdot P(n+1,d,i-1,t) \cdot k_T(n+1)D_{ext} &= k_T D_{ext} \sum_{n',d,i'} (n'-1) \cdot P(n',d,i',t) \cdot n' \\
 &= k_T D_{ext} \sum_{n',d,i'} (n'^2 - n') \cdot P(n',d,i',t) \\
-&= k_T D_{ext} (\langle N^2 \rangle - \langle N \rangle) \\
-&\approx k_T D_{ext} \langle N \rangle (\langle N \rangle - 1)
+&= k_T D_{ext} (\langle n^2 \rangle - \langle n \rangle) \\
+&\approx k_T D_{ext} \langle n \rangle (\langle n \rangle - 1)
 \end{align*}
 
-\textbf{(G) Negative Terms}
+\subsubsection*{Negative Terms}
 \begin{align*}
 &-\sum_{n,d,i} n \cdot P(n,d,i,t) \cdot [H^+(i) + H^-(i) + \gamma n + \gamma d + \gamma_I i + k_T n D_{ext}] \\
-&= -\langle N \cdot H^+(I) \rangle - \langle N \cdot H^-(I) \rangle - \gamma \langle N^2 \rangle - \gamma \langle N \cdot D \rangle - \gamma_I \langle N \cdot I \rangle - k_T D_{ext} \langle N^2 \rangle \\
-&\approx -\langle N \rangle \cdot H^+(\langle I \rangle) - \langle N \rangle \cdot H^-(\langle I \rangle) - \gamma \langle N \rangle^2 - \gamma \langle N \rangle \langle D \rangle - \gamma_I \langle N \rangle
-\langle I \rangle - k_T D_{ext} \langle N \rangle^2
-\end{align*} \\~\\
-
-\textbf{(H) Final Synthesis of $\langle N \rangle$}\\
-
-Combining all these terms:
-
-\begin{align*}
-\frac{d\langle N \rangle}{dt} &= H^+(\langle I \rangle) \cdot (1 + \langle N \rangle) + \langle N \rangle \cdot H^-(\langle I \rangle) + \gamma \langle N \rangle (\langle N \rangle - 1) + \gamma \langle N \rangle \langle D \rangle \\
-&+ \gamma_I \langle N \rangle \langle I \rangle + k_T D_{ext} \langle N \rangle (\langle N \rangle - 1) \\
-&- \langle N \rangle \cdot H^+(\langle I \rangle) - \langle N \rangle \cdot H^-(\langle I \rangle) - \gamma \langle N \rangle^2 - \gamma \langle N \rangle \langle D \rangle - \gamma_I \langle N \rangle \langle I \rangle - k_T D_{ext} \langle N \rangle^2 \\
+&= -\langle n \cdot H^+(i) \rangle - \langle n \cdot H^-(i) \rangle - \gamma \langle n^2 \rangle - \gamma \langle n \cdot d \rangle - \gamma_I \langle n \cdot i \rangle - k_T D_{ext} \langle n^2 \rangle \\
+&\approx -\langle n \rangle \cdot H^+(\langle i \rangle) - \langle n \rangle \cdot H^-(\langle i \rangle) - \gamma \langle n \rangle^2 - \gamma \langle n \rangle \langle d \rangle - \gamma_I \langle n \rangle \langle i \rangle - k_T D_{ext} \langle n \rangle^2
 \end{align*}
 
-After cancellations:
+\subsubsection*{Final ODE for $\langle n \rangle$}
 
+After combining all terms and cancellations:
 \begin{align*}
-\frac{d\langle N \rangle}{dt} &= H^+(\langle I \rangle) + \langle N \rangle \cdot H^+(\langle I \rangle) + \gamma \langle N \rangle (\langle N \rangle - 1) + k_T D_{ext} \langle N \rangle (\langle N \rangle - 1) \\
-&- \langle N \rangle \cdot H^+(\langle I \rangle) - \gamma \langle N \rangle^2 - k_T D_{ext} \langle N \rangle^2 \\
-&= H^+(\langle I \rangle) + \gamma \langle N \rangle (\langle N \rangle - 1) - \gamma \langle N \rangle^2 + k_T D_{ext} \langle N \rangle (\langle N \rangle - 1) - k_T D_{ext} \langle N \rangle^2 \\
-&= H^+(\langle I \rangle) + \gamma \langle N \rangle (\langle N \rangle - 1 - \langle N \rangle) + k_T D_{ext} \langle N \rangle (\langle N \rangle - 1 - \langle N \rangle) \\
-&= H^+(\langle I \rangle) - \gamma \langle N \rangle - k_T D_{ext} \langle N \rangle \\
+\frac{d\langle n \rangle}{dt} &= H^+(\langle i \rangle) \cdot (1 + \langle n \rangle) + \langle n \rangle \cdot H^-(\langle i \rangle) + \gamma \langle n \rangle (\langle n \rangle - 1) + \gamma \langle n \rangle \langle d \rangle \\
+&+ \gamma_I \langle n \rangle \langle i \rangle + k_T D_{ext} \langle n \rangle (\langle n \rangle - 1) \\
+&- \langle n \rangle \cdot H^+(\langle i \rangle) - \langle n \rangle \cdot H^-(\langle i \rangle) - \gamma \langle n \rangle^2 - \gamma \langle n \rangle \langle d \rangle - \gamma_I \langle n \rangle \langle i \rangle - k_T D_{ext} \langle n \rangle^2 \\
+&= H^+(\langle i \rangle) + \langle n \rangle \cdot H^+(\langle i \rangle) + \gamma \langle n \rangle (\langle n \rangle - 1) + k_T D_{ext} \langle n \rangle (\langle n \rangle - 1) \\
+&- \langle n \rangle \cdot H^+(\langle i \rangle) - \gamma \langle n \rangle^2 - k_T D_{ext} \langle n \rangle^2 \\
+&= H^+(\langle i \rangle) + \gamma \langle n \rangle (\langle n \rangle - 1 - \langle n \rangle) + k_T D_{ext} \langle n \rangle (\langle n \rangle - 1 - \langle n \rangle) \\
+&= H^+(\langle i \rangle) - \gamma \langle n \rangle - k_T D_{ext} \langle n \rangle
 \end{align*}
 
-Therefore, the ODE for $\langle N \rangle$ is:
+Substituting $H^+(\langle i \rangle)=\frac{n_m \langle i \rangle^2}{n_0^2 + \langle i \rangle^2}$:
+$$\frac{d\langle n \rangle}{dt} = \frac{n_m \langle i \rangle^2}{n_0^2 + \langle i \rangle^2} - \gamma \langle n \rangle - k_T D_{ext} \langle n \rangle$$
 
-\[
-\frac{d\langle N \rangle}{dt} = H^+(\langle I \rangle) - \gamma \langle N \rangle - k_T D_{ext} \langle N \rangle
-\]
+\subsection*{Simplified Derivation of ODE for Expected Delta ($\langle d \rangle$)}
 
-Substituting the definition of $H^+(\langle I \rangle)$:
+Since we've already derived the ODE for $\langle n \rangle$ in detail, we'll take a more streamlined approach for $\langle d \rangle$. Starting with:
 
-\[
-\frac{d\langle N \rangle}{dt} = \frac{n_m \langle I \rangle^2}{n_0^2 + \langle I \rangle^2} - \gamma \langle N \rangle - k_T D_{ext} \langle N \rangle
-\]
+$$\frac{d\langle d \rangle}{dt} = \frac{d}{dt}\sum_{n,d,i} d \cdot P(n,d,i,t) = \sum_{n,d,i} d \cdot \frac{\partial P(n,d,i,t)}{\partial t}$$
 
-Which can be written as:
-
-\[
-\frac{dN}{dt} = \frac{n_m I^2}{n_0^2 + I^2} - \gamma N - k_T D_{ext} N
-\]
-
-where we use $N$, $D$, and $I$ as shorthand for the expected values $\langle N \rangle$, $\langle D \rangle$, and $\langle I \rangle$.\\~\\
-
-\textbf{Similarly, we can derive the ODE for the expected value of Delta:}
-
+Using the same factorization assumptions and index shifting techniques as before, we can evaluate the key terms:
 \begin{align*}
-\frac{d\langle D \rangle}{dt} &= \frac{d}{dt}\sum_{n,d,i} d \cdot P(n,d,i,t) \\
-&= \sum_{n,d,i} d \cdot \frac{\partial P(n,d,i,t)}{\partial t}
+\text{Delta production term:} &\quad \sum_{n,d,i} d \cdot P(n,d-1,i,t) \cdot H^-(i) \approx \langle d \rangle \cdot H^-(\langle i \rangle) + H^-(\langle i \rangle) \\
+\text{Delta decay term:} &\quad \sum_{n,d,i} d \cdot P(n,d+1,i,t) \cdot \gamma(d+1) \approx \gamma \langle d \rangle (\langle d \rangle - 1)
 \end{align*}
 
-We will analyse each term of the Kolmogorov equation, multiplied by $d$, as follows.
-
-\[
-\sum_{n,d,i} d \cdot P(n-1,d,i,t) \cdot H^+(i) = \langle D \cdot H^+(I) \rangle \approx \langle D \rangle \cdot H^+(\langle I \rangle)
-\]
-
-\[
-\sum_{n,d,i} d \cdot P(n,d-1,i,t) \cdot H^-(i) = \langle D \cdot H^-(I) \rangle + \langle H^-(I) \rangle 
-\approx \langle D \rangle \cdot H^-(\langle I \rangle) + H^-(\langle I \rangle)
-\]
-
-\[
-\sum_{n,d,i} d \cdot P(n+1,d,i,t) \cdot \gamma(n+1) \approx \gamma \langle D \rangle \langle N \rangle
-\]
-
-\[
-\sum_{n,d,i} d \cdot P(n,d+1,i,t) \cdot \gamma(d+1) \approx \gamma \langle D \rangle (\langle D \rangle - 1)
-\]
-
-\[
-\sum_{n,d,i} d \cdot P(n,d,i+1,t) \cdot \gamma_I(i+1) \approx \gamma_I \langle D \rangle \langle I \rangle
-\]
-
-\[
-\sum_{n,d,i} d \cdot P(n+1,d,i-1,t) \cdot k_T(n+1)D_{ext} \approx k_T D_{ext} \langle D \rangle \langle N \rangle
-\]
-
-Now we consider this term which appears in the ODEs but was not explicitly stated in our Kolmogorov equation setup. This is a special case where we need to account for Delta from our cell binding to Notch in neighbouring cells:
-
+The special term for Delta binding to Notch in neighbouring cells:
 \begin{align*}
--\sum_{n,d,i} d \cdot P(n,d,i,t) \cdot k_T d N_{ext} &= -k_T N_{ext} \sum_{n,d,i} d^2 \cdot P(n,d,i,t) \\
-&= -k_T N_{ext} \langle D^2 \rangle \\
-&\approx -k_T N_{ext} \langle D \rangle^2
+-\sum_{n,d,i} d \cdot P(n,d,i,t) \cdot k_T d N_{ext} &= -k_T N_{ext} \sum_{n,d,i} d^2 \cdot P(n,d,i,t) = -k_T N_{ext} \langle d^2 \rangle \approx -k_T N_{ext} \langle d \rangle^2
 \end{align*}
 
-Now we consider negative terms from original equation.
+After combining all terms and cancellations, the simplified equation becomes:
 \begin{align*}
-&-\sum_{n,d,i} d \cdot P(n,d,i,t) \cdot [H^+(i) + H^-(i) + \gamma n + \gamma d + \gamma_I i + k_T n D_{ext}] \\
-&\approx -\langle D \rangle \cdot H^+(\langle I \rangle) - \langle D \rangle \cdot H^-(\langle I \rangle) - \gamma \langle D \rangle \langle N \rangle - \gamma \langle D \rangle^2 - \gamma_I \langle D \rangle \langle I \rangle - k_T D_{ext} \langle D \rangle \langle N \rangle
+\frac{d\langle d \rangle}{dt} &= H^-(\langle i \rangle) - \gamma \langle d \rangle - k_T N_{ext} \langle d \rangle
 \end{align*}
 
-Let's synthesise all terms of $\langle D \rangle$
+Substituting $H^-(\langle i \rangle)=\frac{d_m d_0^2}{d_0^2 + \langle i \rangle^2}$:
+$$\frac{d\langle d \rangle}{dt} = \frac{d_m d_0^2}{d_0^2 + \langle i \rangle^2} - \gamma \langle d \rangle - k_T N_{ext} \langle d \rangle$$
 
+\subsection*{Simplified Derivation of ODE for Expected NICD ($\langle i \rangle$)}
+
+For the NICD concentration, we focus on the most important terms directly:
+
+$$\frac{d\langle i \rangle}{dt} = \frac{d}{dt}\sum_{n,d,i} i \cdot P(n,d,i,t) = \sum_{n,d,i} i \cdot \frac{\partial P(n,d,i,t)}{\partial t}$$
+
+The critical terms are:
 \begin{align*}
-\frac{d\langle D \rangle}{dt} &= \langle D \rangle \cdot H^+(\langle I \rangle) + \langle D \rangle \cdot H^-(\langle I \rangle) + H^-(\langle I \rangle) + \gamma \langle D \rangle \langle N \rangle \\
-&+ \gamma \langle D \rangle (\langle D \rangle - 1) + \gamma_I \langle D \rangle \langle I \rangle + k_T D_{ext} \langle D \rangle \langle N \rangle - k_T N_{ext} \langle D \rangle^2 \\
-&- \langle D \rangle \cdot H^+(\langle I \rangle) - \langle D \rangle \cdot H^-(\langle I \rangle) - \gamma \langle D \rangle \langle N \rangle - \gamma \langle D \rangle^2 - \gamma_I \langle D \rangle \langle I \rangle - k_T D_{ext} \langle D \rangle \langle N \rangle \\
-&= H^-(\langle I \rangle) - \gamma \langle D \rangle - k_T N_{ext} \langle D \rangle^2
+\text{NICD decay:} &\quad \sum_{n,d,i} i \cdot P(n,d,i+1,t) \cdot \gamma_I(i+1) \approx \gamma_I \langle i \rangle (\langle i \rangle - 1) \\
+\text{NICD production:} &\quad \sum_{n,d,i} i \cdot P(n+1,d,i-1,t) \cdot k_T(n+1)D_{ext} \approx k_T D_{ext} \langle i \rangle \langle n \rangle + k_T D_{ext} \langle n \rangle \\
+\text{NICD degradation term:} &\quad -\gamma_I \langle i \rangle^2
 \end{align*}
 
-Making a final approximation that $\langle D \rangle^2 \approx \langle D \rangle$, we get:
-
-\[
-\frac{d\langle D \rangle}{dt} = H^-(\langle I \rangle) - \gamma \langle D \rangle - k_T N_{ext} \langle D \rangle
-\]
-
-Substituting the definition of $H^-(\langle I \rangle)$:
-
-\[
-\frac{d\langle D \rangle}{dt} = \frac{d_m}{d_0^2 + \langle I \rangle^2} - \gamma \langle D \rangle - k_T N_{ext} \langle D \rangle
-\]
-
-Which can be written as:
-
-\[
-\frac{dD}{dt} = \frac{d_m}{d_0^2 + I^2} - \gamma D - k_T N_{ext} D
-\]
-
-\textbf{Finally, we derive the ODE for NICD:}
-
+After simplification and cancellation of terms:
 \begin{align*}
-\frac{d\langle I \rangle}{dt} &= \frac{d}{dt}\sum_{n,d,i} i \cdot P(n,d,i,t) \\
-&= \sum_{n,d,i} i \cdot \frac{\partial P(n,d,i,t)}{\partial t}
-\end{align*}
-
-Let's analyse each term:
-
-\[
-\sum_{n,d,i} i \cdot P(n-1,d,i,t) \cdot H^+(i) = \langle I \cdot H^+(I) \rangle \approx \langle I \rangle \cdot H^+(\langle I \rangle)
-\]
-
-\[
-\sum_{n,d,i} i \cdot P(n,d-1,i,t) \cdot H^-(i) \approx \langle I \rangle \cdot H^-(\langle I \rangle)
-\]
-
-\[
-\sum_{n,d,i} i \cdot P(n+1,d,i,t) \cdot \gamma(n+1) \approx \gamma \langle I \rangle \langle N \rangle
-\]
-
-\[
-\sum_{n,d,i} i \cdot P(n,d+1,i,t) \cdot \gamma(d+1) \approx \gamma \langle I \rangle \langle D \rangle
-\]
-
-\[
-\sum_{n,d,i} i \cdot P(n,d,i+1,t) \cdot \gamma_I(i+1) \approx \gamma_I \langle I \rangle (\langle I \rangle - 1)
-\]
-
-\[
-\sum_{n,d,i} i \cdot P(n+1,d,i-1,t) \cdot k_T(n+1)D_{ext} \approx k_T D_{ext} \langle I \rangle \langle N \rangle + k_T D_{ext} \langle N \rangle
-\]
-
-Negative terms can be rewritten as:
-\begin{align*}
-&-\sum_{n,d,i} i \cdot P(n,d,i,t) \cdot [H^+(i) + H^-(i) + \gamma n + \gamma d + \gamma_I i + k_T n D_{ext}] \\
-&\approx -\langle I \rangle \cdot H^+(\langle I \rangle) - \langle I \rangle \cdot H^-(\langle I \rangle) - \gamma \langle I \rangle \langle N \rangle - \gamma \langle I \rangle \langle D \rangle - \gamma_I \langle I \rangle^2 - k_T D_{ext} \langle I \rangle \langle N \rangle
-\end{align*}
-
-Let's combine all terms for $\langle I \rangle$
-
-\begin{align*}
-\frac{d\langle I \rangle}{dt} &= \langle I \rangle \cdot H^+(\langle I \rangle) + \langle I \rangle \cdot H^-(\langle I \rangle) + \gamma \langle I \rangle \langle N \rangle + \gamma \langle I \rangle \langle D \rangle \\
-&+ \gamma_I \langle I \rangle (\langle I \rangle - 1) + k_T D_{ext} \langle I \rangle \langle N \rangle + k_T D_{ext} \langle N \rangle \\
-&- \langle I \rangle \cdot H^+(\langle I \rangle) - \langle I \rangle \cdot H^-(\langle I \rangle) - \gamma \langle I \rangle \langle N \rangle - \gamma \langle I \rangle \langle D \rangle - \gamma_I \langle I \rangle^2 - k_T D_{ext} \langle I \rangle \langle N \rangle \\
-\end{align*}
-
-Therefore, the ODE for $\langle I \rangle$ is:
-\[
-\frac{d\langle I \rangle}{dt} = k_T D_{ext} \langle N \rangle - \gamma_I \langle I \rangle
-\]
-
-Which can be written as:
-
-\[
-\frac{dI}{dt} = k_T D_{ext} N - \gamma_I I
-\]
-
-\subsection*{Final System of ODEs}
-
-Combining our three derived equations, we get the following system of ODEs:
-
-\begin{align*}
-\frac{dN}{dt} &= \frac{n_m I^2}{n_0^2 + I^2} - \gamma N - k_T D_{ext} N \\
-\frac{dD}{dt} &= \frac{d_m}{d_0^2 + I^2} - \gamma D - k_T N_{ext} D \\
-\frac{dI}{dt} &= k_T D_{ext} N - \gamma_I I
-\end{align*}
-
-This matches the system presented in section 3.6 of the document:
-
-\begin{align*}
-\frac{dN}{dt} &= \frac{n_m I^2}{n_0^2 + I^2} - k_T N D_{ext} - \gamma N \\
-\frac{dD}{dt} &= \frac{d_m}{d_0^2 + I^2} - k_T D N_{ext} - \gamma D \\
-\frac{dI}{dt} &= k_T N D_{ext} - \gamma_I I
+\frac{d\langle i \rangle}{dt} &= k_T D_{ext} \langle n \rangle - \gamma_I \langle i \rangle
 \end{align*}
 
 \subsection*{Mapping Between Probabilities and Rates}
