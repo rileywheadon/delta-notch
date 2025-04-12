@@ -101,7 +101,7 @@ We will also assume that there is no cis-inhibition and no Jagged ligand.
  \hline
  $N_{A} + D_{B} \rightarrow I_{A}$ & 
  $k_{T} N_{A}D_{B}$ &
- A Notch receptor from cell $A$ binds to a delta ligand from cell $B$, triggering the release of NICD in cell $A$. \\
+ A Notch receptor from cell $A$ binds to a Delta ligand from cell $B$, triggering the release of NICD in cell $A$. \\
  \hline
  $N_{A} \rightarrow \emptyset$ & 
  $\gamma N_{A}$ & 
@@ -531,38 +531,15 @@ We define the following expected values:
 \end{itemize}
 
 \subsection*{Key Assumptions}
-
 Throughout this derivation, we make the following assumptions:
-
 \begin{enumerate}
-  \item The standard deviation of the molecular counts is small compared to their mean values. Specifically:
-  \begin{itemize}
-    \item $\sqrt{\text{Var}(N)} \ll \langle n \rangle$
-    \item $\sqrt{\text{Var}(D)} \ll \langle d \rangle$
-    \item $\sqrt{\text{Var}(I)} \ll \langle i \rangle$
-  \end{itemize}
+  \item The standard deviation of molecular counts is small compared to their mean values, $\sqrt{\text{Var}(N)} \ll \langle n \rangle$, $\sqrt{\text{Var}(D)} \ll \langle d \rangle$, and $\sqrt{\text{Var}(I)} \ll \langle i \rangle$.
   
-  \item As a consequence of assumption 1, we can approximate:
-  \begin{itemize}
-    \item $\langle n^2 \rangle \approx \langle n \rangle^2$
-    \item $\langle d^2 \rangle \approx \langle d \rangle^2$
-    \item $\langle i^2 \rangle \approx \langle i \rangle^2$
-  \end{itemize}
+  \item The second moments can be approximated by the squares of the means, i.e., $\langle n^2 \rangle \approx \langle n \rangle^2$, $\langle d^2 \rangle \approx \langle d \rangle^2$, and $\langle i^2 \rangle \approx \langle i \rangle^2$.
   
-  \item The molecular counts are approximately independent, allowing us to factorize expected values:
-  \begin{itemize}
-    \item $\langle n \cdot d \rangle \approx \langle n \rangle \cdot \langle d \rangle$
-    \item $\langle n \cdot i \rangle \approx \langle n \rangle \cdot \langle i \rangle$
-    \item $\langle d \cdot i \rangle \approx \langle d \rangle \cdot \langle i \rangle$
-  \end{itemize}
+  \item Molecular counts are approximately independent, so that joint moments factorize, e.g., $\langle n \cdot d \rangle \approx \langle n \rangle \langle d \rangle$.
   
-  \item For functions $H^+$ and $H^-$, we approximate:
-  \begin{itemize}
-    \item $\langle H^+(i) \rangle \approx H^+(\langle i \rangle)$
-    \item $\langle H^-(i) \rangle \approx H^-(\langle i \rangle)$
-    \item $\langle n \cdot H^+(i) \rangle \approx \langle n \rangle \cdot H^+(\langle i \rangle)$
-    \item $\langle d \cdot H^-(i) \rangle \approx \langle d \rangle \cdot H^-(\langle i \rangle)$
-  \end{itemize}
+  \item For Hill functions $H^+$ and $H^-$, we approximate expectation values by evaluating the function at the mean, i.e., $\langle H(i) \rangle \approx H(\langle i \rangle)$, and similarly $\langle x \cdot H(i) \rangle \approx \langle x \rangle H(\langle i \rangle)$.
 \end{enumerate}
 
 \subsection*{Derivation of ODE for Expected Notch ($\langle n \rangle$)}
