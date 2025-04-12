@@ -231,7 +231,7 @@ See Figure \ref{fig:noise-estimate} for a summary of this result.
 
 All of the previous experiments were run using a fixed set of parameter values.
 However, in order to evaluate the quality of our model, we wanted to see if we could replicate the key result of cell differentiation under different parameter regimes.
-We identified five main parameters which effect whether the two-cell system differentiates.
+We identified five main parameters which determine whether the two-cell system differentiates.
 These parameters are the maximum rates of Notch and Delta production $n_{m}$ and $d_{m}$, the binding rate $k_{T}$, the Notch and Delta decay rate $\gamma$, and the NICD decay rate $\gamma_{I}$.
 Due to computational limitations, we could not perform a complete grid search of the $5$-dimensional parameter space.
 Instead, we opted to explore all $10$ of the $2$-dimensional subspaces of our parameter space.
@@ -246,18 +246,27 @@ The results of our stability analysis are shown in Figure \ref{fig:stability-ana
 \subsection*{Linear Domains}
 
 Collier et al. \cite{collier_pattern_1996} tested their model on linear domains of up to $40$ cells with zero-flux boundary conditions.
-They observed that cells on the boundary of the domain adopted the primary fate first.
+They observed that cells on the boundary of the domain adopted a fate first.
 Then, the alternating pattern of primary and secondary fated cells gradually spread inwards towards the center of the domain.
-In our first experiment on a linear domain, we replicated this result as shown in Figure.
+In our first experiment on a linear domain, we replicated this result as shown in Figure \ref{fig:linear-domain}. 
 
-% TODO: Add linear domain figure here.
+\begin{figure}[!htp]
+   \makebox[\textwidth][c]{\includegraphics[width=1.3\textwidth]{img/linear_heatmap_Gillespie_V1.png}}
+   \caption{
+Results of the agent-based model run on a linear domain with 7 cells using Dirichlet boundary conditions.
+The first subplot shows Notch molecules per cell over time.
+Since noise is introduced every time step, the cell trajectories exhibit Brownian motion-like behaviour and thus have been smoothed out for better legibility.
+The second plot also shows Notch levels over time but in this visualization it is easier to see how cells influence their neighbours and how the cells on the edge of the domain are first to differentiate.
+The third plot shows the final Notch pattern, where primary fate cells are orange (indicating low Notch) and secondary fate cells are green (indicating high Notch).} 
+   \label{fig:linear-domain}
+\end{figure}
 
 We also attempted to broadly classify the types of patterns we observed on linear domains.
-In order to do this, we first need to define the notion of a \emph{pattern}.
-Since the ``default'' or ``regular'' outcome of a simulation on a linear domain is an alternating array of cells with each fate, we will call this pattern $0: [],\, 1: []$.
+In order to do this, we needed to define the notion of a \emph{pattern}.
+Since the ``default'' outcome of a simulation on a linear domain is an alternating array of cells with each fate, we will call this pattern $0: [],\, 1: []$.
 Then, each contiguous group of cells with the same fate (where $0$ is the primary fate and $1$ is the secondary fate) will add entries to the pattern arrays.
 For example, if there are $2$ contiguous pairs of cells with the primary fate and $1$ contiguous triplet of cells with the secondary fate, the simulation will have the pattern $0: [2, 2], \, 1: [3]$. 
-There is a lot more nuance related to pattern formation that we didn't have time to explore, but one interesting result is shown in Table \ref{tb:patterns}.
+There is a lot more nuance related to pattern formation that we were unable to explore, but one interesting result is shown in Table \ref{tb:patterns}.
 
 \begin{table}[!htp]
 \centering
@@ -272,33 +281,67 @@ There is a lot more nuance related to pattern formation that we didn't have time
  \hline
 \end{tabular}
 \caption{
-  Frequency of selected cell patterns in $1000$ simulations of the agent-based model on $9$-cell (even) and $10$-cell (odd) domains with zero-flux boundary conditions. We observe significant variations in patterns across even and odd domains. Similarly drastic variation is observed across different modelling formalisms and boundary conditions (not shown).
+  Frequency of selected cell patterns in $1000$ simulations of the agent-based model on $9$-cell (even) and $10$-cell (odd) domains with zero-flux boundary conditions.
+  We observe significant variations in patterns across even and odd domains.
+  Similarly drastic variation is observed across different modelling formalisms and boundary conditions (not shown).
 }
 \label{tb:patterns}
 \end{table}
 
+Another phenomenon that we discovered, although we did not explore in detail, is that the SDE model was far more likely to allow for adjacent pairs of primary fate cells than the agent-based model when given identical parameter values and initial conditions.
+The agent-based model showed greater robustness to parameter change than the SDE model, as the general differentiation pattern noted by Collier et al. (shown in Figure \ref{fig:linear-domain}) could easily be disrupted by small adjustments to the binding coefficient $k_T$ or the Notch/Delta decay rate $\gamma$ leading to primary fate cell grouping.
+
 \subsection*{Hexagonal Domains}
 
-% TODO: Add results on hexagonal domains.
+Continuing to use the domains in Collier et al. \cite{collier_pattern_1996}, we next considered hexagonal grids of cells in a slanted parallelogram pattern. 
+We imposed both periodic and Dirichlet boundary conditions on these grids.
+In our simulations, we observed alternating patterns of primary fate cells appear on the $7$x$7$ grid (see Figure \ref{fig:hexagonal-domain}), especially for the agent-based model.
+Although the SDE model could replicate this same pattern depending on initial conditions, it was more likely to end up with pairs of adjacent low-notch cells.
+This behaviour was not noted by Collier et al. and points to some key differences between our models depending on the domain.
+
+\begin{figure}[!htp]
+   \makebox[\textwidth][c]{\includegraphics[width=1.3\textwidth]{img/HexDirichletPattern.png}}
+   \caption{Results of the agent-based model run on a hexagonal domain with 49 cells using Dirichlet boundary conditions. In this figure, black represents primary cell fate and white secondary cell fate. Although not all the secondary fated cells have the same Notch levels, this general pattern is stable long term with high Notch concentration around $300$ molecules.} 
+   \label{fig:hexagonal-domain}
+\end{figure}
+
+The patterns on the hexagonal domains also exhibited increased sensitivity to boundary conditions and parameter values.
+In particular, identical starting conditions and parameters would often lead to markedly different final patterns on domains with periodic and Dirichlet boundary conditions.
+Figure \ref{fig:hexagonal-compare} highlights some of these differences.
+Increasing $\gamma$ from $0$ to $0.03$ could leave final patterns showing homogeneous cell fate, isolated primary cells, or even striping behaviour.
+Similar to the linear domain, cells on the edge of the hexagonal domain tended to differentiate first, especially when using Dirichlet boundary conditions.
+
+\begin{figure}[!htp]
+   \makebox[\textwidth][c]{\includegraphics[width=1.3\textwidth]{img/Hex_Compare.png}}
+   \caption{Results of running the SDE model on 49 hexagonal cells, with identical initial conditions comparing periodic and Dirichlet boundary conditions. Cells are coloured black if the notch level is less than $1$ at the final time step and left white otherwise. The first row (A) uses $\gamma = 0.01$ while the second row (B) uses $\gamma = 0.02$. All other parameters are equal for these simulations. }
+   \label{fig:hexagonal-compare}
+\end{figure}
 
 \section*{Discussion}
 
-Our comparison of the ODE, SDE, and agent-based models highlights a clear trade-off between simplicity, accuracy to the biology, and the role of stochasticity in modelling Delta-Notch signalling.
-The ODE model is computationally efficient and easy to analyze, but it can only break symmetry with an initial perturbation.
+Our comparison of the ODE, SDE, and agent-based models highlights a clear trade-off between simplicity and accuracy in modelling Delta-Notch signalling.
+The ODE model is computationally efficient and easy to analyze, but can only break symmetry with an initial perturbation.
 In other words, stable cell differentiation only occurs when the initial conditions are already imbalanced.
-The SDE model, by introducing intrinsic noise, allows cells to break symmetry without perturbations.
-This behaviour closely mirrors the agent-based model, which captures randomness at the level of individual molecules and allows differentiation to emerge purely from fluctuations in the receptor-ligand dynamics.
-
-Simulations of the agent-based model revealed that it is difficult to control cell fate using initial state alone.
+Under the SDE model, the additional noise allows cells to break symmetry without perturbations.
+This behaviour closely mirrors the agent-based model, which captures randomness at the level of individual molecules.
+Although cell differentiation was easy to achieve with the stochastic models, controlling cell fate proved to be more challenging than we initially expected.
 Even when we imposed large initial perturbations in the two-cell system ($\pm 25\%$), the intended outcome only occurred about $80\%$ of the time.
+This result suggests that there are systemic biases in the Delta-Notch signalling pathway that induce specific fates in certain cells. 
+
+
 When comparing the SDE model to the agent-based model, we found that the differentiation time varied considerably depending on the noise coefficient $\sigma$.
 To ensure these two models produced consistent results, we carefully tuned the noise coefficient to an optimal value of $\sigma = 0.02$.
 Finally, we concluded our investigation of the two-cell domain with a stability analysis, which found that the ODE model is the most sensitive to changes in parameter values, especially the decay rates $\gamma$ and $\gamma_{I}$.
-On linear domains, all three models exhibited the behaviour described by Collier et al., with an alternating pattern of cell differentiation spreading inward from the edges.
-The ODE model generated clean, perfectly alternating patterns, consistent with its deterministic structure.
-The SDE model introduced occasional irregularities but largely preserved alternation.
-However, the agent-based model produced the most diverse outcomes — especially in small or oddly shaped domains — where patterns often deviated from strict alternation.
-This variability points to a key biological insight: while stochasticity provides flexibility and diversity in pattern formation, it can also make patterns less predictable, particularly in small systems or near critical parameter boundaries.
+On linear domains, all three models exhibited the behaviour described by Collier et al., with an approximately alternating pattern of cell differentiation spreading inward from the edges.
+However, the SDE model and the agent-based model deviated from perfect alternation in the majority of simulations.
+Furthermore, the deviations were different between the two models, as contiguous groups of primary fated cells almost never appeared in agent-based simulations but appeared frequently in simulations of the SDE model.
+This variability points to a key biological insight: while randomness provides flexibility and diversity in pattern formation, it can also make patterns less predictable, particularly in small systems or near critical parameter boundaries.
+
+Finally, we replicated the qualitative results of Collier et al. on two-dimensional hexagonal domains. 
+We also found that our models were more sensitive to changes in parameter values and boundary conditions on the hexagonal domain compared to the linear and two-cell domains.
+However, due to computational limitations and time constraints we were unable to do a more thorough analysis of the models' behaviour on the hexagonal domain.
+Generally, our results on all three domains show that the choice of modelling formalism can drastically influence the results of simulations.
+Therefore, we suggest that modellers should also investigate whether their results are stable across different formalisms (a ``model stability analysis'') whenever possible.
 
 \nocite{*}
 \printbibliography

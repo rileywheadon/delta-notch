@@ -1,12 +1,12 @@
 # Fdb version 4
-["biber paper"] 1744404003.33357 "paper.bcf" "paper.bbl" "paper" 1744408281.25185 0
-  "paper.bcf" 1744408281.05046 109673 1e29579398803d6c812922060f8ae60a "pdflatex"
+["biber paper"] 1744404003.33357 "paper.bcf" "paper.bbl" "paper" 1744424031.65244 0
+  "paper.bcf" 1744424031.54141 109749 6b37a036a912ae85d892ceacec77ea10 "pdflatex"
   "sources.bib" 1743042777.10462 9353 6ac92d38fdd57acae2bbabae4467adf4 ""
   (generated)
   "paper.bbl"
   "paper.blg"
   (rewritten before read)
-["pdflatex"] 1744408275.46042 "paper.tex" "paper.pdf" "paper" 1744408281.25249 0
+["pdflatex"] 1744424027.13138 "paper.tex" "paper.pdf" "paper" 1744424031.65275 0
   "/usr/share/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc" 1742685315 2900 1537cc8184ad1792082cd229ecc269f4 ""
   "/usr/share/texmf-dist/fonts/map/fontname/texfonts.map" 1742685315 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "/usr/share/texmf-dist/fonts/tfm/jknappen/ec/tcrm0900.tfm" 1742685315 1536 c4f439db76ef96a9c53bc437f35ffe20 ""
@@ -211,16 +211,19 @@
   "/usr/share/texmf-dist/web2c/texmf.cnf" 1742685315 42087 b0f9697c952c8f5a8eede4134282cb0d ""
   "/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map" 1743132438 5311557 9da84c45f5b388655502706482323571 ""
   "/var/lib/texmf/web2c/pdftex/pdflatex.fmt" 1743132357 2008247 6ddb1fa8af5b938e85980e88c606ff3d ""
+  "img/HexDirichletPattern.png" 1744421718.75679 519624 4889a5760691c910e40310a6930e76ce ""
+  "img/Hex_Compare.png" 1744421716.20677 77378 8f1af812e588a8b928c9c1209b5bf153 ""
+  "img/linear_heatmap_Gillespie_V1.png" 1744421721.88481 234880 fdac62d5304dfa9faee8becca4305474 ""
   "img/signalling-network.png" 1744402993.04144 96932 1cdd71722199413d09cb6507b785f373 ""
   "img/vis11_V2.png" 1744402291.32059 265309 38a47e647d866924fc2b1fee7d089b29 ""
   "img/vis12.png" 1743052722.57251 135208 e2a3a41c650e5bd9ed38317aabff57b0 ""
   "img/vis123.png" 1743972819.81605 1245043 9a797ac2165f48abe59a2793a5a37cad ""
   "img/vis13.png" 1743978535.54803 653703 cbe9b4bf5913dfa271eaa2432366d8bb ""
-  "paper.aux" 1744408281.04546 12339 3e60d5dcd53f2e6e82d9bab5a3d7ea89 "pdflatex"
+  "paper.aux" 1744424031.53841 15806 9b1f902cf9345002a206320c056b2819 "pdflatex"
   "paper.bbl" 1744404004.62633 17111 d4d75f3176eec15f001fb76dd06cd1c6 "biber paper"
-  "paper.out" 1744408281.04646 661 15105aeb3e6f24dab05889d745e7ffce "pdflatex"
-  "paper.run.xml" 1744408281.05354 2309 89f93da09bc1f9b75cae122e26edfc57 "pdflatex"
-  "paper.tex" 1744408274.37997 48038 1fb376cb9bb3d15baba8eb5e5d760237 ""
+  "paper.out" 1744424031.54041 661 15105aeb3e6f24dab05889d745e7ffce "pdflatex"
+  "paper.run.xml" 1744424031.54315 2309 89f93da09bc1f9b75cae122e26edfc57 "pdflatex"
+  "paper.tex" 1744424025.22238 52676 8dbda75e374c97cca451cb42012dfe57 ""
   (generated)
   "paper.aux"
   "paper.bcf"
